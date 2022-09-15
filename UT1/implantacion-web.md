@@ -10,6 +10,8 @@
   - [¿Qué necesito para montar un servidor web?](#qué-necesito-para-montar-un-servidor-web)
 - [Instalación y configuración básica de un servidor web](#instalación-y-configuración-básica-de-un-servidor-web)
   - [Instalación](#instalación)
+- [Servidores de aplicaciones](#servidores-de-aplicaciones)
+  - [PHP](#php)
 
 ## La arquitectura web y algunos modelos
 
@@ -290,10 +292,19 @@ Upgrading binary: nginx.
 Configurando nginx (1.18.0-6.1+deb11u2) ...
 Procesando disparadores para man-db (2.9.4-2) ...
 Procesando disparadores para libc-bin (2.31-13+deb11u4) ...
-sdelquin@lemon:~$
 ```
 
-Con esto, en principio, debería estar instalado el servidor web **Nginx**. Podemos comprobarlo con el siguiente comando:
+Con esto, en principio, ya debería estar instalado el servidor web **Nginx**. Para obtener las características de la versión instalada, podemos ejecutar:
+
+```console
+sdelquin@lemon:~$ sudo nginx -V
+nginx version: nginx/1.18.0
+built with OpenSSL 1.1.1n  15 Mar 2022
+TLS SNI support enabled
+configure arguments: --with-cc-opt='-g -O2 -ffile-prefix-map=/build/nginx-vNp64q/nginx-1.18.0=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -fPIC' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --modules-path=/usr/lib/nginx/modules --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-compat --with-debug --with-pcre-jit --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --with-http_v2_module --with-http_dav_module --with-http_slice_module --with-threads --with-http_addition_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_sub_module
+```
+
+Igualmente podemos comprobar que el servicio está corriendo correctamente mediante [systemd](https://wiki.debian.org/systemd):
 
 ```console
 sdelquin@lemon:~$ sudo systemctl status nginx
@@ -323,3 +334,259 @@ sdelquin@lemon:~$ firefox localhost
 ```
 
 ![Nginx Hello](files/nginx-hello.png)
+
+Del mismo modo podremos acceder a http://127.0.0.1 (ip para localhost):
+
+```console
+sdelquin@lemon:~$ firefox 127.0.0.1
+```
+
+![Nginx Hello 127](files/nginx-hello-127.png)
+
+> Dado que Nginx se instala como servicio, ya queda configurado para autoarrancarse. Eso significa que si reiniciamos el equipo, podemos comprobar que el servidor web volverá a levantarse tras cada arranque.
+
+## Servidores de aplicaciones
+
+Un servidor de aplicaciones es un paquete software que proporciona servicios a las aplicaciones como pueden ser seguridad, servicios de datos, soporte para transacciones, balanceo de carga y gestión de sistemas distribuidos.
+
+El funcionamiento de un servidor de aplicaciones necesita de un servidor web. Muchas veces vienen en el mismo paquete, pero realmente son dos partes diferenciadas.
+
+Cuando un cliente hace una petición al servidor web, este trata de gestionarlo, pero hay muchos elementos con los que no sabe qué hacer. Aquí entra en juego el servidor de aplicaciones, que descarga al servidor web de la gestión de determinados tipos de archivo.
+
+### PHP
+
+[PHP](https://www.php.net/) es un lenguaje de "scripting" muy enfocado a la programación web (aunque no únicamente) y permite desarrollar aplicaciones integradas en el propio código HTML.
+
+El servidor de aplicación que se utiliza para PHP es [PHP-FPM](https://www.php.net/manual/es/install.fpm.php). Se encarga de manejar los procesos [FastCGI](https://es.wikipedia.org/wiki/FastCGI), un protocolo para interconectar programas interactivos con un servidor web.
+
+Para **instalar PHP-FPM** ejecutamos el siguiente comando:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y php-fpm
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+Leyendo la información de estado... Hecho
+Se instalarán los siguientes paquetes adicionales:
+  php-common php7.4-cli php7.4-common php7.4-fpm php7.4-json php7.4-opcache php7.4-readline
+Paquetes sugeridos:
+  php-pear
+Se instalarán los siguientes paquetes NUEVOS:
+  php-common php-fpm php7.4-cli php7.4-common php7.4-fpm php7.4-json php7.4-opcache php7.4-readline
+0 actualizados, 8 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
+Se necesita descargar 3.845 kB de archivos.
+Se utilizarán 17,9 MB de espacio de disco adicional después de esta operación.
+Des:1 http://deb.debian.org/debian bullseye/main arm64 php-common all 2:76 [15,6 kB]
+Des:2 http://deb.debian.org/debian bullseye/main arm64 php7.4-common arm64 7.4.30-1+deb11u1 [1.000 kB]
+Des:3 http://deb.debian.org/debian bullseye/main arm64 php7.4-json arm64 7.4.30-1+deb11u1 [18,2 kB]
+Des:4 http://deb.debian.org/debian bullseye/main arm64 php7.4-opcache arm64 7.4.30-1+deb11u1 [179 kB]
+Des:5 http://deb.debian.org/debian bullseye/main arm64 php7.4-readline arm64 7.4.30-1+deb11u1 [11,6 kB]
+Des:6 http://deb.debian.org/debian bullseye/main arm64 php7.4-cli arm64 7.4.30-1+deb11u1 [1.302 kB]
+Des:7 http://deb.debian.org/debian bullseye/main arm64 php7.4-fpm arm64 7.4.30-1+deb11u1 [1.313 kB]
+Des:8 http://deb.debian.org/debian bullseye/main arm64 php-fpm all 2:7.4+76 [6.424 B]
+Descargados 3.845 kB en 0s (9.465 kB/s)
+Seleccionando el paquete php-common previamente no seleccionado.
+(Leyendo la base de datos ... 220357 ficheros o directorios instalados actualmente.)
+Preparando para desempaquetar .../0-php-common_2%3a76_all.deb ...
+Desempaquetando php-common (2:76) ...
+Seleccionando el paquete php7.4-common previamente no seleccionado.
+Preparando para desempaquetar .../1-php7.4-common_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-common (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php7.4-json previamente no seleccionado.
+Preparando para desempaquetar .../2-php7.4-json_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-json (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php7.4-opcache previamente no seleccionado.
+Preparando para desempaquetar .../3-php7.4-opcache_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-opcache (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php7.4-readline previamente no seleccionado.
+Preparando para desempaquetar .../4-php7.4-readline_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-readline (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php7.4-cli previamente no seleccionado.
+Preparando para desempaquetar .../5-php7.4-cli_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-cli (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php7.4-fpm previamente no seleccionado.
+Preparando para desempaquetar .../6-php7.4-fpm_7.4.30-1+deb11u1_arm64.deb ...
+Desempaquetando php7.4-fpm (7.4.30-1+deb11u1) ...
+Seleccionando el paquete php-fpm previamente no seleccionado.
+Preparando para desempaquetar .../7-php-fpm_2%3a7.4+76_all.deb ...
+Desempaquetando php-fpm (2:7.4+76) ...
+Configurando php-common (2:76) ...
+Created symlink /etc/systemd/system/timers.target.wants/phpsessionclean.timer → /lib/systemd/system/phpsession
+clean.timer.
+Configurando php7.4-common (7.4.30-1+deb11u1) ...
+
+Creating config file /etc/php/7.4/mods-available/calendar.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/ctype.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/exif.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/fileinfo.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/ffi.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/ftp.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/gettext.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/iconv.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/pdo.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/phar.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/posix.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/shmop.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/sockets.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/sysvmsg.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/sysvsem.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/sysvshm.ini with new version
+
+Creating config file /etc/php/7.4/mods-available/tokenizer.ini with new version
+Configurando php7.4-readline (7.4.30-1+deb11u1) ...
+
+Creating config file /etc/php/7.4/mods-available/readline.ini with new version
+Configurando php7.4-opcache (7.4.30-1+deb11u1) ...
+
+Creating config file /etc/php/7.4/mods-available/opcache.ini with new version
+Configurando php7.4-json (7.4.30-1+deb11u1) ...
+
+Creating config file /etc/php/7.4/mods-available/json.ini with new version
+Configurando php7.4-cli (7.4.30-1+deb11u1) ...
+update-alternatives: utilizando /usr/bin/php7.4 para proveer /usr/bin/php (php) en modo automático
+update-alternatives: utilizando /usr/bin/phar7.4 para proveer /usr/bin/phar (phar) en modo automático
+update-alternatives: utilizando /usr/bin/phar.phar7.4 para proveer /usr/bin/phar.phar (phar.phar) en modo auto
+mático
+
+Creating config file /etc/php/7.4/cli/php.ini with new version
+Configurando php7.4-fpm (7.4.30-1+deb11u1) ...
+
+Creating config file /etc/php/7.4/fpm/php.ini with new version
+Created symlink /etc/systemd/system/multi-user.target.wants/php7.4-fpm.service → /lib/systemd/system/php7.4-fp
+m.service.
+Configurando php-fpm (2:7.4+76) ...
+Procesando disparadores para man-db (2.9.4-2) ...
+Procesando disparadores para php7.4-cli (7.4.30-1+deb11u1) ...
+Procesando disparadores para php7.4-fpm (7.4.30-1+deb11u1) ...
+```
+
+Dado que PHP-FPM se instala en el sistema como un **servicio**, podemos comprobar su estado utilizando systemd:
+
+```console
+sdelquin@lemon:~$ sudo systemctl status php7.4-fpm
+● php7.4-fpm.service - The PHP 7.4 FastCGI Process Manager
+     Loaded: loaded (/lib/systemd/system/php7.4-fpm.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2022-09-15 10:49:39 WEST; 26min ago
+       Docs: man:php-fpm7.4(8)
+    Process: 25991 ExecStartPost=/usr/lib/php/php-fpm-socket-helper install /run/php/php-fpm.sock /etc/php/7.>
+   Main PID: 25988 (php-fpm7.4)
+     Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
+      Tasks: 3 (limit: 2251)
+     Memory: 8.5M
+        CPU: 125ms
+     CGroup: /system.slice/php7.4-fpm.service
+             ├─25988 php-fpm: master process (/etc/php/7.4/fpm/php-fpm.conf)
+             ├─25989 php-fpm: pool www
+             └─25990 php-fpm: pool www
+
+sep 15 10:49:39 lemon systemd[1]: php7.4-fpm.service: Succeeded.
+sep 15 10:49:39 lemon systemd[1]: Stopped The PHP 7.4 FastCGI Process Manager.
+sep 15 10:49:39 lemon systemd[1]: Starting The PHP 7.4 FastCGI Process Manager...
+sep 15 10:49:39 lemon systemd[1]: Started The PHP 7.4 FastCGI Process Manager.
+```
+
+Con esta instalación, también hemos instalado el propio **intéprete PHP** para ejecutar programas:
+
+```console
+sdelquin@lemon:~$ php --version
+PHP 7.4.30 (cli) (built: Jul  7 2022 15:51:43) ( NTS )
+Copyright (c) The PHP Group
+Zend Engine v3.4.0, Copyright (c) Zend Technologies
+    with Zend OPcache v7.4.30, Copyright (c), by Zend Technologies
+```
+
+Podemos probar que funciona bien ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
+
+```console
+sdelquin@lemon:~$ php -r "echo gethostname();"
+lemon
+```
+
+#### Habilitando PHP en Nginx <!-- omit in TOC -->
+
+Nginx es un servidor web que sirve ficheros pero "no sabe" manejar código escrito en PHP (u otros lenguajes). Es por ello que necesitamos un procesador (servidor de aplicación) como PHP-FPM.
+
+Para habilitar la comunicación entre Nginx y PHP-FPM debemos editar el siguiente fichero de configuración:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/sites-enabled/default
+```
+
+Y modificar lo siguiente:
+
+```nginx
+...
+...
+44         index index.php index.html index.htm index.nginx-debian.html;
+...
+...
+56         location ~ \.php$ {
+57                 include snippets/fastcgi-php.conf;
+58
+59                 # With php-fpm (or other unix sockets):
+60                 fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+61                 # With php-cgi (or other tcp sockets):
+62                 # fastcgi_pass 127.0.0.1:9000;
+63         }
+...
+...
+68         location ~ /\.ht {
+69                 deny all;
+70         }
+```
+
+Podemos comprobar que la sintaxis del fichero de configuración es correcta utilizando Nginx:
+
+```console
+sdelquin@lemon:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+Ahora recargamos la configuración que hemos modificado:
+
+```console
+sdelquin@lemon:~$ sudo systemctl reload nginx
+```
+
+#### Primera aplicación web en PHP <!-- omit in TOC -->
+
+Creamos un fichero PHP que contendrá un sencillo código mostrando la información de la instalación:
+
+```console
+sdelquin@lemon:~$ cd
+sdelquin@lemon:~$ mkdir dev
+sdelquin@lemon:~$ echo "<?php phpinfo(); ?>" > ~/dev/info.php
+```
+
+Ahora enlazamos este fichero desde la carpeta "root" del servidor web Nginx:
+
+```console
+sdelquin@lemon:~$ sudo ln -s ~/dev/info.php /var/www/html/
+sdelquin@lemon:~$ ls -l /var/www/html/
+total 4
+-rw-r--r-- 1 root root 612 sep 15 09:26 index.nginx-debian.html
+lrwxrwxrwx 1 root root  27 sep 15 12:06 info.php -> /home/sdelquin/dev/info.php
+```
+
+Abrimos un navegador en la ruta especificada y vemos el resultado:
+
+```console
+sdelquin@lemon:~$ firefox localhost/info.php
+```
+
+![PHP info](files/php-info.png)
