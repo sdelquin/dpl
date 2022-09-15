@@ -9,6 +9,7 @@
   - [Alternativas](#alternativas)
   - [¿Qué necesito para montar un servidor web?](#qué-necesito-para-montar-un-servidor-web)
 - [Instalación y configuración básica de un servidor web](#instalación-y-configuración-básica-de-un-servidor-web)
+  - [Instalación](#instalación)
 
 ## La arquitectura web y algunos modelos
 
@@ -172,6 +173,8 @@ Nginx destaca sobre otros servidores porque:
 
 Lo más "habitual" sería instalar Nginx en un sistema operativo de tipo servidor pero por motivos didácticos, vamos a instalarlo en una versión estándar con interfaz gráfica. Es menos seguro por lo que en un sistema en producción deberíamos optar por la otra opción. A pesar de usar un Linux con interfaz gráfica vamos a instalar todo desde la ventana de terminal, por lo que los pasos se podrán aplicar a un servidor.
 
+### Instalación
+
 Lo primero será actualizar el listado de paquetes:
 
 ```console
@@ -192,3 +195,131 @@ Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
+
+A continuación instalaremos el paquete `nginx`:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y nginx
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+Leyendo la información de estado... Hecho
+Se instalarán los siguientes paquetes adicionales:
+  geoip-database libgeoip1 libnginx-mod-http-geoip
+  libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter
+  libnginx-mod-mail libnginx-mod-stream libnginx-mod-stream-geoip nginx-common
+  nginx-core
+Paquetes sugeridos:
+  geoip-bin fcgiwrap nginx-doc
+Se instalarán los siguientes paquetes NUEVOS:
+  geoip-database libgeoip1 libnginx-mod-http-geoip
+  libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter
+  libnginx-mod-mail libnginx-mod-stream libnginx-mod-stream-geoip nginx
+  nginx-common nginx-core
+0 actualizados, 11 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
+Se necesita descargar 4.507 kB de archivos.
+Se utilizarán 13,3 MB de espacio de disco adicional después de esta operación.
+Des:1 http://deb.debian.org/debian bullseye/main arm64 geoip-database all 20191224-3 [3.032 kB]
+Des:2 http://deb.debian.org/debian bullseye/main arm64 libgeoip1 arm64 1.6.12-7 [90,7 kB]
+Des:3 http://deb.debian.org/debian bullseye/main arm64 nginx-common all 1.18.0-6.1+deb11u2 [126 kB]
+Des:4 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-geoip arm64 1.18.0-6.1+deb11u2 [98,2 kB]
+Des:5 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-image-filter arm64 1.18.0-6.1+deb11u2 [102 kB]
+Des:6 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-xslt-filter arm64 1.18.0-6.1+deb11u2 [100 kB]
+Des:7 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-mail arm64 1.18.0-6.1+deb11u2 [127 kB]
+Des:8 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-stream arm64 1.18.0-6.1+deb11u2 [151 kB]
+Des:9 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-stream-geoip arm64 1.18.0-6.1+deb11u2 [97,4 kB]
+Des:10 http://deb.debian.org/debian bullseye/main arm64 nginx-core arm64 1.18.0-6.1+deb11u2 [490 kB]
+Des:11 http://deb.debian.org/debian bullseye/main arm64 nginx all 1.18.0-6.1+deb11u2 [92,9 kB]
+Descargados 4.507 kB en 0s (9.951 kB/s)
+Preconfigurando paquetes ...
+Seleccionando el paquete geoip-database previamente no seleccionado.
+(Leyendo la base de datos ... 220164 ficheros o directorios instalados actualmen
+te.)
+Preparando para desempaquetar .../00-geoip-database_20191224-3_all.deb ...
+Desempaquetando geoip-database (20191224-3) ...
+Seleccionando el paquete libgeoip1:arm64 previamente no seleccionado.
+Preparando para desempaquetar .../01-libgeoip1_1.6.12-7_arm64.deb ...
+Desempaquetando libgeoip1:arm64 (1.6.12-7) ...
+Seleccionando el paquete nginx-common previamente no seleccionado.
+Preparando para desempaquetar .../02-nginx-common_1.18.0-6.1+deb11u2_all.deb ...
+Desempaquetando nginx-common (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-http-geoip previamente no seleccionado.
+Preparando para desempaquetar .../03-libnginx-mod-http-geoip_1.18.0-6.1+deb11u2_
+arm64.deb ...
+Desempaquetando libnginx-mod-http-geoip (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-http-image-filter previamente no seleccion
+ado.
+Preparando para desempaquetar .../04-libnginx-mod-http-image-filter_1.18.0-6.1+d
+eb11u2_arm64.deb ...
+Desempaquetando libnginx-mod-http-image-filter (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-http-xslt-filter previamente no selecciona
+do.
+Preparando para desempaquetar .../05-libnginx-mod-http-xslt-filter_1.18.0-6.1+de
+b11u2_arm64.deb ...
+Desempaquetando libnginx-mod-http-xslt-filter (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-mail previamente no seleccionado.
+Preparando para desempaquetar .../06-libnginx-mod-mail_1.18.0-6.1+deb11u2_arm64.
+deb ...
+Desempaquetando libnginx-mod-mail (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-stream previamente no seleccionado.
+Preparando para desempaquetar .../07-libnginx-mod-stream_1.18.0-6.1+deb11u2_arm6
+4.deb ...
+Desempaquetando libnginx-mod-stream (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete libnginx-mod-stream-geoip previamente no seleccionado.
+Preparando para desempaquetar .../08-libnginx-mod-stream-geoip_1.18.0-6.1+deb11u
+2_arm64.deb ...
+Desempaquetando libnginx-mod-stream-geoip (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete nginx-core previamente no seleccionado.
+Preparando para desempaquetar .../09-nginx-core_1.18.0-6.1+deb11u2_arm64.deb ...
+Desempaquetando nginx-core (1.18.0-6.1+deb11u2) ...
+Seleccionando el paquete nginx previamente no seleccionado.
+Preparando para desempaquetar .../10-nginx_1.18.0-6.1+deb11u2_all.deb ...
+Desempaquetando nginx (1.18.0-6.1+deb11u2) ...
+Configurando nginx-common (1.18.0-6.1+deb11u2) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service → /lib
+/systemd/system/nginx.service.
+Configurando libnginx-mod-http-xslt-filter (1.18.0-6.1+deb11u2) ...
+Configurando libgeoip1:arm64 (1.6.12-7) ...
+Configurando geoip-database (20191224-3) ...
+Configurando libnginx-mod-mail (1.18.0-6.1+deb11u2) ...
+Configurando libnginx-mod-http-image-filter (1.18.0-6.1+deb11u2) ...
+Configurando libnginx-mod-stream (1.18.0-6.1+deb11u2) ...
+Configurando libnginx-mod-stream-geoip (1.18.0-6.1+deb11u2) ...
+Configurando libnginx-mod-http-geoip (1.18.0-6.1+deb11u2) ...
+Configurando nginx-core (1.18.0-6.1+deb11u2) ...
+Upgrading binary: nginx.
+Configurando nginx (1.18.0-6.1+deb11u2) ...
+Procesando disparadores para man-db (2.9.4-2) ...
+Procesando disparadores para libc-bin (2.31-13+deb11u4) ...
+sdelquin@lemon:~$
+```
+
+Con esto, en principio, debería estar instalado el servidor web **Nginx**. Podemos comprobarlo con el siguiente comando:
+
+```console
+sdelquin@lemon:~$ sudo systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2022-09-15 09:26:18 WEST; 6min ago
+       Docs: man:nginx(8)
+    Process: 6233 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/>
+    Process: 6234 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 6316 (nginx)
+      Tasks: 3 (limit: 2251)
+     Memory: 3.9M
+        CPU: 14ms
+     CGroup: /system.slice/nginx.service
+             ├─6316 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+             ├─6319 nginx: worker process
+             └─6320 nginx: worker process
+
+sep 15 09:26:18 lemon systemd[1]: Starting A high performance web server and a reverse proxy server...
+sep 15 09:26:18 lemon systemd[1]: Started A high performance web server and a reverse proxy server.
+```
+
+Para comprobar nuestra instalación de **Nginx**, accedemos a http://localhost:
+
+```console
+sdelquin@lemon:~$ firefox localhost
+```
+
+![Nginx Hello](files/nginx-hello.png)
