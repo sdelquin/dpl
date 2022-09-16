@@ -353,160 +353,92 @@ El funcionamiento de un servidor de aplicaciones necesita de un servidor web. Mu
 
 Cuando un cliente hace una petición al servidor web, este trata de gestionarlo, pero hay muchos elementos con los que no sabe qué hacer. Aquí entra en juego el servidor de aplicaciones, que descarga al servidor web de la gestión de determinados tipos de archivo.
 
+A continuación veremos el despliegue de una aplicación PHP como ejemplo de servidor de aplicaciones.
+
 ### PHP
 
 [PHP](https://www.php.net/) es un lenguaje de "scripting" muy enfocado a la programación web (aunque no únicamente) y permite desarrollar aplicaciones integradas en el propio código HTML.
 
 El servidor de aplicación que se utiliza para PHP es [PHP-FPM](https://www.php.net/manual/es/install.fpm.php). Se encarga de manejar los procesos [FastCGI](https://es.wikipedia.org/wiki/FastCGI), un protocolo para interconectar programas interactivos con un servidor web.
 
-Para **instalar PHP-FPM** ejecutamos el siguiente comando:
+Para **instalar PHP-FPM** seguiremos los pasos indicados.
+
+En primer lugar debemos instalar algunos prerrequisitos:
 
 ```console
-sdelquin@lemon:~$ sudo apt install -y php-fpm
+sdelquin@lemon:~$ sudo apt update
+sdelquin@lemon:~$ sudo apt install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
+...
+...
+```
+
+Añadimos el repositorio (externo) desde donde descargarnos la última versión de PHP-FPM:
+
+```console
+sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+```
+
+Importamos la clave [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del repositorio:
+
+```console
+sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg| sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+```
+
+Confirmamos que el repositorio está funcionando tras actualizar las fuentes:
+
+```console
+sdelquin@lemon:~$ sudo apt update
+Obj:1 http://deb.debian.org/debian bullseye InRelease
+Obj:2 http://security.debian.org/debian-security bullseye-security InRelease
+Obj:3 http://deb.debian.org/debian bullseye-updates InRelease
+Obj:4 http://packages.microsoft.com/repos/code stable InRelease
+Obj:5 https://packages.sury.org/php bullseye InRelease
 Leyendo lista de paquetes... Hecho
 Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
-Se instalarán los siguientes paquetes adicionales:
-  php-common php7.4-cli php7.4-common php7.4-fpm php7.4-json php7.4-opcache php7.4-readline
-Paquetes sugeridos:
-  php-pear
-Se instalarán los siguientes paquetes NUEVOS:
-  php-common php-fpm php7.4-cli php7.4-common php7.4-fpm php7.4-json php7.4-opcache php7.4-readline
-0 actualizados, 8 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
-Se necesita descargar 3.845 kB de archivos.
-Se utilizarán 17,9 MB de espacio de disco adicional después de esta operación.
-Des:1 http://deb.debian.org/debian bullseye/main arm64 php-common all 2:76 [15,6 kB]
-Des:2 http://deb.debian.org/debian bullseye/main arm64 php7.4-common arm64 7.4.30-1+deb11u1 [1.000 kB]
-Des:3 http://deb.debian.org/debian bullseye/main arm64 php7.4-json arm64 7.4.30-1+deb11u1 [18,2 kB]
-Des:4 http://deb.debian.org/debian bullseye/main arm64 php7.4-opcache arm64 7.4.30-1+deb11u1 [179 kB]
-Des:5 http://deb.debian.org/debian bullseye/main arm64 php7.4-readline arm64 7.4.30-1+deb11u1 [11,6 kB]
-Des:6 http://deb.debian.org/debian bullseye/main arm64 php7.4-cli arm64 7.4.30-1+deb11u1 [1.302 kB]
-Des:7 http://deb.debian.org/debian bullseye/main arm64 php7.4-fpm arm64 7.4.30-1+deb11u1 [1.313 kB]
-Des:8 http://deb.debian.org/debian bullseye/main arm64 php-fpm all 2:7.4+76 [6.424 B]
-Descargados 3.845 kB en 0s (9.465 kB/s)
-Seleccionando el paquete php-common previamente no seleccionado.
-(Leyendo la base de datos ... 220357 ficheros o directorios instalados actualmente.)
-Preparando para desempaquetar .../0-php-common_2%3a76_all.deb ...
-Desempaquetando php-common (2:76) ...
-Seleccionando el paquete php7.4-common previamente no seleccionado.
-Preparando para desempaquetar .../1-php7.4-common_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-common (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php7.4-json previamente no seleccionado.
-Preparando para desempaquetar .../2-php7.4-json_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-json (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php7.4-opcache previamente no seleccionado.
-Preparando para desempaquetar .../3-php7.4-opcache_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-opcache (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php7.4-readline previamente no seleccionado.
-Preparando para desempaquetar .../4-php7.4-readline_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-readline (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php7.4-cli previamente no seleccionado.
-Preparando para desempaquetar .../5-php7.4-cli_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-cli (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php7.4-fpm previamente no seleccionado.
-Preparando para desempaquetar .../6-php7.4-fpm_7.4.30-1+deb11u1_arm64.deb ...
-Desempaquetando php7.4-fpm (7.4.30-1+deb11u1) ...
-Seleccionando el paquete php-fpm previamente no seleccionado.
-Preparando para desempaquetar .../7-php-fpm_2%3a7.4+76_all.deb ...
-Desempaquetando php-fpm (2:7.4+76) ...
-Configurando php-common (2:76) ...
-Created symlink /etc/systemd/system/timers.target.wants/phpsessionclean.timer → /lib/systemd/system/phpsession
-clean.timer.
-Configurando php7.4-common (7.4.30-1+deb11u1) ...
+Todos los paquetes están actualizados.
+```
 
-Creating config file /etc/php/7.4/mods-available/calendar.ini with new version
+Ahora ya podemos instalar PHP-FPM:
 
-Creating config file /etc/php/7.4/mods-available/ctype.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/exif.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/fileinfo.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/ffi.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/ftp.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/gettext.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/iconv.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/pdo.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/phar.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/posix.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/shmop.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/sockets.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/sysvmsg.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/sysvsem.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/sysvshm.ini with new version
-
-Creating config file /etc/php/7.4/mods-available/tokenizer.ini with new version
-Configurando php7.4-readline (7.4.30-1+deb11u1) ...
-
-Creating config file /etc/php/7.4/mods-available/readline.ini with new version
-Configurando php7.4-opcache (7.4.30-1+deb11u1) ...
-
-Creating config file /etc/php/7.4/mods-available/opcache.ini with new version
-Configurando php7.4-json (7.4.30-1+deb11u1) ...
-
-Creating config file /etc/php/7.4/mods-available/json.ini with new version
-Configurando php7.4-cli (7.4.30-1+deb11u1) ...
-update-alternatives: utilizando /usr/bin/php7.4 para proveer /usr/bin/php (php) en modo automático
-update-alternatives: utilizando /usr/bin/phar7.4 para proveer /usr/bin/phar (phar) en modo automático
-update-alternatives: utilizando /usr/bin/phar.phar7.4 para proveer /usr/bin/phar.phar (phar.phar) en modo auto
-mático
-
-Creating config file /etc/php/7.4/cli/php.ini with new version
-Configurando php7.4-fpm (7.4.30-1+deb11u1) ...
-
-Creating config file /etc/php/7.4/fpm/php.ini with new version
-Created symlink /etc/systemd/system/multi-user.target.wants/php7.4-fpm.service → /lib/systemd/system/php7.4-fp
-m.service.
-Configurando php-fpm (2:7.4+76) ...
-Procesando disparadores para man-db (2.9.4-2) ...
-Procesando disparadores para php7.4-cli (7.4.30-1+deb11u1) ...
-Procesando disparadores para php7.4-fpm (7.4.30-1+deb11u1) ...
+```console
+sdelquin@lemon:~$ sudo apt install -y php8.1-fpm
+...
+...
+...
 ```
 
 Dado que PHP-FPM se instala en el sistema como un **servicio**, podemos comprobar su estado utilizando systemd:
 
 ```console
-sdelquin@lemon:~$ sudo systemctl status php7.4-fpm
-● php7.4-fpm.service - The PHP 7.4 FastCGI Process Manager
-     Loaded: loaded (/lib/systemd/system/php7.4-fpm.service; enabled; vendor preset: enabled)
-     Active: active (running) since Thu 2022-09-15 10:49:39 WEST; 26min ago
-       Docs: man:php-fpm7.4(8)
-    Process: 25991 ExecStartPost=/usr/lib/php/php-fpm-socket-helper install /run/php/php-fpm.sock /etc/php/7.>
-   Main PID: 25988 (php-fpm7.4)
-     Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
+sdelquin@lemon:~$ sudo systemctl status php8.1-fpm
+● php8.1-fpm.service - The PHP 8.1 FastCGI Process Manager
+     Loaded: loaded (/lib/systemd/system/php8.1-fpm.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2022-09-16 11:38:52 WEST; 39min ago
+       Docs: man:php-fpm8.1(8)
+    Process: 73647 ExecStartPost=/usr/lib/php/php-fpm-socket-helper install /run/php/php-fpm.sock /etc/php/8>
+   Main PID: 73644 (php-fpm8.1)
+     Status: "Processes active: 0, idle: 2, Requests: 1, slow: 0, Traffic: 0req/sec"
       Tasks: 3 (limit: 2251)
-     Memory: 8.5M
-        CPU: 125ms
-     CGroup: /system.slice/php7.4-fpm.service
-             ├─25988 php-fpm: master process (/etc/php/7.4/fpm/php-fpm.conf)
-             ├─25989 php-fpm: pool www
-             └─25990 php-fpm: pool www
+     Memory: 9.4M
+        CPU: 181ms
+     CGroup: /system.slice/php8.1-fpm.service
+             ├─73644 php-fpm: master process (/etc/php/8.1/fpm/php-fpm.conf)
+             ├─73645 php-fpm: pool www
+             └─73646 php-fpm: pool www
 
-sep 15 10:49:39 lemon systemd[1]: php7.4-fpm.service: Succeeded.
-sep 15 10:49:39 lemon systemd[1]: Stopped The PHP 7.4 FastCGI Process Manager.
-sep 15 10:49:39 lemon systemd[1]: Starting The PHP 7.4 FastCGI Process Manager...
-sep 15 10:49:39 lemon systemd[1]: Started The PHP 7.4 FastCGI Process Manager.
+sep 16 11:38:52 lemon systemd[1]: Starting The PHP 8.1 FastCGI Process Manager...
+sep 16 11:38:52 lemon systemd[1]: Started The PHP 8.1 FastCGI Process Manager.
 ```
 
 Con esta instalación, también hemos instalado el propio **intéprete PHP** para ejecutar programas:
 
 ```console
 sdelquin@lemon:~$ php --version
-PHP 7.4.30 (cli) (built: Jul  7 2022 15:51:43) ( NTS )
+PHP 8.1.10 (cli) (built: Sep 14 2022 10:31:35) (NTS)
 Copyright (c) The PHP Group
-Zend Engine v3.4.0, Copyright (c) Zend Technologies
-    with Zend OPcache v7.4.30, Copyright (c), by Zend Technologies
+Zend Engine v4.1.10, Copyright (c) Zend Technologies
+    with Zend OPcache v8.1.10, Copyright (c), by Zend Technologies
 ```
 
 Podemos probar que funciona bien ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
@@ -538,7 +470,7 @@ Y modificar lo siguiente:
 57                 include snippets/fastcgi-php.conf;
 58
 59                 # With php-fpm (or other unix sockets):
-60                 fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+60                 fastcgi_pass unix:/run/php/php8.1-fpm.sock;
 61                 # With php-cgi (or other tcp sockets):
 62                 # fastcgi_pass 127.0.0.1:9000;
 63         }
