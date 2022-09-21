@@ -103,11 +103,7 @@ Un usuario "ordinario" no podría trabajar con Docker ya que el servicio sólo e
 sdelquin@lemon:~$ sudo usermod -aG docker $USER
 ```
 
-Para que los cambios surtan efecto, ejecutamos el siguiente comando:
-
-```console
-sdelquin@lemon:~$ newgrp docker
-```
+> Para que los cambios surtan efecto, salimos de la sesión y volvemos a entrar con nuestro usuario habitual.
 
 ## Primer contenedor
 
@@ -142,3 +138,90 @@ Share images, automate workflows, and more with a free Docker ID:
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
+
+## Manejando los procesos
+
+Cuando un contenedor está funcionando, existe un proceso dentro de Docker que lo gestiona. Podemos **ver los procesos activos** usando:
+
+```console
+sdelquin@lemon:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+Incluso podemos ver los procesos ya finalizados:
+
+```console
+sdelquin@lemon:~$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND    CREATED         STATUS                     PORTS     NAMES
+6dcc89f90f61   hello-world   "/hello"   2 minutes ago   Exited (0) 2 minutes ago             kind_kowalevski
+```
+
+Para **matar un proceso** podemos usar su ID o bien su nombre (que se genera aleatoriamente si no aportamos uno):
+
+```console
+sdelquin@lemon:~$ docker rm 6dcc89f90f61
+6dcc89f90f61
+sdelquin@lemon:~$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+## Manejando las imágenes
+
+Cuando lanzamos un contenedor, su imagen debe ser previamente descargada a nuestro disco. Por ejemplo, para la aplicación anterior `hello-world`, su imagen se ha guardado localmente.
+
+Podemos **ver las imágenes almacenadas** en nuestro disco:
+
+```console
+sdelquin@lemon:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    46331d942d63   6 months ago   9.14kB
+```
+
+Para **borrar una imagen** podemos usar su ID o bien su nombre:
+
+```console
+sdelquin@lemon:~$ docker rmi 46331d942d63
+Untagged: hello-world:latest
+Untagged: hello-world@sha256:62af9efd515a25f84961b70f973a798d2eca956b1b2b026d0a4a63a3b0b6a3f2
+Deleted: sha256:46331d942d6350436f64e614d75725f6de3bb5c63e266e236e04389820a234c4
+Deleted: sha256:efb53921da3394806160641b72a2cbd34ca1a9a8345ac670a85a04ad3d0e3507
+sdelquin@lemon:~$ docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
+
+Como se comentó previamente, el lanzamiento de un contenedor implica la descarga de su imagen. Pero también es posible únicamente **descargar una imagen**:
+
+```console
+sdelquin@lemon:~$ docker pull hello-world
+Using default tag: latest
+latest: Pulling from library/hello-world
+7050e35b49f5: Pull complete
+Digest: sha256:62af9efd515a25f84961b70f973a798d2eca956b1b2b026d0a4a63a3b0b6a3f2
+Status: Downloaded newer image for hello-world:latest
+docker.io/library/hello-world:latest
+```
+
+Ahora ya lo tenemos disponible en el listado de imágenes locales:
+
+```console
+sdelquin@lemon:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    46331d942d63   6 months ago   9.14kB
+```
+
+## Limpiando recursos
+
+Hay un paquete muy interesante de cara a la "limpieza" de recursos Docker. Se llama `docker-clean` y se puede instalar de la siguiente manera:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y docker-clean
+...
+...
+```
+
+Uno de los comandos más cómodos es: `docker-clean run` que se encarga de borrar:
+
+- Todos los contenedores parados.
+- Todas las imágenes sin etiquetar.
+- Todos las volúmenes sin usar.
+- Todas las redes virtuales.

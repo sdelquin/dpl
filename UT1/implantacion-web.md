@@ -9,9 +9,11 @@
   - [Alternativas](#alternativas)
   - [¿Qué necesito para montar un servidor web?](#qué-necesito-para-montar-un-servidor-web)
 - [Instalación y configuración básica de un servidor web](#instalación-y-configuración-básica-de-un-servidor-web)
-  - [Instalación](#instalación)
+  - [Instalación nativa](#instalación-nativa)
+  - [Instalación dockerizada](#instalación-dockerizada)
 - [Servidores de aplicaciones](#servidores-de-aplicaciones)
-  - [PHP](#php)
+  - [PHP nativo](#php-nativo)
+  - [PHP dockerizado](#php-dockerizado)
 
 ## La arquitectura web y algunos modelos
 
@@ -175,7 +177,7 @@ Nginx destaca sobre otros servidores porque:
 
 Lo más "habitual" sería instalar Nginx en un sistema operativo de tipo servidor pero por motivos didácticos, vamos a instalarlo en una versión estándar con interfaz gráfica. Es menos seguro por lo que en un sistema en producción deberíamos optar por la otra opción. A pesar de usar un Linux con interfaz gráfica vamos a instalar todo desde la ventana de terminal, por lo que los pasos se podrán aplicar a un servidor.
 
-### Instalación
+### Instalación nativa
 
 Lo primero será actualizar el listado de paquetes:
 
@@ -345,6 +347,70 @@ sdelquin@lemon:~$ firefox 127.0.0.1
 
 > Dado que Nginx se instala como servicio, ya queda configurado para autoarrancarse. Eso significa que si reiniciamos el equipo, podemos comprobar que el servidor web volverá a levantarse tras cada arranque.
 
+### Instalación dockerizada
+
+[Docker](https://www.docker.com/) es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativos.​
+
+→ [Iniciación a Docker](./docker.md)
+
+Existen multitud de imágenes para contenedores ya preparadas en [Docker Hub](https://hub.docker.com/search). Una de ellas es [Nginx](https://hub.docker.com/_/nginx). Lanzar este contenedor es bastante sencillo:
+
+```console
+sdelquin@lemon:~$ docker run -p 80:80 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+3d898485473e: Pull complete
+3f45c0a5377f: Pull complete
+f1cdcf23708a: Pull complete
+a73e5a7988e9: Pull complete
+43509f6ae4b3: Pull complete
+8460b172ee88: Pull complete
+Digest: sha256:0b970013351304af46f322da1263516b188318682b2ab1091862497591189ff1
+Status: Downloaded newer image for nginx:latest
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2022/09/19 08:16:45 [notice] 1#1: using the "epoll" event method
+2022/09/19 08:16:45 [notice] 1#1: nginx/1.23.1
+2022/09/19 08:16:45 [notice] 1#1: built by gcc 10.2.1 20210110 (Debian 10.2.1-6)
+2022/09/19 08:16:45 [notice] 1#1: OS: Linux 5.10.0-18-arm64
+2022/09/19 08:16:45 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2022/09/19 08:16:45 [notice] 1#1: start worker processes
+2022/09/19 08:16:45 [notice] 1#1: start worker process 31
+2022/09/19 08:16:45 [notice] 1#1: start worker process 32
+2022/09/19 08:18:39 [notice] 1#1: signal 28 (SIGWINCH) received
+```
+
+> Con `-p 80:80` estamos mapeando el puerto 80 de la máquina anfitriona ("host") al puerto 80 del contenedor Docker.
+
+> ⭐ `-p <puerto-máquina-anfitriona>:<puerto-contenedor-Docker>`
+
+Si dejamos este proceso corriendo y abrimos una nueva pestaña, podemos lanzar un navegador web en http://localhost y comprobar que el servidor web está instalado y funcionando:
+
+```console
+sdelquin@lemon:~$ firefox localhost
+```
+
+![Nginx Hello](files/nginx-hello.png)
+
+> Podemos parar el contenedor simplemente pulsando <kbd>Ctrl-C</kbd>.
+
+Correr un contenedor implica descargar su imagen (si es que no existía). Este proceso denominado "pull" hace que dispongamos de la imagen del contenedor de manera permanente (hasta que se elimine) en nuestro disco.
+
+Podemos ver las imágenes descargadas de la siguiente manera:
+
+```console
+sdelquin@lemon:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+nginx         latest    0c404972e130   5 days ago     135MB
+hello-world   latest    46331d942d63   6 months ago   9.14kB
+```
+
 ## Servidores de aplicaciones
 
 Un servidor de aplicaciones es un paquete software que proporciona servicios a las aplicaciones como pueden ser seguridad, servicios de datos, soporte para transacciones, balanceo de carga y gestión de sistemas distribuidos.
@@ -355,7 +421,7 @@ Cuando un cliente hace una petición al servidor web, este trata de gestionarlo,
 
 A continuación veremos el despliegue de una aplicación PHP como ejemplo de servidor de aplicaciones.
 
-### PHP
+### PHP nativo
 
 [PHP](https://www.php.net/) es un lenguaje de "scripting" muy enfocado a la programación web (aunque no únicamente) y permite desarrollar aplicaciones integradas en el propio código HTML.
 
@@ -522,3 +588,138 @@ sdelquin@lemon:~$ firefox localhost/info.php
 ```
 
 ![PHP info](files/php-info.png)
+
+### PHP dockerizado
+
+Para este escenario es necesario "componer" dos servicios:
+
+- Nginx (`web`)
+- PHP-FPM (`php-fpm`)
+
+La estructura del "proyecto" quedaría así:
+
+```console
+sdelquin@lemon:~/dev/app$ tree
+.
+├── default.conf
+├── docker-compose.yml
+├── fastcgi-php.conf
+└── src
+    └── index.php
+
+1 directory, 4 files
+```
+
+La composición de servicios en Docker se lleva a cabo mediante la herramienta [docker compose](https://docs.docker.com/compose/) usando un fichero de configuración en formato [yaml](https://es.wikipedia.org/wiki/YAML):
+
+```yaml
+version: "3.3"
+
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./src:/etc/nginx/html
+      - ./fastcgi-php.conf:/etc/nginx/fastcgi-php.conf
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+
+  php-fpm:
+    image: php:8-fpm
+    volumes:
+      - ./src:/etc/nginx/html
+```
+
+Como se puede ver, dependemos de otros dos ficheros de configuración:
+
+**`fastcgi-php.conf`**
+
+```nginx
+# regex to split $uri to $fastcgi_script_name and $fastcgi_path
+fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+
+# Check that the PHP script exists before passing it
+try_files $fastcgi_script_name =404;
+
+# Bypass the fact that try_files resets $fastcgi_path_info
+# see: http://trac.nginx.org/nginx/ticket/321
+set $path_info $fastcgi_path_info;
+fastcgi_param PATH_INFO $path_info;
+
+fastcgi_index index.php;
+
+fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+fastcgi_param PATH_INFO $fastcgi_path_info;
+```
+
+**`default.conf`**
+
+```nginx
+server {
+  server_name _;
+  index index.php index.html;
+
+  location ~ \.php$ {
+    include fastcgi-php.conf;
+    include fastcgi_params;  # fichero incluido en la instalación
+    fastcgi_pass php-fpm:9000;
+  }
+}
+```
+
+Y finalmente, nuestro programa PHP de prueba que mostrará por pantalla la configuración misma de PHP:
+
+**`src/index.php`**
+
+```nginx
+<?php
+  echo phpinfo();
+?>
+```
+
+Con todo esto ya podemos levantar los servicios:
+
+```console
+sdelquin@lemon:~/dev/app$ docker compose up
+[+] Running 3/0
+ ⠿ Network app_default      Created                                                                                 0.0s
+ ⠿ Container app-php-fpm-1  Created                                                                                 0.0s
+ ⠿ Container app-web-1      Created                                                                                 0.0s
+Attaching to app-php-fpm-1, app-web-1
+app-php-fpm-1  | [21-Sep-2022 10:22:20] NOTICE: fpm is running, pid 1
+app-php-fpm-1  | [21-Sep-2022 10:22:20] NOTICE: ready to handle connections
+app-web-1      | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+app-web-1      | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+app-web-1      | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+app-web-1      | 10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+app-web-1      | 10-listen-on-ipv6-by-default.sh: info: /etc/nginx/conf.d/default.conf differs from the packaged version
+app-web-1      | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+app-web-1      | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+app-web-1      | /docker-entrypoint.sh: Configuration complete; ready for start up
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: using the "epoll" event method
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: nginx/1.23.1
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: built by gcc 10.2.1 20210110 (Debian 10.2.1-6)
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: OS: Linux 5.10.0-18-arm64
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: start worker processes
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: start worker process 29
+app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: start worker process 30
+```
+
+Si dejamos este proceso corriendo y abrimos otra pestaña de la terminal, podemos comprobar que la aplicación PHP está funcionando correctamente:
+
+```console
+sdelquin@lemon:~/dev/app$ firefox localhost
+```
+
+![PHP Info](files/php-info-docker.png)
+
+De hecho podemos también visualizar los servicios que están corriendo dentro de esta "composición", utilizando el siguiente comando:
+
+```console
+sdelquin@lemon:~/dev/app$ docker compose ps
+NAME                COMMAND                  SERVICE             STATUS              PORTS
+app-php-fpm-1       "docker-php-entrypoi…"   php-fpm             running             9000/tcp
+app-web-1           "/docker-entrypoint.…"   web                 running             0.0.0.0:80->80/tcp, :::80->80/tcp
+```
