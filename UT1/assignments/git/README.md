@@ -29,4 +29,4 @@ color: darkgreen;
 
 ## Entregable
 
-Informe explicando los pasos seguidos para resolver la tarea. Se entregará el mismo informe por cada pareja y la calificación será la misma para ambas personas.
+Informe explicando los pasos seguidos para resolver la tarea. Se entregará el mismo informe por cada pareja y la calificación será la misma para las dos personas.
