@@ -1,4 +1,4 @@
-# UT1: Implantación de arquitecturas web <!-- omit in TOC -->
+# UT2: Implantación de arquitecturas web <!-- omit in TOC -->
 
 - [La arquitectura web y algunos modelos](#la-arquitectura-web-y-algunos-modelos)
 - [Un modelo simple para el despliegue de aplicaciones web](#un-modelo-simple-para-el-despliegue-de-aplicaciones-web)
