@@ -4,7 +4,7 @@ La entrega de las actividades se hará vía repositorio de GitHub.
 
 ## Creación del repositorio
 
-Debes crearte un repositorio **privado** en GitHub con el nombre: `dpl22-23` y dar permisos de lectura al usuario `sdelquin`.
+Debes crearte un repositorio **privado** en GitHub con el nombre: `dpl` y dar permisos de lectura al usuario `sdelquin`.
 
 ## Estructura del repositorio
 
@@ -28,11 +28,11 @@ Se habilitará una entrega en el **Campus Virtual** donde que se tendrá que sub
 
 Para ello basta con acceder en GitHub al fichero en cuestión:
 
-→ `https://github.com/<user>/dpl22-23/blob/main/UT1/A1/README.md`
+→ `https://github.com/<user>/dpl/blob/main/UT1/A1/README.md`
 
 , y pulsar la tecla <kbd>y</kbd> para que la URL se nos convierta en un formato tipo:
 
-→ `https://github.com/<user>/dpl22-23/blob/ffaabb62206fa0c0f350dfe0a4ba370ed00b9218/UT1/A1/README.md`
+→ `https://github.com/<user>/dpl/blob/ffaabb62206fa0c0f350dfe0a4ba370ed00b9218/UT1/A1/README.md`
 
 La parte de la url que consta de 40 caracteres es el **hash del commit** y lo identifica de manera unívoca: `ffaabb62206fa0c0f350dfe0a4ba370ed00b9218`
 
