@@ -24,7 +24,7 @@ UT2
 
 ## Subida de la actividad
 
-Se habilitará una entrega en el **Campus Virtual** donde que se tendrá que subir únicamente la URL al `README.md` incluyendo el commit específico.
+Se habilitará una entrega en el **Campus Virtual** donde se tendrá que subir únicamente la URL al `README.md` incluyendo el commit específico.
 
 Para ello basta con acceder en GitHub al fichero en cuestión:
 
