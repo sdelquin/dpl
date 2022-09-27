@@ -2,9 +2,11 @@
 
 ![Nginx Logo](files/nginx-logo.png)
 
-Vamos a optar por instalar un servidor web **Nginx** en un sistema operativo **Linux**. Es una de las opciones más extendidas y la posibilidad de obtener este software de manera gratuita disminuye mucho los costes, aunque no es la única razón.
+**Nginx** se define como un **servidor web** / **proxy inverso** ligero de alto rendimiento.
 
-Nginx destaca sobre otros servidores porque:
+![Arquitectura Nginx](./images/nginx-arquitecture.png)
+
+Vamos a optar por instalar Nginx sobre un sistema operativo **Linux**, una de las opciones más extendidas con la posibilidad de obtener este software de manera gratuita. Nginx destaca sobre otros servidores porque:
 
 - Tiene un diseño modular y altamente configurable.
 - Ofrece un alto rendimiento.
