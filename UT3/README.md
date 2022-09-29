@@ -4,7 +4,7 @@ Ya hemos visto la instalación de Nginx. En esta unidad de trabajo nos vamos a d
 
 [Configuración del servidor web](#configuración-del-servidor-web)  
 [Hosts virtuales](#hosts-virtuales)  
-[Directivas Nginx](#directivas-nginx)  
+[Directivas](#directivas)  
 [Módulos](#módulos)
 
 ## Configuración del servidor web
@@ -312,9 +312,9 @@ sdelquin@lemon:~$ firefox helloworld
 
 ![Hello World](./images/hello-world.png)
 
-## Directivas Nginx
+## Directivas
 
-Existen [multitud de directivas](https://nginx.org/en/docs/dirindex.html) para Nginx. En las próximas secciones veremos las que se consideran más relevantes para la puesta en funcionamiento de un servicio web.
+Existen [multitud de directivas](https://nginx.org/en/docs/dirindex.html) para Nginx. En esta sección veremos las que se consideran más relevantes para la puesta en funcionamiento de un servicio web.
 
 ### Ubicaciones
 
