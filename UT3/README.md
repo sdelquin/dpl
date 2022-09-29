@@ -1,21 +1,11 @@
-# UT3: Administración de servidores web <!-- omit in TOC -->
+# UT3: Administración de servidores web
 
 Ya hemos visto la instalación de Nginx. En esta unidad de trabajo nos vamos a dedicar a explorar todas sus opciones de configuración y administración.
 
-- [Configuración del servidor web](#configuración-del-servidor-web)
-	- [Número de conexiones](#número-de-conexiones)
-	- [Usuario de trabajo](#usuario-de-trabajo)
-	- [Carpeta raíz](#carpeta-raíz)
-- [Hosts virtuales](#hosts-virtuales)
-	- [Sitio por defecto](#sitio-por-defecto)
-	- [Creación de un host virtual](#creación-de-un-host-virtual)
-- [Directivas Nginx](#directivas-nginx)
-	- [Ubicaciones](#ubicaciones)
-	- [Alias](#alias)
-	- [Listado de directorios](#listado-de-directorios)
-	- [Acceso protegido](#acceso-protegido)
-- [Módulos](#módulos)
-	- [Instalación de un módulo](#instalación-de-un-módulo)
+[Configuración del servidor web](#configuración-del-servidor-web)  
+[Hosts virtuales](#hosts-virtuales)  
+[Directivas Nginx](#directivas-nginx)  
+[Módulos](#módulos)
 
 ## Configuración del servidor web
 

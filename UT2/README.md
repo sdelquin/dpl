@@ -122,7 +122,7 @@ Antes de decidirse a instalar nuestro propio servidor web, debemos tener en cuen
 
 Por otro lado la máquina que necesitamos podría requerir mucha RAM y capacidad de almacenamiento además de soportar grandes cargas de trabajo. La conexión a internet también deberá ser potente y necesitaremos contratar una dirección IP estática.
 
-#### Hosting <!-- omit in TOC -->
+#### Hosting
 
 Lo primero que se debe tener en cuenta es si nos interesa tener **nuestro propio servidor** o contratar un **servicio de hosting**. Realmente el término "Web Hosting" incluye el tener un servidor propio, pero en la actualidad se utiliza para denominar el alquilar espacio y recursos en un servidor de otra compañía. Generalmente esta compañía está dedicada a ello específicamente. Las ventajas de este caso son las obvias: no tenemos que preocuparnos de adquirir ni mantener ni el hardware ni el software necesario. Además la fiabilidad del servicio de una empresa especializada suele ser muy alta.
 
@@ -131,7 +131,7 @@ Los términos que se suelen manejar en este contexto son:
 - **On-premise** para infraestructuras montadas en la propia organización.
 - **Cloud** para infraestructuras alojadas en empresas de terceros.
 
-#### Wordpress <!-- omit in TOC -->
+#### Wordpress
 
 Existen casos en los que incluso hay tecnologías más específicas para nuestras necesidades. Cada vez es más habitual la existencia de sitios web en los que la apariencia no cambia pero el contenido es actualizado constantemente. Para estos casos se puede usar un **gestor de contenidos**. Con ellos se permite al usuario actualizar la información del sitio sin necesidad de que tenga conocimientos web concretos. Existen muchos gestores web, algunos comerciales y otros de gratuitos y de código abierto. En este último apartado destaca por encima de todos [Wordpress](https://es.wordpress.org/), que empezó siendo una plataforma para alojar blogs pero hoy en día ya es un servicio de propósito general (webs, blogs, aplicaciones).
 
@@ -506,7 +506,7 @@ sdelquin@lemon:~$ php -r "echo gethostname();"
 lemon
 ```
 
-#### Habilitando PHP en Nginx <!-- omit in TOC -->
+#### Habilitando PHP en Nginx
 
 Nginx es un servidor web que sirve ficheros pero "no sabe" manejar código escrito en PHP (u otros lenguajes). Es por ello que necesitamos un procesador (servidor de aplicación) como PHP-FPM.
 
@@ -553,7 +553,7 @@ Ahora recargamos la configuración que hemos modificado:
 sdelquin@lemon:~$ sudo systemctl reload nginx
 ```
 
-#### Primera aplicación web en PHP <!-- omit in TOC -->
+#### Primera aplicación web en PHP
 
 Creamos un fichero PHP que contendrá un sencillo código mostrando la información de la instalación:
 
