@@ -12,73 +12,43 @@ Ya hemos visto la instalación de Nginx. En esta unidad de trabajo nos vamos a d
 En Nginx, la configuración del servicio está en el archivo `/etc/nginx/nginx.conf` con el siguiente contenido:
 
 ```nginx
-user www-data;
-worker_processes auto;
-pid /run/nginx.pid;
-include /etc/nginx/modules-enabled/*.conf;
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
 
 events {
-	worker_connections 768;
-	# multi_accept on;
+    worker_connections  1024;
 }
 
+
 http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
 
-	##
-	# Basic Settings
-	##
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-	sendfile on;
-	tcp_nopush on;
-	types_hash_max_size 2048;
-	# server_tokens off;
+    access_log  /var/log/nginx/access.log  main;
 
-	# server_names_hash_bucket_size 64;
-	# server_name_in_redirect off;
+    sendfile        on;
+    #tcp_nopush     on;
 
-	include /etc/nginx/mime.types;
-	default_type application/octet-stream;
+    keepalive_timeout  65;
 
-	##
-	# SSL Settings
-	##
+    #gzip  on;
 
-	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
-	ssl_prefer_server_ciphers on;
-
-	##
-	# Logging Settings
-	##
-
-	access_log /var/log/nginx/access.log;
-	error_log /var/log/nginx/error.log;
-
-	##
-	# Gzip Settings
-	##
-
-	gzip on;
-
-	# gzip_vary on;
-	# gzip_proxied any;
-	# gzip_comp_level 6;
-	# gzip_buffers 16 8k;
-	# gzip_http_version 1.1;
-	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-	##
-	# Virtual Host Configs
-	##
-
-	include /etc/nginx/conf.d/*.conf;
-	include /etc/nginx/sites-enabled/*;
+    include /etc/nginx/conf.d/*.conf;
 }
 ```
 
 ### Número de conexiones
 
 - [worker_processes](https://nginx.org/en/docs/ngx_core_module.html#worker_processes) establece el número de procesos que atienden peticiones. El valor por defecto "auto" indica que se usarán todos los _cores_ disponibles.
-- [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) establece el número simultáneo de conexiones que puede atender un _worker_. El valor por defecto es 768.
+- [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) establece el número simultáneo de conexiones que puede atender un _worker_. El valor por defecto es 1024.
 
 Por lo tanto, el número máximo de clientes viene dado por:
 
@@ -125,35 +95,29 @@ Desde la ayuda de la shell (`man bash`) podemos extraer información sobre el co
 
 ### Usuario de trabajo
 
-El **usuario** con el que Nginx accede al sistema es `www-data`, tal y como se especifica en el fichero de configuración `nginx.conf`:
-
-```console
-sdelquin@lemon:/etc/nginx$ grep "www-data" nginx.conf
-user www-data;
-```
-
-Esto se puede comprobar visualizando los detalles de los procesos _workers_:
+El **usuario** con el que Nginx accede al sistema es `nginx`, tal y como se puede comprobar al listar los procesos:
 
 ```console
 sdelquin@lemon:~$ ps aux | grep nginx | grep worker
-www-data  176438  0.0  0.3  53028  6296 ?        S    12:30   0:00 nginx: worker process
-www-data  176439  0.0  0.3  53028  6296 ?        S    12:30   0:00 nginx: worker process
+nginx     192386  0.0  0.1   9904  3760 ?        S    01:33   0:00 nginx: worker process
+nginx     192387  0.0  0.1   9904  3760 ?        S    01:33   0:00 nginx: worker process
 ```
 
-> Es importante tenerlo en cuenta de cara a los permisos que asignar a ficheros y carpetas.
+> Es importante tenerlo en cuenta de cara a los permisos que asignemos a ficheros y carpetas.
 
 ### Carpeta raíz
 
 Un concepto fundamental en los servidores web es el de `root` que indica la carpeta raíz desde la que se sirven los archivos.
 
-El valor por defecto que tiene `root` en Nginx es `/usr/share/nginx/www` y eso viene dado por el parámetro `--prefix` durante la fase de compilación:
+El valor por defecto que tiene `root` en Nginx es `/etc/nginx/html` y eso viene dado por el parámetro `--prefix` (junto a `html`) durante la fase de compilación:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -V
-nginx version: nginx/1.18.0
-built with OpenSSL 1.1.1n  15 Mar 2022
+nginx version: nginx/1.22.0
+built by gcc 10.2.1 20210110 (Debian 10.2.1-6)
+built with OpenSSL 1.1.1k  25 Mar 2021 (running with OpenSSL 1.1.1n  15 Mar 2022)
 TLS SNI support enabled
-configure arguments: (...) --prefix=/usr/share/nginx (...)
+configure arguments: (...) --prefix=/etc/nginx (...)
 ```
 
 Sin embargo, este comportamiento se puede modificar si establecemos un valor distinto para `root` en el _virtual-host_.
@@ -162,33 +126,32 @@ Sin embargo, este comportamiento se puede modificar si establecemos un valor dis
 
 Nginx se configura a través de bloques de servidor denominados _**virtual hosts**_. Cada uno de ellos nos permite montar un servicio diferente.
 
-La definición de los _virtual host_ se lleva a cabo mediante un fichero presente en alguna de estas dos ubicaciones:
+La definición de los _virtual host_ se lleva a cabo mediante un fichero `*.conf` presente en la ruta `/etc/nginx/conf.d/`
 
-| Ubicación                   | Fichero  | Instalación      | Por defecto    |
-| --------------------------- | -------- | ---------------- | -------------- |
-| `/etc/nginx/conf.d/`        | `*.conf` | Docker/Compilado | `default.conf` |
-| `/etc/nginx/sites-enabled/` | `*`      | Paquetería       | `default`      |
-
-> Estas rutas vienen definidas mediante un `include` en el fichero de configuración `nginx.conf`
+> Esta ruta viene definida mediante un `include` en el fichero de configuración `nginx.conf`
 
 ### Sitio por defecto
 
-La propia instalación de Nginx ya configura un _virtual host_ **por defecto**. Destacamos algunas líneas de este fichero:
+La propia instalación de Nginx ya configura un _virtual host_ **por defecto**. Destacamos algunas líneas de este fichero `/etc/nginx/conf.d/default.conf`:
 
 ```nginx
 server {
-	listen 80;                    # Escuchando en el puerto 80
-	server_name _;                # Sirve para cualquier nombre de servidor
-	root /var/www/html;           # Ruta raíz por defecto
-	index index.html index.html;  # Ficheros implícitos de índice
-}
+    listen       80;
+    server_name  localhost;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
 ```
 
 Por lo tanto, podemos concluir que colocando un fichero índice en la ruta raíz (de hecho siempre existe uno por defecto), deberíamos poder acceder a nuestro servidor web en el puerto 80 de la máquina.
 
-Veamos el contenido del fichero de índice que está creado por defecto en Debian:
+Veamos el contenido del fichero de índice que está creado por defecto:
 
-→ `/var/www/html/index.nginx-debian.html`
+→ `/usr/share/nginx/html/index.html`
 
 ```html
 <!DOCTYPE html>
@@ -196,6 +159,9 @@ Veamos el contenido del fichero de índice que está creado por defecto en Debia
   <head>
     <title>Welcome to nginx!</title>
     <style>
+      html {
+        color-scheme: light dark;
+      }
       body {
         width: 35em;
         margin: 0 auto;
@@ -226,21 +192,14 @@ Es por esto que cuando accedemos a http://localhost obtenemos esta página:
 
 ![Nginx Inicio](./images/nginx-boot.png)
 
-Podemos **deshabilitar el sitio por defecto** sin "destruir" su configuración. Basta con borrar el enlace simbólico:
-
-```console
-sdelquin@lemon:~$ sudo rm /etc/nginx/sites-enabled/default
-sdelquin@lemon:~$ sudo systemctl reload nginx
-```
-
-> Tras una modificación de Nginx debemos recargar el servicio para que los cambios tengan efecto.
+> 💡 &nbsp;Tras una modificación de Nginx debemos recargar el servicio para que los cambios tengan efecto.
 
 ### Creación de un host virtual
 
 Para crear un _virtual host_ debemos preparar un fichero de configuración:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-available/helloworld
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/helloworld.conf
 ```
 
 ```nginx
@@ -282,14 +241,10 @@ sdelquin@lemon:~$ vi ~/www/helloworld/index.html
 </html>
 ```
 
-Ahora habilitamos este nuevo _virtual host_ creando un enlace simbólico y recargando la configuración en Nginx:
+Ahora recargamos la configuración en Nginx para que el nuevo _virtual host_ sea detectado:
 
 ```console
-sdelquin@lemon:~$ sudo ln -s /etc/nginx/sites-available/helloworld /etc/nginx/sites-enabled/
-sdelquin@lemon:~$ ls -l /etc/nginx/sites-enabled/
-total 0
-lrwxrwxrwx 1 root root 37 sep 26 10:25 helloworld -> /etc/nginx/sites-available/helloworld
-sdelquin@lemon:~$ sudo systemctl reload nginx
+delquin@lemon:~$ sudo systemctl reload nginx
 ```
 
 Lo único que faltaría es simular un nombre de dominio a través de la configuración local:
@@ -322,15 +277,17 @@ Los _virtual hosts_ permiten definir ubicaciones (**locations**) en su interior 
 
 A su vez, cada _location_ puede incluir las directivas correspondientes.
 
-Supongamos que nuestro "Hello World" lo queremos montar sobre http://localhost/helloworld. Procedemos de la siguiente manera:
+Supongamos que nuestro "Hello World" lo queremos montar sobre http://universe/helloworld. Procedemos de la siguiente manera:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-available/helloworld
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
 ```
+
+> 💡 &nbsp;Es recomendable crear un fichero `*.conf` por cada nombre de dominio que vamos a utilizar.
 
 ```nginx
 server {
-	server_name localhost;
+	server_name universe;
 
     location /helloworld {
         root /home/sdelquin/www;  # /home/sdelquin/www/helloworld
@@ -349,24 +306,28 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 Ahora si accedemos a http://localhost/helloworld podremos visualizar la página correctamente:
 
 ```console
-sdelquin@lemon:~$ firefox localhost/helloworld
+sdelquin@lemon:~$ firefox universe/helloworld
 ```
 
 ![Nginx Location](./images/nginx-location.png)
+
+> 💡 &nbsp;Recordar que hay que incluir la entrada correspondiente en `/etc/hosts` para que el nombre de dominio se resuelva localmente.
 
 ### Alias
 
 Los "alias" son directivas que funcionan junto a los _locations_ y permiten evitar que se añada la ruta de la url al _root_.
 
-Siguiendo con nuestro "Hello World" vamos a configurar un _location_ (mediante alias) para acceder al recurso en la url http://localhost/hello:
+Siguiendo con nuestro "Hello World" vamos a configurar un _location_ (mediante alias) para acceder al recurso en la url http://universe/hello:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-available/helloworld
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
 ```
 
 ```nginx
 server {
-    server_name localhost;
+    server_name universe;
+
+    # ...
 
     location /hello {
         alias /home/sdelquin/www/helloworld;
@@ -384,23 +345,19 @@ Recargamos la configuración y accedemos en el navegador:
 
 La directiva `autoindex` nos permite listar el contenido del directorio indicado, pudiendo implementar una especie de FTP (lectura) a través del navegador.
 
-Vamos a ejemplificar este escenario listando el contenido de la carpeta `/etc/nginx` cuando accedamos a http://locahost/files.
+Vamos a ejemplificar este escenario listando el contenido de la carpeta `/etc/nginx` cuando accedamos a http://universe/files.
 
-Lo primero, para evitar "colisiones" en nombres de servidor, vamos a deshabilitar el _virtual host_ anterior:
-
-```console
-sdelquin@lemon:~$ sudo rm /etc/nginx/sites-enabled/helloworld
-```
-
-Ahora vamos a crear un nuevo _virtual host_ llamado "files":
+Editamos el _virtual host_ con el que venimos trabajando:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-available/files
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
 ```
 
 ```nginx
 server {
-    server_name localhost;
+    server_name universe;
+
+    # ...
 
     location /files {
         alias /etc/nginx;
@@ -412,7 +369,7 @@ server {
 Después de recargar, podemos acceder a la URL y ver que se muestra el listado de ficheros que hay en la ruta especificada:
 
 ```console
-sdelquin@lemon:~$ firefox localhost/files
+sdelquin@lemon:~$ firefox universe/files
 ```
 
 ![Nginx Autoindex](./images/nginx-autoindex.png)
@@ -443,12 +400,14 @@ sdelquin:$apr1$A.UE2T7J$qgt0pRnZ99ePuDukgi/oh/
 Ahora debemos hacer una pequeña modificación a nuestro _virtual host_ para añadir la autenticación:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-available/files
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
 ```
 
 ```nginx
 server {
-    server_name localhost;
+    server_name universe;
+
+    # ...
 
     location /files {
         alias /etc/nginx;
@@ -471,39 +430,35 @@ Tras introducir nuestras credenciales ya podemos ver el listado de ficheros:
 
 ## Módulos
 
-Cuando Nginx se compila (o se instala vía paquetería) se hace incluyendo una serie de módulos que le otorgan ciertas funcionalidades extra.
+Cuando Nginx se compila se hace incluyendo una serie de módulos que le otorgan ciertas funcionalidades extra.
 
 Podemos ver estos módulos con el siguiente comando:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -V 2>&1 | tr ' ' '\n' | grep module
 --modules-path=/usr/lib/nginx/modules
---with-http_ssl_module
---with-http_stub_status_module
---with-http_realip_module
---with-http_auth_request_module
---with-http_v2_module
---with-http_dav_module
---with-http_slice_module
 --with-http_addition_module
+--with-http_auth_request_module
+--with-http_dav_module
+--with-http_flv_module
 --with-http_gunzip_module
 --with-http_gzip_static_module
+--with-http_mp4_module
+--with-http_random_index_module
+--with-http_realip_module
+--with-http_secure_link_module
+--with-http_slice_module
+--with-http_ssl_module
+--with-http_stub_status_module
 --with-http_sub_module
+--with-http_v2_module
+--with-mail_ssl_module
+--with-stream_realip_module
+--with-stream_ssl_module
+--with-stream_ssl_preread_module
 ```
 
-Podemos inferir de la salida del comando anterior que los **módulos estáticos** incluidos en el proceso de compilación son los siguientes:
-
-- https://nginx.org/en/docs/http/ngx_http_ssl_module.html
-- https://nginx.org/en/docs/http/ngx_http_stub_status_module.html
-- https://nginx.org/en/docs/mail/ngx_mail_realip_module.html
-- https://nginx.org/en/docs/mail/ngx_mail_auth_http_module.html
-- https://nginx.org/en/docs/http/ngx_http_v2_module.html
-- https://nginx.org/en/docs/http/ngx_http_dav_module.html
-- https://nginx.org/en/docs/http/ngx_http_slice_module.html
-- https://nginx.org/en/docs/http/ngx_http_addition_module.html
-- https://nginx.org/en/docs/http/ngx_http_gunzip_module.html
-- https://nginx.org/en/docs/http/ngx_http_gzip_static_module.html
-- https://nginx.org/en/docs/http/ngx_http_sub_module.html
+Podemos inferir de la salida del comando anterior cuáles son los **módulos estáticos** incluidos en el proceso de compilación. La documentación de cada uno de ellos se puede consultar en https://nginx.org/en/docs/
 
 Los **módulos dinámicos** son aquellos que se pueden cargar "a posteriori" de la instalación inicial. Por defecto se encuentran en la carpeta `/usr/lib/nginx/modules`:
 

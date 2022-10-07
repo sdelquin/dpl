@@ -155,7 +155,7 @@ Existe la posibilidad de funcionar con una **dirección IP dinámica** mediante 
 
 ![Nginx Logo](files/nginx-logo.png)
 
-**Nginx** se define como un **servidor web** / **proxy inverso** ligero de alto rendimiento.
+**Nginx** se define como un **servidor web** / **proxy inverso** ligero y de alto rendimiento.
 
 ![Arquitectura Nginx](./images/nginx-arquitecture.png)
 
@@ -192,133 +192,98 @@ Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
 
-A continuación instalaremos el paquete `nginx`:
+A continuación instalaremos algunos paquetes de soporte:
 
 ```console
-sdelquin@lemon:~$ sudo apt install -y nginx
+sdelquin@lemon:~$ sudo apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+```
+
+Ahora descargamos y guardamos la clave de firma Nginx:
+
+```console
+sdelquin@lemon:~$ curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nginx.gpg
+```
+
+Actualizamos el índice de paquetes:
+
+```console
+sdelquin@lemon:~$ sudo apt update
+Obj:1 http://security.debian.org/debian-security bullseye-security InRelease
+Obj:2 http://deb.debian.org/debian bullseye InRelease
+Obj:3 http://deb.debian.org/debian bullseye-updates InRelease
+Obj:4 https://packages.sury.org/php bullseye InRelease
+Obj:5 http://nginx.org/packages/debian bullseye InRelease
+Obj:6 https://download.docker.com/linux/debian bullseye InRelease
+Obj:7 http://packages.microsoft.com/repos/code stable InRelease
 Leyendo lista de paquetes... Hecho
 Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
-Se instalarán los siguientes paquetes adicionales:
-  geoip-database libgeoip1 libnginx-mod-http-geoip
-  libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter
-  libnginx-mod-mail libnginx-mod-stream libnginx-mod-stream-geoip nginx-common
-  nginx-core
-Paquetes sugeridos:
-  geoip-bin fcgiwrap nginx-doc
-Se instalarán los siguientes paquetes NUEVOS:
-  geoip-database libgeoip1 libnginx-mod-http-geoip
-  libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter
-  libnginx-mod-mail libnginx-mod-stream libnginx-mod-stream-geoip nginx
-  nginx-common nginx-core
-0 actualizados, 11 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
-Se necesita descargar 4.507 kB de archivos.
-Se utilizarán 13,3 MB de espacio de disco adicional después de esta operación.
-Des:1 http://deb.debian.org/debian bullseye/main arm64 geoip-database all 20191224-3 [3.032 kB]
-Des:2 http://deb.debian.org/debian bullseye/main arm64 libgeoip1 arm64 1.6.12-7 [90,7 kB]
-Des:3 http://deb.debian.org/debian bullseye/main arm64 nginx-common all 1.18.0-6.1+deb11u2 [126 kB]
-Des:4 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-geoip arm64 1.18.0-6.1+deb11u2 [98,2 kB]
-Des:5 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-image-filter arm64 1.18.0-6.1+deb11u2 [102 kB]
-Des:6 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-http-xslt-filter arm64 1.18.0-6.1+deb11u2 [100 kB]
-Des:7 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-mail arm64 1.18.0-6.1+deb11u2 [127 kB]
-Des:8 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-stream arm64 1.18.0-6.1+deb11u2 [151 kB]
-Des:9 http://deb.debian.org/debian bullseye/main arm64 libnginx-mod-stream-geoip arm64 1.18.0-6.1+deb11u2 [97,4 kB]
-Des:10 http://deb.debian.org/debian bullseye/main arm64 nginx-core arm64 1.18.0-6.1+deb11u2 [490 kB]
-Des:11 http://deb.debian.org/debian bullseye/main arm64 nginx all 1.18.0-6.1+deb11u2 [92,9 kB]
-Descargados 4.507 kB en 0s (9.951 kB/s)
-Preconfigurando paquetes ...
-Seleccionando el paquete geoip-database previamente no seleccionado.
-(Leyendo la base de datos ... 220164 ficheros o directorios instalados actualmen
-te.)
-Preparando para desempaquetar .../00-geoip-database_20191224-3_all.deb ...
-Desempaquetando geoip-database (20191224-3) ...
-Seleccionando el paquete libgeoip1:arm64 previamente no seleccionado.
-Preparando para desempaquetar .../01-libgeoip1_1.6.12-7_arm64.deb ...
-Desempaquetando libgeoip1:arm64 (1.6.12-7) ...
-Seleccionando el paquete nginx-common previamente no seleccionado.
-Preparando para desempaquetar .../02-nginx-common_1.18.0-6.1+deb11u2_all.deb ...
-Desempaquetando nginx-common (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-http-geoip previamente no seleccionado.
-Preparando para desempaquetar .../03-libnginx-mod-http-geoip_1.18.0-6.1+deb11u2_
-arm64.deb ...
-Desempaquetando libnginx-mod-http-geoip (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-http-image-filter previamente no seleccion
-ado.
-Preparando para desempaquetar .../04-libnginx-mod-http-image-filter_1.18.0-6.1+d
-eb11u2_arm64.deb ...
-Desempaquetando libnginx-mod-http-image-filter (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-http-xslt-filter previamente no selecciona
-do.
-Preparando para desempaquetar .../05-libnginx-mod-http-xslt-filter_1.18.0-6.1+de
-b11u2_arm64.deb ...
-Desempaquetando libnginx-mod-http-xslt-filter (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-mail previamente no seleccionado.
-Preparando para desempaquetar .../06-libnginx-mod-mail_1.18.0-6.1+deb11u2_arm64.
-deb ...
-Desempaquetando libnginx-mod-mail (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-stream previamente no seleccionado.
-Preparando para desempaquetar .../07-libnginx-mod-stream_1.18.0-6.1+deb11u2_arm6
-4.deb ...
-Desempaquetando libnginx-mod-stream (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete libnginx-mod-stream-geoip previamente no seleccionado.
-Preparando para desempaquetar .../08-libnginx-mod-stream-geoip_1.18.0-6.1+deb11u
-2_arm64.deb ...
-Desempaquetando libnginx-mod-stream-geoip (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete nginx-core previamente no seleccionado.
-Preparando para desempaquetar .../09-nginx-core_1.18.0-6.1+deb11u2_arm64.deb ...
-Desempaquetando nginx-core (1.18.0-6.1+deb11u2) ...
-Seleccionando el paquete nginx previamente no seleccionado.
-Preparando para desempaquetar .../10-nginx_1.18.0-6.1+deb11u2_all.deb ...
-Desempaquetando nginx (1.18.0-6.1+deb11u2) ...
-Configurando nginx-common (1.18.0-6.1+deb11u2) ...
-Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service → /lib
-/systemd/system/nginx.service.
-Configurando libnginx-mod-http-xslt-filter (1.18.0-6.1+deb11u2) ...
-Configurando libgeoip1:arm64 (1.6.12-7) ...
-Configurando geoip-database (20191224-3) ...
-Configurando libnginx-mod-mail (1.18.0-6.1+deb11u2) ...
-Configurando libnginx-mod-http-image-filter (1.18.0-6.1+deb11u2) ...
-Configurando libnginx-mod-stream (1.18.0-6.1+deb11u2) ...
-Configurando libnginx-mod-stream-geoip (1.18.0-6.1+deb11u2) ...
-Configurando libnginx-mod-http-geoip (1.18.0-6.1+deb11u2) ...
-Configurando nginx-core (1.18.0-6.1+deb11u2) ...
-Upgrading binary: nginx.
-Configurando nginx (1.18.0-6.1+deb11u2) ...
-Procesando disparadores para man-db (2.9.4-2) ...
-Procesando disparadores para libc-bin (2.31-13+deb11u4) ...
+```
+
+Con el nuevo repositorio añadido, ya podemos instalar Nginx:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y nginx
 ```
 
 Con esto, en principio, ya debería estar instalado el servidor web **Nginx**. Para obtener las características de la versión instalada, podemos ejecutar:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -V
-nginx version: nginx/1.18.0
-built with OpenSSL 1.1.1n  15 Mar 2022
+nginx version: nginx/1.22.0
+built by gcc 10.2.1 20210110 (Debian 10.2.1-6)
+built with OpenSSL 1.1.1k  25 Mar 2021 (running with OpenSSL 1.1.1n  15 Mar 2022)
 TLS SNI support enabled
-configure arguments: --with-cc-opt='-g -O2 -ffile-prefix-map=/build/nginx-vNp64q/nginx-1.18.0=. -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -fPIC' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --modules-path=/usr/lib/nginx/modules --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-compat --with-debug --with-pcre-jit --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --with-http_v2_module --with-http_dav_module --with-http_slice_module --with-threads --with-http_addition_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_sub_module
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-g -O2 -ffile-prefix-map=/data/builder/debuild/nginx-1.22.0/debian/debuild-base/nginx-1.22.0=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
-Igualmente podemos comprobar que el servicio está corriendo correctamente mediante [systemd](https://wiki.debian.org/systemd):
+Igualmente podemos comprobar el estado del servicio mediante [systemd](https://wiki.debian.org/systemd):
 
 ```console
 sdelquin@lemon:~$ sudo systemctl status nginx
-● nginx.service - A high performance web server and a reverse proxy server
+● nginx.service - nginx - high performance web server
      Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
-     Active: active (running) since Thu 2022-09-15 09:26:18 WEST; 6min ago
-       Docs: man:nginx(8)
-    Process: 6233 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/>
-    Process: 6234 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
-   Main PID: 6316 (nginx)
-      Tasks: 3 (limit: 2251)
-     Memory: 3.9M
-        CPU: 14ms
-     CGroup: /system.slice/nginx.service
-             ├─6316 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
-             ├─6319 nginx: worker process
-             └─6320 nginx: worker process
+     Active: inactive (dead)
+       Docs: https://nginx.org/en/docs/
 
-sep 15 09:26:18 lemon systemd[1]: Starting A high performance web server and a reverse proxy server...
-sep 15 09:26:18 lemon systemd[1]: Started A high performance web server and a reverse proxy server.
+sep 26 20:02:24 lemon systemd[1]: Reloading A high performance web server and a reverse proxy serve>
+sep 26 20:02:24 lemon systemd[1]: Reloaded A high performance web server and a reverse proxy server.
+sep 29 16:16:26 lemon systemd[1]: Stopping A high performance web server and a reverse proxy server>
+sep 29 16:16:26 lemon systemd[1]: nginx.service: Succeeded.
+sep 29 16:16:26 lemon systemd[1]: Stopped A high performance web server and a reverse proxy server.
+sep 29 16:17:16 lemon systemd[1]: Starting nginx - high performance web server...
+sep 29 16:17:16 lemon systemd[1]: Started nginx - high performance web server.
+sep 29 16:18:22 lemon systemd[1]: Stopping nginx - high performance web server...
+sep 29 16:18:22 lemon systemd[1]: nginx.service: Succeeded.
+sep 29 16:18:22 lemon systemd[1]: Stopped nginx - high performance web server.
+```
+
+Vemos que está "inactive (dead)". Así que podemos levantarlo usando sintaxis de servicios:
+
+```console
+sdelquin@lemon:~$ sudo systemctl start nginx
+```
+
+Y ahora sí deberíamos tener el servicio corriendo:
+
+```console
+sdelquin@lemon:~$ sudo systemctl status nginx
+● nginx.service - nginx - high performance web server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2022-09-29 17:11:54 WEST; 39s ago
+       Docs: https://nginx.org/en/docs/
+    Process: 192384 ExecStart=/usr/sbin/nginx -c /etc/nginx/nginx.conf (code=exited, status=0/SUCCE>
+   Main PID: 192385 (nginx)
+      Tasks: 3 (limit: 2251)
+     Memory: 2.4M
+        CPU: 9ms
+     CGroup: /system.slice/nginx.service
+             ├─192385 nginx: master process /usr/sbin/nginx -c /etc/nginx/nginx.conf
+             ├─192386 nginx: worker process
+             └─192387 nginx: worker process
+
+sep 29 17:11:54 lemon systemd[1]: Starting nginx - high performance web server...
+sep 29 17:11:54 lemon systemd[1]: Started nginx - high performance web server.
 ```
 
 Para comprobar nuestra instalación de **Nginx**, accedemos a http://localhost:
@@ -439,7 +404,7 @@ sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) ma
 Importamos la clave [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del repositorio:
 
 ```console
-sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg| sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury.gpg
 ```
 
 Confirmamos que el repositorio está funcionando tras actualizar las fuentes:
