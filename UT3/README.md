@@ -428,6 +428,46 @@ Tras introducir nuestras credenciales ya podemos ver el listado de ficheros:
 
 ![Nginx Autoindex](./images/nginx-autoindex.png)
 
+### Ficheros de log
+
+La ubicación por defecto de los _logfiles_ en Nginx es:
+
+- `/var/log/nginx/access.log`
+- `/var/log/nginx/error.log`
+
+#### `access.log`
+
+```console
+sdelquin@lemon:~$ sudo tail -5 /var/log/nginx/access.log
+127.0.0.1 - - [08/Oct/2022:10:33:54 +0100] "GET /files/ HTTP/1.1" 200 966 "-" "Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101 Firefox/91.0" "-"
+127.0.0.1 - - [08/Oct/2022:10:33:54 +0100] "GET /favicon.ico HTTP/1.1" 404 153 "http://universe/files/" "Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101 Firefox/91.0" "-"
+127.0.0.1 - - [08/Oct/2022:10:34:53 +0100] "GET /files HTTP/1.1" 301 169 "-" "Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101 Firefox/91.0" "-"
+127.0.0.1 - - [08/Oct/2022:10:34:53 +0100] "GET /files/ HTTP/1.1" 200 2369 "-" "Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101 Firefox/91.0" "-"
+127.0.0.1 - - [08/Oct/2022:10:34:53 +0100] "GET /favicon.ico HTTP/1.1" 404 153 "http://universe/files/" "Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101 Firefox/91.0" "-"
+```
+
+#### `error.log`
+
+```console
+sdelquin@lemon:~$ sudo tail -5 /var/log/nginx/error.log
+2022/10/08 10:34:47 [notice] 362884#362884: signal 17 (SIGCHLD) received from 362885
+2022/10/08 10:34:47 [notice] 362884#362884: worker process 362885 exited with code 0
+2022/10/08 10:34:47 [notice] 362884#362884: worker process 362886 exited with code 0
+2022/10/08 10:34:47 [notice] 362884#362884: signal 29 (SIGIO) received
+2022/10/08 10:34:53 [error] 362964#362964: *2 open() "/etc/nginx/html/favicon.ico" failed (2: No such file or directory), client: 127.0.0.1, server: universe, request: "GET /favicon.ico HTTP/1.1", host: "universe", referrer: "http://universe/files/"
+```
+
+Además, para cada _virtual host_ y/o para cada _location_, podemos definir logfiles propios. Para hacer esto habría que añadir las siguientes líneas a las secciones correspondientes:
+
+```nginx
+server {
+    ...
+    access_log /path/to/your/access.log;
+    error_log /path/to/your/error.log;
+    ...
+}
+```
+
 ## Módulos
 
 Cuando Nginx se compila se hace incluyendo una serie de **módulos estáticos** que le otorgan ciertas funcionalidades extra:
