@@ -430,9 +430,7 @@ Tras introducir nuestras credenciales ya podemos ver el listado de ficheros:
 
 ## Módulos
 
-Cuando Nginx se compila se hace incluyendo una serie de módulos que le otorgan ciertas funcionalidades extra.
-
-Podemos ver estos módulos con el siguiente comando:
+Cuando Nginx se compila se hace incluyendo una serie de **módulos estáticos** que le otorgan ciertas funcionalidades extra:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -V 2>&1 | tr ' ' '\n' | grep module
@@ -458,27 +456,9 @@ sdelquin@lemon:~$ sudo nginx -V 2>&1 | tr ' ' '\n' | grep module
 --with-stream_ssl_preread_module
 ```
 
-Podemos inferir de la salida del comando anterior cuáles son los **módulos estáticos** incluidos en el proceso de compilación. La documentación de cada uno de ellos se puede consultar en https://nginx.org/en/docs/
+Podemos inferir de la salida del comando anterior cuáles son los módulos incluidos en el proceso de compilación. La documentación de cada uno de ellos se puede consultar en https://nginx.org/en/docs/
 
-Los **módulos dinámicos** son aquellos que se pueden cargar "a posteriori" de la instalación inicial. Por defecto se encuentran en la carpeta `/usr/lib/nginx/modules`:
-
-```console
-sdelquin@lemon:~$ ls -l /usr/lib/nginx/modules
-total 360
--rw-r--r-- 1 root root  20064 may 14 07:27 ngx_http_geoip_module.so
--rw-r--r-- 1 root root  23352 may 14 07:27 ngx_http_image_filter_module.so
--rw-r--r-- 1 root root  23248 may 14 07:27 ngx_http_xslt_filter_module.so
--rw-r--r-- 1 root root 103096 may 14 07:27 ngx_mail_module.so
--rw-r--r-- 1 root root  15608 may 14 07:27 ngx_stream_geoip_module.so
--rw-r--r-- 1 root root 175408 may 14 07:27 ngx_stream_module.so
-```
-
-Pero realmente, la instalación de Nginx "descubre" los módulos dinámicos desde `/etc/nginx/modules-avaiable/*.conf`. Si nos fijamos en alguno de estos ficheros veremos que únicamente cargan el módulo desde su ubicación principal:
-
-```console
-sdelquin@lemon:~$ cat /etc/nginx/modules-enabled/50-mod-stream.conf
-load_module modules/ngx_stream_module.so;
-```
+Desde la versión 1.11.5 de Nginx se pueden incorporar **módulos dinámicos**. Estos módulos permiten la carga "a posteriori" de la compilación inicial y se cargan desde la carpeta `/etc/nginx/modules`.
 
 > [Librerías estáticas (`*.a`) vs Librerías dinámicas (`*.so`)](https://medium.com/swlh/linux-basics-static-libraries-vs-dynamic-libraries-a7bcf8157779)
 
@@ -492,83 +472,98 @@ Nginx se puede extender haciendo uso de módulos propios o módulos de la comuni
 
 Vamos a instalar un módulo de terceros para Nginx y cargarlo dinámicamente. En este caso hemos escogido [Fancy Index](https://www.nginx.com/resources/wiki/modules/fancy_index/) que permite visualizar de manera más "bonita" un listado de ficheros.
 
-Lo primero sería instalar el paquete asociado:
+Dado que vamos a realizar un proceso de compilación, primero necesitamos tener instaladas ciertas dependencias:
 
 ```console
-sdelquin@lemon:~$ sudo apt install libnginx-mod-http-fancyindex
+sdelquin@lemon:~$  sudo apt install libpcre3-dev
 ```
 
-Podemos comprobar los ficheros que se han instalado:
+Posteriormente tenemos que **descargar el código fuente de Nginx** con la misma versión que tenemos instalada en el sistema. Para ello:
 
 ```console
-sdelquin@lemon:~$ dpkg -L libnginx-mod-http-fancyindex
-/.
-/usr
-/usr/lib
-/usr/lib/nginx
-/usr/lib/nginx/modules
-/usr/lib/nginx/modules/ngx_http_fancyindex_module.so
-/usr/share
-/usr/share/doc
-/usr/share/doc/libnginx-mod-http-fancyindex
-/usr/share/doc/libnginx-mod-http-fancyindex/changelog.Debian.gz
-/usr/share/doc/libnginx-mod-http-fancyindex/changelog.gz
-/usr/share/doc/libnginx-mod-http-fancyindex/copyright
-/usr/share/nginx
-/usr/share/nginx/modules-available
-/usr/share/nginx/modules-available/mod-http-fancyindex.conf
+sdelquin@lemon:~$ curl -sL https://nginx.org/download/nginx-$(/sbin/nginx -v |& cut -d '/' -f2).tar.gz | tar xvz -C /tmp
 ```
 
-Un par de detalles interesantes:
+Ahora pasamos a **descargar el código fuente del módulo** en cuestión. En este caso el de Fancy Index:
 
-1. La libería dinámica se encuentra en `/usr/lib/nginx/modules/ngx_http_fancyindex_module.so`.
-2. Existe una configuración en `/usr/share/nginx/modules-available/mod-http-fancyindex.conf`
+```console
+sdelquin@lemon:~$ git clone https://github.com/aperezdc/ngx-fancyindex.git /tmp/ngx-fancyindex
+Clonando en '/tmp/ngx-fancyindex'...
+remote: Enumerating objects: 944, done.
+remote: Counting objects: 100% (156/156), done.
+remote: Compressing objects: 100% (77/77), done.
+remote: Total 944 (delta 81), reused 128 (delta 73), pack-reused 788
+Recibiendo objetos: 100% (944/944), 274.95 KiB | 1.52 MiB/s, listo.
+Resolviendo deltas: 100% (534/534), listo.
+```
 
-Ahora ya podemos añadir sus directivas a la configuración por defecto. Modificamos el archivo `/etc/nginx/sites-enabled/default` de la siguiente manera:
+Nos movemos a la carpeta donde hemos descargado el código fuente de Nginx y realizamos la **configuración de la compilación**:
+
+```console
+sdelquin@lemon:~$ cd /tmp/nginx-$(/sbin/nginx -v |& cut -d '/' -f2)
+sdelquin@lemon:/tmp/nginx-1.22.0$ ./configure --add-dynamic-module=../ngx-fancyindex --with-compat
+...
+```
+
+A continuación generamos la librería dinámica:
+
+```console
+sdelquin@lemon:/tmp/nginx-1.22.0$ make modules
+...
+```
+
+Este proceso habrá creado un fichero `.so` dentro de la carpeta `objs`. Lo copiaremos a la carpeta desde la que se cargan los módulos dinámicos de Nginx:
+
+```console
+sdelquin@lemon:/tmp/nginx-1.22.0$ sudo cp objs/ngx_http_fancyindex_module.so /etc/nginx/modules
+sdelquin@lemon:~$ cd
+```
+
+Para que este módulo se cargue correctamente, hay que especificarlo en el fichero de configuración de Nginx:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/nginx.conf
+```
 
 ```nginx
-...
-root /etc/nginx;
-...
-location / {
-  ...
-  fancyindex on;              # Enable fancy indexes.
-  fancyindex_exact_size off;  # Output human-readable file sizes.
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+# Añadir aquí ↓
+load_module /etc/nginx/modules/ngx_http_fancyindex_module.so;
+# Añadir aquí ↑
+
+events {
+    worker_connections  1024;
 }
-...
+
+# ...
 ```
 
-Recargamos el servicio para que los cambios surtan efecto:
+Ahora ya podemos añadir las directivas del módulo a la configuración del _virtual host_. Modificamos el archivo `/etc/nginx/conf.d/universe.conf` de la siguiente manera:
+
+```nginx
+server {
+	server_name universe;
+    # ...
+
+    location /files {
+        alias /etc/nginx;
+        fancyindex on;              # Enable fancy indexes.
+        fancyindex_exact_size off;  # Output human-readable file sizes.
+    }
+}
+```
+
+Por supuesto hemos de recargar la configuración de Nginx para que estos cambios surtan efecto:
 
 ```console
 sdelquin@lemon:~$ sudo systemctl reload nginx
 ```
 
-Ahora, si accedemos a http://localhost veremos algo similar a lo siguiente:
+Ahora, si accedemos a http://universe/files veremos algo similar a lo siguiente:
 
 ![Fancy index](./images/fancy-index.png)
-
-En la fecha de escritura de este documento, los módulos Nginx disponibles en la paquetería de Debian son los siguientes:
-
-- libnginx-mod-http-auth-pam
-- libnginx-mod-http-cache-purge
-- libnginx-mod-http-dav-ext
-- libnginx-mod-http-echo
-- libnginx-mod-http-fancyindex
-- libnginx-mod-http-geoip
-- libnginx-mod-http-geoip2
-- libnginx-mod-http-headers-more-filter
-- libnginx-mod-http-image-filter
-- libnginx-mod-http-lua
-- libnginx-mod-http-ndk
-- libnginx-mod-http-perl
-- libnginx-mod-http-subs-filter
-- libnginx-mod-http-uploadprogress
-- libnginx-mod-http-upstream-fair
-- libnginx-mod-http-xslt-filter
-- libnginx-mod-mail
-- libnginx-mod-nchan
-- libnginx-mod-rtmp
-- libnginx-mod-stream
-- libnginx-mod-stream-geoip
-- libnginx-mod-stream-geoip2
