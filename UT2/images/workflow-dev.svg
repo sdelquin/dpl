@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 923 448" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-516.5,-282.5)">
+        <g transform="matrix(5.44877e-17,-0.868217,1.08787,6.76698e-17,60.6841,1413.79)">
+            <path d="M787,580.325L787,496.675L1153.27,496.675L1153.27,419L1303,538.5L1153.27,658L1153.27,580.325L787,580.325Z" style="fill:url(#_Linear1);"/>
+        </g>
+        <g transform="matrix(6.12323e-17,-1,1,6.12323e-17,78.6606,1744.8)">
+            <text x="1047.48px" y="585.747px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">DESARROLLO</text>
+        </g>
+        <g transform="matrix(1,0,0,1,304.364,63.0742)">
+            <text x="521px" y="666.815px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">CAP<tspan x="620.097px 650.688px 664.579px " y="666.815px 666.815px 666.815px ">A D</tspan>E DA<tspan x="813.676px 843.314px 882.206px " y="666.815px 666.815px 666.815px ">TOS</tspan></text>
+        </g>
+        <g transform="matrix(1,0,0,1,304.364,-80.2085)">
+            <text x="521px" y="666.815px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">CAP<tspan x="620.097px 650.688px 664.579px " y="666.815px 666.815px 666.815px ">A D</tspan>E NEGOCIO</text>
+        </g>
+        <g transform="matrix(1,0,0,1,304.364,-223.491)">
+            <text x="521px" y="666.815px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">CAP<tspan x="620.097px 650.688px 664.579px " y="666.815px 666.815px 666.815px ">A D</tspan>E PRESENT<tspan x="980.375px 1013.73px " y="666.815px 666.815px ">AC</tspan>IÓN</text>
+        </g>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(516,0,0,239,787,538.5)"><stop offset="0" style="stop-color:rgb(239,87,148);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(235,235,235);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>
