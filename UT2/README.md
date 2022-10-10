@@ -59,10 +59,10 @@ Una **aplicación web** es una aplicación que se va a ejecutar a través de int
 
 Constará, al menos, de dos partes:
 
-| Lado     | Tecnología | Aplicación    |
-| -------- | ---------- | ------------- |
-| Cliente  | Frontend   | Navegador web |
-| Servidor | Backend    | -             |
+| Lado     | Rol      | Instrumento   |
+| -------- | -------- | ------------- |
+| Cliente  | Frontend | Navegador web |
+| Servidor | Backend  | Servidor web  |
 
 Las aplicaciones web se engloban en el concepto superior de _aplicaciones distribuidas_. El servidor pone a disposición del cliente diferentes recursos. Ejemplos de aplicaciones web son el correo electrónico web, las tiendas online, las redes sociales, etc.
 
@@ -108,7 +108,7 @@ Muchas veces el concepto "servidor web" también se usa como referencia al **har
 
 El objetivo de un servidor web es **proporcionar los medios para permitir la comunicación entre dos o más programas o artefactos de software** sin importar la tecnología usada para operar en cada uno de ellos.
 
-En la actualidad el [servidor web más extendido]() es **Nginx**. Por ello nos centraremos en él durante este curso. Existen otros servidores web. Una forma fácil de consultar la lista y ver una [comparativa muy general](https://en.wikipedia.org/wiki/Comparison_of_web_server_software) es visitando la Wikipedia.
+En la actualidad el [servidor web más extendido](https://w3techs.com/technologies/overview/web_server) es **Nginx**. Por ello nos centraremos en él durante este curso. Existen otros servidores web. Una forma fácil de consultar la lista y ver una [comparativa muy general](https://en.wikipedia.org/wiki/Comparison_of_web_server_software) es visitando la Wikipedia.
 
 Los servidores web se engloban en un conjunto de sistemas más generales fundamentados en el **modelo distribuido**. En este modelo el sistema no es unitario, sino que está repartido entre diferentes máquinas o conjuntos de hardware. Esta arquitectura tiene que afrontar algunos problemas que se deben tener en cuenta:
 
@@ -161,7 +161,7 @@ También es vital que el **sistema operativo** que elijamos sea estable. No tien
 
 > Se estima que alrededor de un 80% de los servidores que hay funcionando en Internet corren sobre Linux.
 
-Lo siguiente que tendrás que conseguir es una **dirección IP estática**. Por supuesto debe ser una dirección de internet a no ser que tu objetivo sea montar una intranet. Nuestra máquina debe ser accesible desde redes remotas.
+Obviamente se debe disponer de una **conexión a internet** con suficiente ancho de banda de subida y bajada. Lo siguiente que tendrás que conseguir es una **dirección IP estática**. Por supuesto debe ser una dirección de internet a no ser que tu objetivo sea montar una intranet. Nuestra máquina debe ser accesible desde redes remotas.
 
 Los nombres y direcciones de internet que conocemos se basan en un sistema llamado **DNS** que convierte esas direcciones legibles para nosotros en direcciones IP y viceversa. Si nuestra dirección IP cambia frecuentemente cuando alguien accede a nuestra página esta le aparecería como no disponible a pesar de que todo el resto del sistema estuviera trabajando.
 
