@@ -1,4 +1,6 @@
-# UT1-A1: Trabajando con git
+# UT1-TE1: Documentación y sistemas de control de versiones
+
+### TAREA EVALUABLE
 
 1. El alumnado trabajará por parejas: `user1` y `user2`. Indicar quién es `user1` y quién es `user2`.
 2. `user1` creará un **repositorio público** llamado **git-work** en su cuenta de GitHub, añadiendo un `README.md` y una licencia MIT.
