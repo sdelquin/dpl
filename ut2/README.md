@@ -159,7 +159,7 @@ Este punto de dimensionar los recursos necesarios es crítico y difícil de gest
 
 También es vital que el **sistema operativo** que elijamos sea estable. No tiene ningún sentido elegir un sistema operativo que deje de estar funcional rápidamente. Es conveniente que lleve cierta seguridad y control de permisos integrado. Los sistemas operativos más habituales para este tipo de tareas son **Linux** (en sus distintas distribuciones) ya que proporcionan robustez, disponibilidad y alto nivel de personalización.
 
-> Se estima que alrededor de un 80% de los servidores que hay funcionando en Internet corren sobre Linux.
+> Se estima que alrededor de un [80% de los servidores que hay funcionando en Internet corren sobre Linux/Unix](https://w3techs.com/technologies/overview/operating_system).
 
 Obviamente se debe disponer de una **conexión a internet** con suficiente ancho de banda de subida y bajada. Lo siguiente que tendrás que conseguir es una **dirección IP estática**. Por supuesto debe ser una dirección de internet a no ser que tu objetivo sea montar una intranet. Nuestra máquina debe ser accesible desde redes remotas.
 
@@ -187,7 +187,7 @@ Lo más "habitual" sería instalar Nginx en un sistema operativo de tipo servido
 
 ### Instalación nativa
 
-Aunque existen versiones de Nginx en la paquetería de casi todas las distribuciones Linux, vamos a optar por instalar la versión que se ofrece en los **repositorios oficiales** de Nginx. El principal motivo es que se trata de versiones mucho más actualizadas y que siguen el estándar de estructura de carpetas y ficheros usadas mayoritariamente.
+Aunque existen versiones de Nginx en la paquetería de casi todas las distribuciones Linux, vamos a optar por instalar la versión que se ofrece en los **repositorios oficiales** de Nginx. El principal motivo es que se trata de versiones mucho más actualizadas y que siguen el estándar de estructura de carpetas y ficheros más extendida.
 
 Lo primero será actualizar el listado de paquetes:
 
@@ -216,7 +216,7 @@ A continuación instalaremos algunos paquetes de soporte:
 sdelquin@lemon:~$ sudo apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
 ```
 
-Ahora descargamos y guardamos la clave de firma Nginx:
+Ahora descargamos, desarmamos y guardamos la clave de firma Nginx:
 
 ```console
 sdelquin@lemon:~$ curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nginx.gpg
@@ -255,7 +255,7 @@ TLS SNI support enabled
 configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-g -O2 -ffile-prefix-map=/data/builder/debuild/nginx-1.22.0/debian/debuild-base/nginx-1.22.0=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
-Igualmente podemos comprobar el estado del servicio mediante el respectivo comando de [systemd](https://wiki.debian.org/systemd):
+Igualmente podemos comprobar el estado del servicio mediante el comando adecuado de [systemd](https://wiki.debian.org/systemd):
 
 ```console
 sdelquin@lemon:~$ sudo systemctl status nginx
@@ -320,7 +320,7 @@ sdelquin@lemon:~$ firefox 127.0.0.1
 
 ![Nginx Hello 127](files/nginx-hello-127.png)
 
-> Dado que Nginx se instala como servicio, ya queda configurado para autoarrancarse. Eso significa que si reiniciamos el equipo, podemos comprobar que el servidor web volverá a levantarse tras cada arranque.
+> Dado que Nginx se instala como servicio, ya queda configurado para autoarrancarse. Eso significa que si reiniciamos el equipo el servidor web volverá a levantarse tras cada arranque.
 
 ### Instalación dockerizada
 
@@ -388,11 +388,11 @@ hello-world   latest    46331d942d63   6 months ago   9.14kB
 
 ## Servidores de aplicaciones
 
-Un servidor de aplicaciones es un paquete software que proporciona servicios a las aplicaciones como pueden ser seguridad, servicios de datos, soporte para transacciones, balanceo de carga y gestión de sistemas distribuidos.
+Un servidor de aplicaciones es un paquete software que proporciona servicios a las aplicaciones tales como seguridad, servicios de datos, soporte para transacciones, balanceo de carga y gestión de sistemas distribuidos.
 
 El funcionamiento de un servidor de aplicaciones necesita de un servidor web. Muchas veces vienen en el mismo paquete, pero realmente son dos partes diferenciadas.
 
-Cuando un cliente hace una petición al servidor web, este trata de gestionarlo, pero hay muchos elementos con los que no sabe qué hacer. Aquí entra en juego el servidor de aplicaciones, que descarga al servidor web de la gestión de determinados tipos de archivo.
+Cuando un cliente hace una petición al servidor web, este trata de gestionarla, pero hay muchos elementos con los que no sabe qué hacer. Aquí entra en juego el servidor de aplicaciones, que descarga al servidor web de la gestión de determinados tipos de archivos.
 
 A continuación veremos el despliegue de una aplicación PHP como ejemplo de servidor de aplicaciones.
 
@@ -400,9 +400,9 @@ A continuación veremos el despliegue de una aplicación PHP como ejemplo de ser
 
 [PHP](https://www.php.net/) es un lenguaje de "scripting" muy enfocado a la programación web (aunque no únicamente) y permite desarrollar aplicaciones integradas en el propio código HTML.
 
-El servidor de aplicación que se utiliza para PHP es [PHP-FPM](https://www.php.net/manual/es/install.fpm.php). Se encarga de manejar los procesos [FastCGI](https://es.wikipedia.org/wiki/FastCGI), un protocolo para interconectar programas interactivos con un servidor web.
+El servidor de aplicación (o manejador de procesos) que se utiliza para PHP es [PHP-FPM](https://www.php.net/manual/es/install.fpm.php). Se encarga de manejar los procesos [FastCGI](https://es.wikipedia.org/wiki/FastCGI), un protocolo para interconectar programas interactivos con un servidor web.
 
-Para **instalar PHP-FPM** seguiremos los pasos indicados.
+Para **instalar PHP-FPM** seguiremos los pasos indicados a continuación.
 
 En primer lugar debemos instalar algunos prerrequisitos:
 
@@ -440,10 +440,26 @@ Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
 
-Ahora ya podemos instalar PHP-FPM:
+Es posible encontrarnos con varias versiones disponibles del paquete. Veamos primero cómo enfocar la búsqueda a los nombres de paquete que nos interesan:
 
 ```console
-sdelquin@lemon:~$ sudo apt install -y php8.1-fpm
+sdelquin@lemon:~$ apt-cache search --names-only 'php*-fpm'
+php7.4-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary) (default)
+php5.6-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php7.0-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php7.1-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php7.2-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php7.3-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php8.0-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php8.1-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+php8.2-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
+```
+
+Revisando la salida, nos damos cuenta que versión más reciente es la `v8.2`. Instalamos dicha versión:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y php8.2-fpm
 ...
 ...
 ...
@@ -452,37 +468,37 @@ sdelquin@lemon:~$ sudo apt install -y php8.1-fpm
 Dado que PHP-FPM se instala en el sistema como un **servicio**, podemos comprobar su estado utilizando systemd:
 
 ```console
-sdelquin@lemon:~$ sudo systemctl status php8.1-fpm
-● php8.1-fpm.service - The PHP 8.1 FastCGI Process Manager
-     Loaded: loaded (/lib/systemd/system/php8.1-fpm.service; enabled; vendor preset: enabled)
-     Active: active (running) since Fri 2022-09-16 11:38:52 WEST; 39min ago
-       Docs: man:php-fpm8.1(8)
-    Process: 73647 ExecStartPost=/usr/lib/php/php-fpm-socket-helper install /run/php/php-fpm.sock /etc/php/8>
-   Main PID: 73644 (php-fpm8.1)
-     Status: "Processes active: 0, idle: 2, Requests: 1, slow: 0, Traffic: 0req/sec"
+sdelquin@lemon:~$ sudo systemctl status php8.2-fpm
+● php8.2-fpm.service - The PHP 8.2 FastCGI Process Manager
+     Loaded: loaded (/lib/systemd/system/php8.2-fpm.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2022-10-13 16:08:16 WEST; 26s ago
+       Docs: man:php-fpm8.2(8)
+    Process: 598830 ExecStartPost=/usr/lib/php/php-fpm-socket-helper install /run/php/php-fpm.sock >
+   Main PID: 598827 (php-fpm8.2)
+     Status: "Processes active: 0, idle: 2, Requests: 0, slow: 0, Traffic: 0req/sec"
       Tasks: 3 (limit: 2251)
-     Memory: 9.4M
-        CPU: 181ms
-     CGroup: /system.slice/php8.1-fpm.service
-             ├─73644 php-fpm: master process (/etc/php/8.1/fpm/php-fpm.conf)
-             ├─73645 php-fpm: pool www
-             └─73646 php-fpm: pool www
+     Memory: 9.1M
+        CPU: 19ms
+     CGroup: /system.slice/php8.2-fpm.service
+             ├─598827 php-fpm: master process (/etc/php/8.2/fpm/php-fpm.conf)
+             ├─598828 php-fpm: pool www
+             └─598829 php-fpm: pool www
 
-sep 16 11:38:52 lemon systemd[1]: Starting The PHP 8.1 FastCGI Process Manager...
-sep 16 11:38:52 lemon systemd[1]: Started The PHP 8.1 FastCGI Process Manager.
+oct 13 16:08:16 lemon systemd[1]: Starting The PHP 8.2 FastCGI Process Manager...
+oct 13 16:08:16 lemon systemd[1]: Started The PHP 8.2 FastCGI Process Manager.
 ```
 
 Con esta instalación, también hemos instalado el propio **intéprete PHP** para ejecutar programas:
 
 ```console
 sdelquin@lemon:~$ php --version
-PHP 8.1.10 (cli) (built: Sep 14 2022 10:31:35) (NTS)
+PHP 8.2.0RC3 (cli) (built: Sep 29 2022 22:12:49) (NTS)
 Copyright (c) The PHP Group
-Zend Engine v4.1.10, Copyright (c) Zend Technologies
-    with Zend OPcache v8.1.10, Copyright (c), by Zend Technologies
+Zend Engine v4.2.0RC3, Copyright (c) Zend Technologies
+    with Zend OPcache v8.2.0RC3, Copyright (c), by Zend Technologies
 ```
 
-Podemos probar que funciona bien ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
+Podemos comprobar que funciona bien ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
 
 ```console
 sdelquin@lemon:~$ php -r "echo gethostname();"
@@ -492,6 +508,8 @@ lemon
 #### Habilitando PHP en Nginx
 
 Nginx es un servidor web que sirve ficheros pero "no sabe" manejar código escrito en PHP (u otros lenguajes). Es por ello que necesitamos un procesador (servidor de aplicación) como PHP-FPM.
+
+Lo primero que hay que hacer es permitir que el usuario
 
 Para habilitar la comunicación entre Nginx y PHP-FPM debemos editar el siguiente fichero de configuración:
 

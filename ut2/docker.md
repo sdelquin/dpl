@@ -7,8 +7,9 @@
 Instalamos ciertos prerrequisitos:
 
 ```console
-sdelquin@lemon:~$ sudo apt-get update
-sdelquin@lemon:~$ sudo apt-get install \
+sdelquin@lemon:~$ sudo apt update
+...
+sdelquin@lemon:~$ sudo apt install -y \
     ca-certificates \
     curl \
     gnupg \
@@ -52,7 +53,7 @@ Todos los paquetes están actualizados.
 Ahora sí podemos instalar ya las herramientas Docker en el sistema:
 
 ```console
-sdelquin@lemon:~$ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sdelquin@lemon:~$ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ...
 ...
 ...
@@ -97,7 +98,7 @@ Docker version 20.10.18, build b40c2f6
 
 ## Pasos posteriores
 
-Un usuario "ordinario" no podría trabajar con Docker ya que el servicio sólo está a disposición de usuarios "privilegiados" (`root`). En este sentido debemos incluir a nuestro usuario habitual en el grupo adecuado:
+Un usuario "ordinario" no podría trabajar con Docker ya que el servicio sólo está a disposición de usuarios "privilegiados" (`root`, `sudo`). En este sentido debemos incluir a nuestro usuario habitual en el grupo adecuado:
 
 ```console
 sdelquin@lemon:~$ sudo usermod -aG docker $USER
@@ -107,7 +108,7 @@ sdelquin@lemon:~$ sudo usermod -aG docker $USER
 
 ## Primer contenedor
 
-Docker nos ofrece un "Hello World" para probar que todo se ha instalado correctamente y que los permisos son los adecuados:
+Docker nos ofrece un contenedor "[Hello World](https://github.com/docker-library/hello-world/blob/master/hello.c)" para comprobar que todo se ha instalado correctamente y que los permisos son los adecuados:
 
 ```console
 sdelquin@lemon:~$ docker run hello-world
@@ -167,7 +168,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 ## Manejando las imágenes
 
-Cuando lanzamos un contenedor, su imagen debe ser previamente descargada a nuestro disco. Por ejemplo, para la aplicación anterior `hello-world`, su imagen se ha guardado localmente.
+Cuando lanzamos un contenedor, su imagen debe ser previamente descargada en nuestro disco. Por ejemplo, para la aplicación anterior `hello-world`, su imagen se ha guardado localmente.
 
 Podemos **ver las imágenes almacenadas** en nuestro disco:
 
@@ -189,7 +190,7 @@ sdelquin@lemon:~$ docker images
 REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
 ```
 
-Como se comentó previamente, el lanzamiento de un contenedor implica la descarga de su imagen. Pero también es posible únicamente **descargar una imagen**:
+Como se comentó previamente, el lanzamiento de un contenedor implica la descarga de su imagen. Pero también es posible únicamente **descargar la imagen**:
 
 ```console
 sdelquin@lemon:~$ docker pull hello-world
