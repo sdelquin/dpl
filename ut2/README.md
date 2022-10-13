@@ -210,16 +210,24 @@ Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
 
-A continuación instalaremos algunos paquetes de soporte:
+A continuación instalaremos algunos **paquetes de soporte**:
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
 ```
 
-Ahora descargamos, desarmamos y guardamos la clave de firma Nginx:
+Ahora descargamos, desarmamos y guardamos la **clave de firma** Nginx:
 
 ```console
-sdelquin@lemon:~$ curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nginx.gpg
+sdelquin@lemon:~$ curl -fsSL https://nginx.org/keys/nginx_signing.key \
+| sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nginx.gpg
+```
+
+A continuación añadimos las **fuentes del repositorio oficial** de Nginx para `apt`:
+
+```console
+sdelquin@lemon:~$ echo 'deb http://nginx.org/packages/debian bullseye nginx' \
+| sudo tee /etc/apt/sources.list.d/nginx.list > /dev/null
 ```
 
 Actualizamos el índice de paquetes:
@@ -238,7 +246,7 @@ Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
 ```
 
-Con el nuevo repositorio añadido, ya podemos instalar Nginx:
+Con el nuevo repositorio añadido, ya podemos **instalar Nginx**:
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y nginx
@@ -324,9 +332,9 @@ sdelquin@lemon:~$ firefox 127.0.0.1
 
 ### Instalación dockerizada
 
-[Docker](https://www.docker.com/) es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativos.​
+[Docker](https://www.docker.com/) es un proyecto de código abierto que **automatiza el despliegue de aplicaciones dentro de contenedores de software**, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativos.​
 
-→ [Iniciación a Docker](./docker.md)
+🐳 [Iniciación a Docker](./docker.md)
 
 Existen multitud de imágenes para contenedores ya preparadas en [Docker Hub](https://hub.docker.com/search). Una de ellas es [Nginx](https://hub.docker.com/_/nginx). Lanzar este contenedor es bastante sencillo:
 
@@ -404,28 +412,30 @@ El servidor de aplicación (o manejador de procesos) que se utiliza para PHP es 
 
 Para **instalar PHP-FPM** seguiremos los pasos indicados a continuación.
 
-En primer lugar debemos instalar algunos prerrequisitos:
+En primer lugar debemos instalar algunos **prerrequisitos**:
 
 ```console
 sdelquin@lemon:~$ sudo apt update
-sdelquin@lemon:~$ sudo apt install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
-...
-...
+
+sdelquin@lemon:~$ sudo apt install -y lsb-release ca-certificates \
+apt-transport-https software-properties-common gnupg2
 ```
 
-Añadimos el repositorio (externo) desde donde descargarnos la última versión de PHP-FPM:
+Añadimos el **repositorio externo** desde donde descargarnos la última versión de PHP-FPM:
 
 ```console
-sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" \
+| sudo tee /etc/apt/sources.list.d/sury-php.list
 ```
 
-Importamos la clave [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del repositorio:
+**Importamos la clave** [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del repositorio:
 
 ```console
-sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury.gpg
+sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg \
+| sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury.gpg
 ```
 
-Confirmamos que el repositorio está funcionando tras actualizar las fuentes:
+Confirmamos que el **repositorio está disponible** tras actualizar las fuentes:
 
 ```console
 sdelquin@lemon:~$ sudo apt update
@@ -440,7 +450,7 @@ Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
 
-Es posible encontrarnos con varias versiones disponibles del paquete. Veamos primero cómo enfocar la búsqueda a los nombres de paquete que nos interesan:
+Es posible encontrarnos con varias versiones del paquete. Veamos primero cómo enfocar la búsqueda a los nombres de paquete que nos interesan:
 
 ```console
 sdelquin@lemon:~$ apt-cache search --names-only 'php*-fpm'
@@ -456,13 +466,10 @@ php8.1-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
 php8.2-fpm - server-side, HTML-embedded scripting language (FPM-CGI binary)
 ```
 
-Revisando la salida, nos damos cuenta que versión más reciente es la `v8.2`. Instalamos dicha versión:
+Revisando la salida, nos damos cuenta que la versión más reciente es la `v8.2`. Instalamos dicha versión:
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y php8.2-fpm
-...
-...
-...
 ```
 
 Dado que PHP-FPM se instala en el sistema como un **servicio**, podemos comprobar su estado utilizando systemd:
@@ -498,7 +505,7 @@ Zend Engine v4.2.0RC3, Copyright (c) Zend Technologies
     with Zend OPcache v8.2.0RC3, Copyright (c), by Zend Technologies
 ```
 
-Podemos comprobar que funciona bien ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
+Podemos comprobar que funciona ejecutando, por ejemplo, una instrucción en PHP que devuelve el nombre de nuestra máquina:
 
 ```console
 sdelquin@lemon:~$ php -r "echo gethostname();"
@@ -509,38 +516,45 @@ lemon
 
 Nginx es un servidor web que sirve ficheros pero "no sabe" manejar código escrito en PHP (u otros lenguajes). Es por ello que necesitamos un procesador (servidor de aplicación) como PHP-FPM.
 
-Lo primero que hay que hacer es permitir que el usuario
-
-Para habilitar la comunicación entre Nginx y PHP-FPM debemos editar el siguiente fichero de configuración:
+Lo primero que hay que hacer es permitir que el usuario `nginx` tenga acceso al [socket unix](https://es.wikipedia.org/wiki/Socket_Unix) que abre PHP-FPM. Para ello debemos editar la configuración de PHP-FPM:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/nginx/sites-enabled/default
+sdelquin@lemon:~$ sudo vi /etc/php/8.2/fpm/pool.d/www.conf
 ```
 
-Y modificar lo siguiente:
+```ini
+23| user = nginx
+24| group = nginx
+...
+51| listen.owner = nginx
+52| listen.group = nginx
+```
+
+Guardamos y **recargamos la configuración** de PHP-FPM:
+
+```console
+sdelquin@lemon:~$ sudo systemctl reload php8.2-fpm
+```
+
+Para **habilitar la comunicación entre Nginx y PHP-FPM** vamos a editar el siguiente fichero de configuración:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/default.conf
+```
+
+Buscar el bloque `location ~ \.php` y dejarlo así:
 
 ```nginx
-...
-...
-44         index index.php index.html index.htm index.nginx-debian.html;
-...
-...
-56         location ~ \.php$ {
-57                 include snippets/fastcgi-php.conf;
-58
-59                 # With php-fpm (or other unix sockets):
-60                 fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-61                 # With php-cgi (or other tcp sockets):
-62                 # fastcgi_pass 127.0.0.1:9000;
-63         }
-...
-...
-68         location ~ /\.ht {
-69                 deny all;
-70         }
+location ~ \.php$ {
+    root           /usr/share/nginx/html;
+    fastcgi_pass   unix:/var/run/php/php8.2-fpm.sock;
+    index          index.php;
+    include        fastcgi_params;
+    fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
+}
 ```
 
-Podemos comprobar que la sintaxis del fichero de configuración es correcta utilizando Nginx:
+Podemos comprobar que la **sintaxis del fichero de configuración** es correcta utilizando Nginx:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -t
@@ -548,7 +562,7 @@ nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
 
-Ahora recargamos la configuración que hemos modificado:
+Ahora **recargamos la configuración** que hemos modificado:
 
 ```console
 sdelquin@lemon:~$ sudo systemctl reload nginx
@@ -567,11 +581,13 @@ sdelquin@lemon:~$ echo "<?php phpinfo(); ?>" > ~/dev/info.php
 Ahora enlazamos este fichero desde la carpeta "root" del servidor web Nginx:
 
 ```console
-sdelquin@lemon:~$ sudo ln -s ~/dev/info.php /var/www/html/
-sdelquin@lemon:~$ ls -l /var/www/html/
-total 4
--rw-r--r-- 1 root root 612 sep 15 09:26 index.nginx-debian.html
-lrwxrwxrwx 1 root root  27 sep 15 12:06 info.php -> /home/sdelquin/dev/info.php
+sdelquin@lemon:~$ sudo ln -s ~/dev/info.php /usr/share/nginx/html/
+
+sdelquin@lemon:~$ ls -l /usr/share/nginx/html/
+total 8
+-rw-r--r-- 1 root root 497 may 24 00:59 50x.html
+-rw-r--r-- 1 root root 615 may 24 00:59 index.html
+lrwxrwxrwx 1 root root  27 oct 13 16:15 info.php -> /home/sdelquin/dev/info.php
 ```
 
 Abrimos un navegador en la ruta especificada y vemos el resultado:
@@ -596,7 +612,6 @@ sdelquin@lemon:~/dev/app$ tree
 .
 ├── default.conf
 ├── docker-compose.yml
-├── fastcgi-php.conf
 └── src
     └── index.php
 
@@ -612,8 +627,7 @@ services:
   web:
     image: nginx
     volumes:
-      - ./src:/etc/nginx/html
-      - ./fastcgi-php.conf:/etc/nginx/fastcgi-php.conf
+      - ./src:/etc/nginx/html # "root" por defecto en Nginx
       - ./default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 80:80
@@ -624,27 +638,7 @@ services:
       - ./src:/etc/nginx/html
 ```
 
-Como se puede ver, dependemos de otros dos ficheros de configuración:
-
-**`fastcgi-php.conf`**
-
-```nginx
-## regex to split $uri to $fastcgi_script_name and $fastcgi_path
-fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-
-## Check that the PHP script exists before passing it
-try_files $fastcgi_script_name =404;
-
-## Bypass the fact that try_files resets $fastcgi_path_info
-## see: http://trac.nginx.org/nginx/ticket/321
-set $path_info $fastcgi_path_info;
-fastcgi_param PATH_INFO $path_info;
-
-fastcgi_index index.php;
-
-fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-fastcgi_param PATH_INFO $fastcgi_path_info;
-```
+Fichero de configuración del sitio web por defecto:
 
 **`default.conf`**
 
@@ -654,9 +648,9 @@ server {
   index index.php index.html;
 
   location ~ \.php$ {
-    include fastcgi-php.conf;
-    include fastcgi_params;  # fichero incluido en la instalación
     fastcgi_pass php-fpm:9000;
+    include fastcgi_params;  # fichero incluido en la instalación
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
   }
 }
 ```

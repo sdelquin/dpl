@@ -16,13 +16,13 @@ sdelquin@lemon:~$ sudo apt install -y \
     lsb-release
 ```
 
-Importamos la clave GPG del repositorio externo de Docker:
+Importamos la **clave GPG del repositorio** externo de Docker:
 
 ```console
 sdelquin@lemon:~$ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
 ```
 
-Añadimos el respositorio externo de Docker:
+Añadimos el **repositorio externo** de Docker:
 
 ```console
 sdelquin@lemon:~$ echo \
@@ -50,14 +50,13 @@ Leyendo la información de estado... Hecho
 Todos los paquetes están actualizados.
 ```
 
-Ahora sí podemos instalar ya las herramientas Docker en el sistema:
+Ahora sí podemos instalar ya las **herramientas Docker** en el sistema:
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-...
-...
-...
 ```
+
+> 💡 &nbsp;CE viene de Community Edition.
 
 ## Comprobación
 
@@ -160,8 +159,9 @@ CONTAINER ID   IMAGE         COMMAND    CREATED         STATUS                  
 Para **matar un proceso** podemos usar su ID o bien su nombre (que se genera aleatoriamente si no aportamos uno):
 
 ```console
-sdelquin@lemon:~$ docker rm 6dcc89f90f61
+sdelquin@lemon:~$ docker rm 6dcc89f90f61  # docker rm kind_kowalevski
 6dcc89f90f61
+
 sdelquin@lemon:~$ docker ps -a
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ```
@@ -181,16 +181,17 @@ hello-world   latest    46331d942d63   6 months ago   9.14kB
 Para **borrar una imagen** podemos usar su ID o bien su nombre:
 
 ```console
-sdelquin@lemon:~$ docker rmi 46331d942d63
+sdelquin@lemon:~$ docker rmi 46331d942d63  # docker rmi hello-world
 Untagged: hello-world:latest
 Untagged: hello-world@sha256:62af9efd515a25f84961b70f973a798d2eca956b1b2b026d0a4a63a3b0b6a3f2
 Deleted: sha256:46331d942d6350436f64e614d75725f6de3bb5c63e266e236e04389820a234c4
 Deleted: sha256:efb53921da3394806160641b72a2cbd34ca1a9a8345ac670a85a04ad3d0e3507
+
 sdelquin@lemon:~$ docker images
 REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
 ```
 
-Como se comentó previamente, el lanzamiento de un contenedor implica la descarga de su imagen. Pero también es posible únicamente **descargar la imagen**:
+Como se comentó previamente, el lanzamiento de un contenedor implica la descarga de su imagen. Pero más allá de correr un contenedor también es posible únicamente **descargar la imagen**:
 
 ```console
 sdelquin@lemon:~$ docker pull hello-world
@@ -202,7 +203,7 @@ Status: Downloaded newer image for hello-world:latest
 docker.io/library/hello-world:latest
 ```
 
-Ahora ya lo tenemos disponible en el listado de imágenes locales:
+Ahora ya la tenemos disponible en el listado de imágenes locales:
 
 ```console
 sdelquin@lemon:~$ docker images
@@ -212,17 +213,15 @@ hello-world   latest    46331d942d63   6 months ago   9.14kB
 
 ## Limpiando recursos
 
-Hay un paquete muy interesante de cara a la "limpieza" de recursos Docker. Se llama `docker-clean` y se puede instalar de la siguiente manera:
+Hay un paquete muy interesante de cara a la "limpieza" de recursos Docker. Se llama [docker-clean](https://github.com/ZZROTDesign/docker-clean) y se puede instalar de la siguiente manera:
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y docker-clean
-...
-...
 ```
 
-Uno de los comandos más cómodos es: `docker-clean run` que se encarga de borrar:
+Uno de los comandos más cómodos de este paquete es: `docker-clean run` que se encarga de borrar:
 
 - Todos los contenedores parados.
 - Todas las imágenes sin etiquetar.
-- Todos las volúmenes sin usar.
+- Todos los volúmenes sin usar.
 - Todas las redes virtuales.
