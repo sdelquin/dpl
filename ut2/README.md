@@ -694,6 +694,8 @@ app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: start worker process 29
 app-web-1      | 2022/09/21 10:22:20 [notice] 1#1: start worker process 30
 ```
 
+> ⚠️ &nbsp;Si el comando anterior da un error de tipo "bind: address already in use" es posible que tengas Nginx nativo funcionando. Puedes pararlo con: `sudo systemctl stop nginx`.
+
 Si dejamos este proceso corriendo y abrimos otra pestaña de la terminal, podemos comprobar que la aplicación PHP está funcionando correctamente:
 
 ```console
