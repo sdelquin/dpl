@@ -5,7 +5,8 @@ Ya hemos visto la instalación de Nginx. En esta unidad de trabajo nos vamos a d
 [Configuración del servidor web](#configuración-del-servidor-web)  
 [Hosts virtuales](#hosts-virtuales)  
 [Directivas](#directivas)  
-[Módulos](#módulos)
+[Módulos](#módulos)  
+[Configuración SSL](#configuración-ssl)
 
 ## Configuración del servidor web
 
@@ -313,6 +314,22 @@ sdelquin@lemon:~$ firefox universe/helloworld
 
 > 💡 &nbsp;Recordar que hay que incluir la entrada correspondiente en `/etc/hosts` para que el nombre de dominio se resuelva localmente.
 
+### Puerto de escucha
+
+Lo habitual es configurar el _virtual host_ para escuchar en el puerto 80 (http) mediante la directiva:
+
+```nginx
+listen 80;
+```
+
+Pero nada impide que cambiemos este puerto a cualquier otro (ej. 8000, 8080, 8081, etc.). En el caso concreto de **https** tendremos que escuchar en el puerto **443** indicando Secure Sockets Layer (**ssl**):
+
+```nginx
+listen 443 ssl;
+```
+
+> 💡 Si quitamos `ssl` de la directiva tendríamos que usar http://hostname:443 para conectar (especifica que queremos conectar al puerto 443 usando http, en vez del puerto por defecto 80). Es extraño pero se podría hacer.
+
 ### Alias
 
 Los "alias" son directivas que funcionan junto a los _locations_ y permiten evitar que se añada la ruta de la url al _root_.
@@ -468,6 +485,102 @@ server {
 }
 ```
 
+### Ficheros de índice
+
+En ausencia de un fichero en la ruta de una URL, Nginx buscará de forma ordenada, aquellos **ficheros de índice** especificados en la directiva `index`. Lo habitual es tener algo como:
+
+```nginx
+location / {
+    index index.html index.php;
+}
+```
+
+Pero es sólo una convención. Se podría sustituir por lo que nos interesase en cada momento.
+
+### Valores de retorno
+
+Al igual que podría pasar con una función en cualquier lenguaje de programación, Nginx también permite devolver un valor como resultado de una petición.
+
+Para ello hay que utilizar la directiva `return` indicando el [código de estado HTTP](https://es.wikipedia.org/wiki/Anexo:C%C3%B3digos_de_estado_HTTP).
+
+Para el caso de **errores de cliente** (4xx) bastante con indicar el código de retorno:
+
+```nginx
+return 403;
+```
+
+Para el caso de **redirecciones** (3xx) además del código hay que indicar la URL a la que redirigimos:
+
+```nginx
+return 301 https://example.com;
+```
+
+### Redirecciones
+
+Como hemos visto, las [redirecciones](https://www.nginx.com/blog/creating-nginx-rewrite-rules/) son un caso especial de valores de retorno en Nginx, pero dada su importancia, lo vamos a ver en un apartado propio.
+
+Veamos un primer ejemplo de redirección:
+
+```nginx
+server {
+    listen 80;
+    listen 443 ssl;
+    server_name www.old-name.com;
+    return 301 $scheme://www.new-name.com$request_uri;
+}
+```
+
+En este ejemplo estamos redirigiendo todo el tráfico del dominio `www.old-name.com` al dominio `www.new-name.com`. Es importante destacar el uso de [variables Nginx](https://nginx.org/en/docs/varindex.html) en las directivas. En este caso concreto se manejan dos de ellas:
+
+| Variable       | Significado                      |
+| -------------- | -------------------------------- |
+| `$scheme`      | Esquema usado (http, https, ...) |
+| `$request_uri` | Resto de la url                  |
+
+> 💡 Aunque no es exactamente lo mismo, podemos simplificar diciendo que [URI y URL](https://danielmiessler.com/study/difference-between-uri-url/), a los efectos que manejamos, son equivalentes.
+
+### Expresiones regulares
+
+Nginx nos permite usar **expresiones regulares** en ubicaciones (y otras directivas similares). Para ello usamos el operador `~` indicando el fragmento que debe coincidir:
+
+```nginx
+location ~ ^/img/.*-profile.png {
+  return 403;
+}
+```
+
+También es posible utilizar _grupos de captura_ para manipular determinadas partes de la URL:
+
+```nginx
+location ~ ^/query/(.*) {
+  return 301 https://domain.example/?search=$1;
+}
+```
+
+> 💡 Si usamos el operador `=` en vez de `~` estaremos forzando a que la URL sea exactamente la que indicamos.
+
+### Orden de búsqueda
+
+A través de la directiva `try_files` de Nginx podemos probar distintas rutas definiendo un orden de búsqueda.
+
+Supongamos que en el siguiente ejemplo hacemos una petición a **http://www.domain.com/images/image1.gif**. El orden de búsqueda será el siguiente:
+
+1. `image1.gif`
+2. `image1.gif/`
+3. Devolver `/images/default.gif`
+
+La directiva `expires` indica el tiempo que será cacheado un archivo. En este caso 30 segundos.
+
+```nginx
+location /images/ {
+    try_files $uri $uri/ /images/default.gif;
+}
+
+location = /images/default.gif {
+    expires 30s;
+}
+```
+
 ## Módulos
 
 Cuando Nginx se compila se hace incluyendo una serie de **módulos estáticos** que le otorgan ciertas funcionalidades extra:
@@ -607,3 +720,213 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 Ahora, si accedemos a http://universe/files veremos algo similar a lo siguiente:
 
 ![Fancy index](./images/fancy-index.png)
+
+## Configuración SSL
+
+Hoy en día es fundamental que los sitios web utilicen protocolo **https** y cifren el tráfico a través de un certificado de seguridad SSL (_Secure Sockets Layer_). Entre otras cosas porque [desde julio de 2018 Google marca todas las webs que no usen https como inseguras](https://es.gizmodo.com/se-acabo-a-partir-de-julio-google-chrome-marcara-toda-1822842221).
+
+## Let's Encrypt
+
+Los certificados de seguridad _SSL_ son emitidos por entidades certificadoras de autoridad. La gran mayoría de certificadoras cobran por los certificados, pero [Let's Encrypt](https://letsencrypt.org/) es un proyecto que surge con el objetivo de democratizar el acceso a los certificados de seguridad, emitiéndolos de forma gratuita y ofreciendo gran variedad de herramientas para trabajar con ellos.
+
+## Certbot
+
+### Instalación
+
+Existen [múltiples clientes](https://letsencrypt.org/docs/client-options/) de _Let's Encrypt_ que permiten validar nuestros dominios, pero la herramienta más recomendada es [Certbot](https://certbot.eff.org/).
+
+La página de Certbot nos permite elegir incluso el servidor web que estamos utilizando y sobre qué sistema operativo corre.
+
+![Certbot1](images/certbot.png)
+
+Lo primero que haremos (tras actualizar paquetería) será instalar el **cliente de certbot**:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y certbot
+```
+
+Podemos comprobar que el programa está correctamente instalado:
+
+```console
+sdelquin@lemon:~$ certbot --version
+certbot 1.12.0
+```
+
+A continuación debemos instalar el **plugin de Nginx para certbot**:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y python3-certbot-nginx
+```
+
+### Configuración
+
+Ahora ya podemos lanzar el cliente que nos permitirá obtener los certificados SSL y configurar el sitio web que queramos para que utilice protocolo **https**.
+
+Vamos a configurar el host virtual para el dominio **`http://arkania.es`**:
+
+```console
+sdelquin@lemon:~$ sudo certbot --nginx
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator nginx, Installer nginx
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): sdelqui@gobiernodecanarias.org
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.3-September-21-2022.pdf. You must
+agree in order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: Y
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Would you be willing, once your first certificate is successfully issued, to
+share your email address with the Electronic Frontier Foundation, a founding
+partner of the Let's Encrypt project and the non-profit organization that
+develops Certbot? We'd like to send you email about our work encrypting the web,
+EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: N
+Account registered.
+
+Which names would you like to activate HTTPS for?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: arkania.es
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate numbers separated by commas and/or spaces, or leave input
+blank to select all options shown (Enter 'c' to cancel): 1
+Obtaining a new certificate
+Performing the following challenges:
+http-01 challenge for arkania.es
+Waiting for verification...
+Cleaning up challenges
+Deploying Certificate to VirtualHost /etc/nginx/conf.d/arkania.conf
+
+Please choose whether or not to redirect HTTP traffic to HTTPS, removing HTTP access.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: No redirect - Make no further changes to the webserver configuration.
+2: Redirect - Make all requests redirect to secure HTTPS access. Choose this for
+new sites, or if you're confident your site works on HTTPS. You can undo this
+change by editing your web server's configuration.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
+Redirecting all traffic on port 80 to ssl in /etc/nginx/conf.d/arkania.conf
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations! You have successfully enabled https://arkania.es
+
+You should test your configuration at:
+https://www.ssllabs.com/ssltest/analyze.html?d=arkania.es
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/arkania.es/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/arkania.es/privkey.pem
+   Your cert will expire on 2022-12-25. To obtain a new or tweaked
+   version of this certificate in the future, simply run certbot again
+   with the "certonly" option. To non-interactively renew *all* of
+   your certificates, run "certbot renew"
+ - Your account credentials have been saved in your Certbot
+   configuration directory at /etc/letsencrypt. You should make a
+   secure backup of this folder now. This configuration directory will
+   also contain certificates and private keys obtained by Certbot so
+   making regular backups of this folder is ideal.
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+sdelquin@lemon:~$
+```
+
+> 💡 Las preguntas sobre email de contacto, términos de servicio y campaña EFF sólo saldrán la primera vez que ejecutamos el comando.
+
+Ahora vamos a echar un vistazo a los cambios que ha sufrido el archivo de configuración del host virtual:
+
+```console
+sdelquin@lemon:~$ cat /etc/nginx/conf.d/arkania.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    server_name arkania.es;
+    root /home/sdelquin/arkania;
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/arkania.es/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/arkania.es/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+    if ($host = arkania.es) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name arkania.es;
+    listen 80;
+    return 404; # managed by Certbot
+}
+```
+
+### Probando el acceso seguro
+
+Antes de probar el acceso desde nuestro dominio, debemos reiniciar el servidor web para que las nuevas configuraciones surtan efecto:
+
+```console
+sdelquin@lemon:~$ sudo systemctl restart nginx
+```
+
+🔒 Ahora ya podemos acceder a http://arkania.es (incluso sin _https_) y la conexión será segura.
+
+### Renovación automática del certificado
+
+Los certificados de _Let's Encrypt_ tienen una validez de **90 días**, pero afortunadamente, `certbot` instala una tarea en el cron del sistema de manera que renueva los certificados antes de que expiren:
+
+```console
+sdelquin@lemon:~$ cat /etc/cron.d/certbot
+# /etc/cron.d/certbot: crontab entries for the certbot package
+#
+# Upstream recommends attempting renewal twice a day
+#
+# Eventually, this will be an opportunity to validate certificates
+# haven't been revoked, etc.  Renewal will only occur if expiration
+# is within 30 days.
+#
+# Important Note!  This cronjob will NOT be executed if you are
+# running systemd as your init system.  If you are running systemd,
+# the cronjob.timer function takes precedence over this cronjob.  For
+# more details, see the systemd.timer manpage, or use systemctl show
+# certbot.timer.
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e 'sleep int(rand(43200))' && certbot -q renew
+```
+
+### Redirección www
+
+Es muy habitual que la gente use el prefijo `www` al acceder a un sitio web. Es por ello que puede resultar útil configurar una redirección desde `www.arkania.es` a `arkania.es`.
+
+Lo primero sería lanzar `certbot` para el dominio `www.arkania.es`:
+
+```console
+sdelquin@lemon:~$ sudo certbot --nginx -d www.arkania.es
+```
+
+A continuación deberíamos configurar la redirección de www:
+
+```nginx
+server {
+    listen 80;
+    server_name www.arkania.es;
+    return 301 https://arkania.es$request_uri;
+}
+```
