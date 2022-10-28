@@ -175,7 +175,7 @@ Existe la posibilidad de funcionar con una **dirección IP dinámica** mediante 
 
 ![Arquitectura Nginx](./images/nginx-arquitecture.png)
 
-Vamos a optar por instalar **Nginx** sobre un sistema operativo **Linux**, una de las opciones más extendidas en la actualidad (con la posibilidad de obtener todo el software de manera gratuita). Nginx destaca sobre otros servidores porque:
+Vamos a optar por instalar **Nginx** sobre un sistema operativo **Linux**, una de las opciones más extendidas en la actualidad (con la posibilidad de obtener todo el software de manera gratuita). Nginx destaca sobre otros servidores web porque:
 
 - Tiene un diseño modular y altamente configurable.
 - Ofrece un alto rendimiento.
@@ -183,11 +183,11 @@ Vamos a optar por instalar **Nginx** sobre un sistema operativo **Linux**, una d
 - Forma parte de muchos "stacks" tecnológicos modernos.
 - Existen versiones para muchos sistemas operativos incluyendo Windows, Linux y MacOS.
 
-Lo más "habitual" sería instalar Nginx en un sistema operativo de tipo servidor pero por motivos didácticos, vamos a instalarlo en una versión estándar con interfaz gráfica. Es menos seguro por lo que en un sistema en producción deberíamos optar por la otra opción. A pesar de usar un Linux con interfaz gráfica vamos a instalar todo desde la ventana de terminal, por lo que los pasos se podrán aplicar a un servidor.
+Lo más "habitual" sería instalar Nginx en un **sistema operativo Linux de tipo servidor** pero por motivos didácticos, vamos a instalarlo en una versión estándar con interfaz gráfica. Esta opción es menos segura, por lo que en un sistema en producción deberíamos optar por la otra aproximación. A pesar de usar un Linux con interfaz gráfica vamos a instalar todo desde la ventana de terminal, por lo que los pasos se podrán aplicar a un servidor.
 
 ### Instalación nativa
 
-Aunque existen versiones de Nginx en la paquetería de casi todas las distribuciones Linux, vamos a optar por instalar la versión que se ofrece en los **repositorios oficiales** de Nginx. El principal motivo es que se trata de versiones mucho más actualizadas y que siguen el estándar de estructura de carpetas y ficheros más extendida.
+Aunque existen versiones de Nginx en la paquetería de casi todas las distribuciones Linux, vamos a optar por instalar la versión que se ofrece en los **repositorios oficiales** de Nginx. El principal motivo es que se trata de versiones mucho más actualizadas y que siguen un estándar de estructura de carpetas y ficheros mucho más extendida.
 
 Lo primero será actualizar el listado de paquetes:
 
