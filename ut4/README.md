@@ -2,6 +2,9 @@
 
 En esta unidad vamos a abordar el despliegue de aplicaciones escritas en distintos lenguajes de programación y sobre los frameworks web más utilizados en el momento.
 
+Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** que se encargará de mostrar por pantalla aquellos destinos que ya hemos visitado y aquellos que aún nos quedan por visitar.
+
+[PostgreSQL](#postgresql)  
 [Laravel](#laravel)  
 [Flask](#flask)  
 [Express](#express)  
@@ -10,9 +13,11 @@ En esta unidad vamos a abordar el despliegue de aplicaciones escritas en distint
 
 ## PostgreSQL
 
+![PostgreSQL Logo](./images/postgresql-logo.jpg)
+
 ### Instalación
 
-Para la **capa de datos** de las aplicaciones que vamos a desplegar, necesitamos un sistema gestor de bases de datos. Trabajaremos sobre [PostgreSQL](<[https://](https://www.postgresql.org/)>): _"The World's Most Advanced Open Source Relational Database"_.
+Para la **capa de datos** de la aplicación que vamos a desplegar, necesitamos un sistema gestor de bases de datos. Trabajaremos sobre [PostgreSQL](<[https://](https://www.postgresql.org/)>): _"The World's Most Advanced Open Source Relational Database"_.
 
 Lo primero será **actualizar los repositorios**:
 
@@ -273,7 +278,7 @@ sdelquin@lemon:~$ sudo -u postgres psql
 psql (15.0 (Debian 15.0-1.pgdg110+1))
 Digite «help» para obtener ayuda.
 
-postgres=# CREATE USER travelroad_user WITH ENCRYPTED PASSWORD 'travelroad_password';
+postgres=# CREATE USER travelroad_user WITH ENCRYPTED PASSWORD 'dpl0000';
 CREATE ROLE
 postgres=# CREATE DATABASE travelroad WITH OWNER travelroad_user;
 CREATE DATABASE
@@ -313,6 +318,266 @@ travelroad=> SELECT * FROM places;
 
 ### Carga de datos
 
-Vamos a cargar los datos desde este fichero [places.csv](./files/places.csv):
+Vamos a cargar los datos desde este fichero [places.csv](./files/places.csv) a la tabla `places`.
 
-https://raw.githubusercontent.com/sdelquin/dpl/main/ut0/github-deliver.md
+Lo primero será **descargar el fichero CSV**:
+
+```console
+sdelquin@lemon:~$ curl -o /tmp/places.csv https://raw.githubusercontent.com/sdelquin/dpl/main/ut4/files/places.csv
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   142  100   142    0     0    402      0 --:--:-- --:--:-- --:--:--   402
+```
+
+A continuación usaremos la función `copy` de PostgreSQL para **insertar los datos en la tabla**:
+
+```console
+sdelquin@lemon:~$ psql -h localhost -U travelroad_user -d travelroad \
+-c "\copy places(name, visited) FROM '/tmp/places.csv' DELIMITER ','"
+
+Contraseña para usuario travelroad_user:
+COPY 11
+```
+
+**Comprobamos** que los datos se han insertado de manera adecuada:
+
+```console
+sdelquin@lemon:~$ psql -h localhost -U travelroad_user travelroad
+Contraseña para usuario travelroad_user:
+psql (15.0 (Debian 15.0-1.pgdg110+1))
+Conexión SSL (protocolo: TLSv1.3, cifrado: TLS_AES_256_GCM_SHA384, compresión: desactivado)
+Digite «help» para obtener ayuda.
+```
+
+```sql
+travelroad=> SELECT * FROM places;
+ id |    name    | visited
+----+------------+---------
+  1 | Tokio      | f
+  2 | Budapest   | t
+  3 | Nairobi    | f
+  4 | Berlín     | t
+  5 | Lisboa     | t
+  6 | Denver     | f
+  7 | Moscú      | f
+  8 | Oslo       | f
+  9 | Río        | t
+ 10 | Cincinnati | f
+ 11 | Helsinki   | f
+(11 filas)
+```
+
+## Laravel
+
+![Laravel Logo](./images/laravel-logo.jpg)
+
+[Laravel](https://laravel.com/) es un framework de código abierto para desarrollar aplicaciones y servicios web con **PHP**.
+
+### Instalación
+
+#### Composer
+
+Lo primero que necesitamos es un gestor de dependencias para PHP. Vamos a instalar [Composer](<[https://](https://getcomposer.org/)>):
+
+```console
+sdelquin@lemon:~$ curl -fsSL https://raw.githubusercontent.com/composer/getcomposer.org/main/web/installer \
+| php -- --quiet | sudo mv composer.phar /usr/local/bin/composer
+```
+
+Comprobamos la versión instalada:
+
+```console
+sdelquin@lemon:~$ composer --version
+Composer version 2.4.4 2022-10-27 14:39:29
+```
+
+#### Paquetes de soporte
+
+Necesitamos **ciertos módulos PHP** habilitados en el sistema. Para ello instalamos los siguientes paquetes soporte:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y php8.2-mbstring php8.2-xml php8.2-bcmath php8.2-curl php8.2-pgsql
+```
+
+#### Aplicación
+
+Ahora ya podemos crear la estructura de nuestra aplicación Laravel. Para ello utilizamos `composer`:
+
+```console
+sdelquin@lemon:~$ composer create-project --prefer-dist laravel/laravel travelroad
+```
+
+> 💡 El comando anterior creará una carpeta `travelround` con todas las dependencias que necesitamos.
+
+Entramos en la carpeta de trabajo y probamos [artisan](https://laravel.com/docs/9.x/artisan), la interfaz en línea de comandos para Laravel:
+
+```console
+sdelquin@lemon:~$ cd travelroad/
+
+sdelquin@lemon:~/travelroad$ php artisan --version
+Laravel Framework 9.38.0
+```
+
+Ahora tenemos que **configurar ciertas variables** en el fichero `.env`:
+
+```console
+sdelquin@lemon:~/travelroad$ vi .env
+```
+
+```ini
+...
+APP_NAME=TravelRoad
+APP_ENV=development
+...
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=travelroad
+DB_USERNAME=travelroad_user
+DB_PASSWORD=dpl0000
+...
+```
+
+### Configuración Nginx
+
+Lo primero será fijar los **permisos adecuados a los ficheros del proyecto** para que los servicios Nginx+PHP-FPM pueda trabajar sin errores de acceso:
+
+```console
+sdelquin@lemon:~$ cd ~/travelroad/
+
+sdelquin@lemon:~/travelroad$ sudo chown -R $USER:nginx .
+
+sdelquin@lemon:~/travelroad$ sudo chgrp -R nginx storage bootstrap/cache
+sdelquin@lemon:~/travelroad$ sudo chmod -R ug+rwx storage bootstrap/cache
+```
+
+La **configuración del _virtual-host_ Nginx** para nuestra aplicación Laravel la vamos a hacer en un fichero específico:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+Contenido ↓
+
+```nginx
+server {
+    listen 80;
+    server_name travelroad;
+    root /home/sdelquin/travelroad/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.html index.htm index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+> 💡 Recordar añadir `travelroad` al fichero `/etc/hosts` en caso de estar trabajando en local.
+
+**Comprobamos la sintaxis** del fichero y, si todo ha ido bien, **recargamos la configuración** Nginx:
+
+```console
+sdelquin@lemon:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+sdelquin@lemon:~$ sudo systemctl reload nginx
+```
+
+Ya podemos abrir el navegador en http://travelroad para ver que todo está funcionando correctamente:
+
+```console
+sdelquin@lemon:~$ firefox http://travelroad
+```
+
+![Laravel Init](./images/laravel-init.png)
+
+### Lógica de negocio
+
+Nos queda modificar el comportamiento de la aplicación para cargar los datos y mostrarlos en una plantilla.
+
+Lo primero es **cambiar el código de la ruta**:
+
+```console
+sdelquin@lemon:~$ cd travelroad/
+sdelquin@lemon:~/travelroad$ vi routes/web.php
+```
+
+Contenido ↓
+
+```php
+<?php
+
+use Illuminate\Support\Facades\DB;
+
+Route::get('/', function () {
+  $visited = DB::select('select * from places where visited = ?', [1]);
+  $togo = DB::select('select * from places where visited = ?', [0]);
+
+  return view('travelroad', ['visited' => $visited, 'togo' => $togo ] );
+});
+```
+
+Lo segundo es **escribir la plantilla** que renderiza los datos:
+
+```console
+sdelquin@lemon:~/travelroad$ vi resources/views/travelroad.blade.php
+```
+
+Contenido ↓
+
+```html
+<html>
+  <head>
+    <title>Travel List</title>
+  </head>
+
+  <body>
+    <h1>My Travel Bucket List</h1>
+    <h2>Places I'd Like to Visit</h2>
+    <ul>
+      @foreach ($togo as $newplace)
+      <li>{{ $newplace->name }}</li>
+      @endforeach
+    </ul>
+
+    <h2>Places I've Already Been To</h2>
+    <ul>
+      @foreach ($visited as $place)
+      <li>{{ $place->name }}</li>
+      @endforeach
+    </ul>
+  </body>
+</html>
+```
+
+Ya podemos abrir el navegador en http://travelroad para ver que todo está funcionando correctamente:
+
+```console
+sdelquin@lemon:~$ firefox http://travelroad
+```
+
+![Laravel Works](./images/laravel-works.png)
