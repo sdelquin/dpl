@@ -243,9 +243,9 @@ permitted by applicable law.
 Last login: Thu Nov  3 10:43:27 2022 from 88.8.15.135
 ```
 
-## Acceso rápido
+### Acceso rápido
 
-Para no tener que estar escribiendo continuamente el nombre completo de dominio `aluXXXX.arkania.es` podemos hacer uso del fichero `/etc/hosts` y definir ciertos "alias".
+Para no tener que estar escribiendo continuamente el nombre completo de dominio `aluXXXX.arkania.es` podemos hacer uso del fichero `~/.ssh/config` y definir ciertos "alias".
 
 Lo primero será obtener la IP de nuestra máquina remota. Para ello, **desde la máquina local** ejecutamos:
 
@@ -256,13 +256,34 @@ dpl.arkania.es has address 193.70.86.26
 
 > ⚠️ Recuerda usar tu nombre de dominio.
 
-Ahora ya podemos editar el fichero `/etc/hosts` y añadir la siguiente entrada:
+Ahora ya podemos crear el fichero de configuración ssh:
+
+```console
+sdelquin@lemon:~$ vi ~/.ssh/config
+```
+
+Contenido ↓
 
 ```
-193.70.86.26  arkania  dpl
+Host "arkania"
+    Hostname "193.70.86.26"
+    Port 2222
 ```
 
-> 💡 Esto nos permite acceder a la máquina remota utilizando los alias `arkania` o `dpl`. Por ejemplo: `ssh arkania` o `ssh dpl`.
+Esto nos permite acceder a la máquina remota simplemente con:
+
+```console
+sdelquin@lemon:~$ ssh arkania
+Linux vps-fc1b46ec 5.10.0-19-cloud-amd64 #1 SMP Debian 5.10.149-2 (2022-10-21) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Nov  3 11:03:36 2022 from 88.8.15.135
+```
 
 ## Pasos posteriores a la instalación
 
