@@ -13,9 +13,9 @@ Para ello se pide:
 3. Subir las imágenes de [images.zip](./files/images.zip) a una carpeta `img` dentro de la carpeta de trabajo elegida.
 4. Crear una aplicación web que permita el tratamiento de dichas imágenes.
 5. Incorporar certificado de seguridad SSL.
-6. Redirigir `www` al dominio base (incluyendo ssl).
+6. Redirigir el subdominio `www` al dominio base (incluyendo ssl).
 
-### Aplicación web
+## Aplicación web
 
 La aplicación debe contener un formulario web con los siguientes campos de texto:
 

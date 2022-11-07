@@ -2,22 +2,19 @@
 
 ### TAREA EVALUABLE
 
-1. Implantar una aplicación PHP que funcione como una calculadora usando Nginx + php-fpm.
-2. Utilizar una interfaz similar a la siguiente:
+1. Implantar una aplicación PHP que funcione como una calculadora usando Nginx + PHP-FPM.
+2. Realizar el despliegue en la máquina local con la url http://localhost tanto para **entorno nativo** como para **entorno dockerizado**.
+
+## Aplicación PHP
+
+1. Utilizar una interfaz similar a la siguiente:
 
 ![Plantilla](images/template.png)
 
-3. Realizar las siguientes implementaciones:
-
-| Entorno | URL local                |
-| ------- | ------------------------ |
-| Nativo  | http://calculator.native |
-| Docker  | http://calculator.docker |
-
-## Aclaraciones
-
-1. Incluir [esta imagen de la calculadora](./images/calculadora.png).
-2. Incluir un fichero `.css` con unos estilos básicos.
+2. Incluir [esta imagen de la calculadora](./images/calculadora.png).
+3. Incluir un fichero `.css` con unos estilos básicos.
+4. La "calculadora nativa" debe tener como título `h1` "Calculadora en entorno nativo" y la "calculadora dockerizada" debe tener como título `h1` "Calculadora en entorno dockerizado".
+5. Trabajar en una carpeta dentro del `$HOME`.
 
 ## Entregable
 

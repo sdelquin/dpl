@@ -42,6 +42,7 @@ text-shadow: 2px 2px 8px lightgreen;
 
 ## Entregable
 
-Informe explicando los pasos seguidos para resolver la tarea. Se entregará el mismo informe por cada pareja y la calificación será la misma para las dos personas.
+Informe explicando los pasos seguidos para resolver la tarea. Las dos personas de cada pareja deberán subir el mismo informe y la calificación será la misma para ambas.
 
-> Las dos personas de la pareja deberán subir el mismo informe al repositorio de la asignatura.
+> Subir únicamente la URL al commit del repositorio:  
+> `https://github.com/<user>/dpl/blob/ffaabb62206fa0c0f350dfe0a4ba370ed00b9218/ut<X>/te<X>/README.md`
