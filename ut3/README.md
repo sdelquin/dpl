@@ -203,7 +203,7 @@ Para crear un _virtual host_ debemos preparar un fichero de configuración:
 sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/helloworld.conf
 ```
 
-Contenido ↓
+> Contenido:
 
 ```nginx
 server {
@@ -227,7 +227,7 @@ sdelquin@lemon:~$ mkdir -p ~/www/helloworld
 sdelquin@lemon:~$ vi ~/www/helloworld/index.html
 ```
 
-Contenido ↓
+> Contenido:
 
 ```html
 <!DOCTYPE html>

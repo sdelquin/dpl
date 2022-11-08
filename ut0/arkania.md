@@ -262,7 +262,7 @@ Ahora ya podemos crear el fichero de configuración ssh:
 sdelquin@lemon:~$ vi ~/.ssh/config
 ```
 
-Contenido ↓
+> Contenido:
 
 ```
 Host "arkania"
