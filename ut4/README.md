@@ -793,7 +793,7 @@ En otra pestaña de terminal, abrimos con el navegador la dirección http://loca
 
 ![Express init](./images/express-init.png)
 
-### Acceso a base de datos
+### Configuración de la base de datos
 
 Para poder acceder a la base de datos PostgreSQL necesitamos una dependencia adicional [node-postgres](https://www.npmjs.com/package/pg). Realizamos la instalación:
 
@@ -837,8 +837,95 @@ To address all issues, run:
 Run `npm audit` for details.
 ```
 
-En este fichero hay que
+En este fichero hay que guardar la cadena de conexión a la base de datos PostgreSQL:
+
+```console
+sdelquin@lemon:~/travelroad$ echo 'PSQL_CONNECTION=postgresql://travelroad_user:dpl0000@localhost:5432/travelroad' > .env
+```
 
 ### Lógica de negocio
 
-Nos queda modificar el comportamiento de la aplicación para cargar los datos y mostrarlos en una plantilla.
+Nos queda modificar el comportamiento de la aplicación para **cargar los datos** y **mostrarlos en una plantilla**.
+
+#### Conexión a la base de datos
+
+```console
+sdelquin@lemon:~/travelroad$ mkdir config && vi config/database.js
+```
+
+> Contenido:
+
+```js
+const { Pool } = require("pg");
+require("dotenv").config();
+const connectionString = process.env.PSQL_CONNECTION;
+const pool = new Pool({
+  connectionString,
+});
+
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+};
+```
+
+#### Gestión de las rutas
+
+```console
+sdelquin@lemon:~/travelroad$ vi routes/index.js
+```
+
+> Contenido:
+
+```js
+const db = require("../config/database");
+var express = require("express");
+var router = express.Router();
+
+/* GET home page. */
+router.get("/", async function (req, res, next) {
+  const { rows: newplace } = await db.query(
+    "SELECT * FROM places WHERE visited=$1",
+    [0]
+  );
+  const { rows: visited } = await db.query(
+    "SELECT * FROM places WHERE visited=$1",
+    [1]
+  );
+  res.render("index", { newplace, visited });
+});
+
+module.exports = router;
+```
+
+#### Plantilla para la vista
+
+```console
+sdelquin@lemon:~/travelroad$ vi views/index.pug
+```
+
+> Contenido:
+
+```pug
+extends layout
+
+block content
+  h1= "My Travel Bucket List"
+  h2= "Places I'd Like to Visit"
+  ul
+    each place in newplace
+      li= place.name
+  h2= "Places I've Already Been To"
+  ul
+    each place in visited
+      li= place.name
+```
+
+Volvemos a **lanzar la aplicación**:
+
+```console
+sdelquin@lemon:~/travelroad$ DEBUG=travelroad:* npm start
+```
+
+Y comprobamos que la dirección http://localhost:3000 nos da el resultado que esperábamos:
+
+![Express en desarrollo](./images/express-dev.png)
