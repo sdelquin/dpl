@@ -6,8 +6,8 @@ Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** q
 
 [PostgreSQL](#postgresql)  
 [Laravel](#laravel)  
-[Flask](#flask)  
 [Express](#express)  
+[Flask](#flask)  
 [Ruby on Rails](#ruby-on-rails)  
 [Spring](#spring)
 
@@ -451,13 +451,13 @@ sdelquin@lemon:~/travelroad$ sudo chgrp -R nginx storage bootstrap/cache
 sdelquin@lemon:~/travelroad$ sudo chmod -R ug+rwx storage bootstrap/cache
 ```
 
-La **configuración del _virtual-host_ Nginx** para nuestra aplicación Laravel la vamos a hacer en un fichero específico:
+La **configuración del _virtual host_ Nginx** para nuestra aplicación Laravel la vamos a hacer en un fichero específico:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 ```
 
-Contenido ↓
+> Contenido:
 
 ```nginx
 server {
@@ -526,7 +526,7 @@ sdelquin@lemon:~$ cd travelroad/
 sdelquin@lemon:~/travelroad$ vi routes/web.php
 ```
 
-Contenido ↓
+> Contenido:
 
 ```php
 <?php
@@ -547,7 +547,7 @@ Lo segundo es **escribir la plantilla** que renderiza los datos:
 sdelquin@lemon:~/travelroad$ vi resources/views/travelroad.blade.php
 ```
 
-Contenido ↓
+> Contenido:
 
 ```html
 <html>
@@ -581,3 +581,264 @@ sdelquin@lemon:~$ firefox http://travelroad
 ```
 
 ![Laravel Works](./images/laravel-works.png)
+
+## Express
+
+![Express Logo](./images/express-logo.png)
+
+[Express](https://expressjs.com/) es un framework web mínimo y flexible para Node.js.
+
+### Instalación
+
+#### Node.js
+
+Lo primero que debemos instalar es [Node.js](<[https://](https://nodejs.org/es/)>): un entorno de ejecución para JavaScript construido con [V8, motor de JavaScript de Chrome](https://v8.dev/).
+
+Existe un instalador que nos facilita **añadir los repositorios oficiales de Node.js**. El comando a ejecutar es el siguiente:
+
+```console
+sdelquin@lemon:~$ curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash
+[sudo] password for sdelquin:
+
+## Installing the NodeSource Node.js 19.x repo...
+
+
+## Populating apt-get cache...
+
++ apt-get update
+Obj:1 http://deb.debian.org/debian bullseye InRelease
+Des:2 https://download.docker.com/linux/debian bullseye InRelease [43,3 kB]
+Des:3 http://security.debian.org/debian-security bullseye-security InRelease [48,4 kB]
+Obj:4 https://packages.sury.org/php bullseye InRelease
+Des:5 http://deb.debian.org/debian bullseye-updates InRelease [44,1 kB]
+Des:6 http://nginx.org/packages/debian bullseye InRelease [2.866 B]
+Des:7 http://security.debian.org/debian-security bullseye-security/main Sources [167 kB]
+Des:8 http://packages.microsoft.com/repos/code stable InRelease [10,4 kB]
+Des:9 http://apt.postgresql.org/pub/repos/apt bullseye-pgdg InRelease [91,7 kB]
+Des:10 http://security.debian.org/debian-security bullseye-security/main arm64 Packages [192 kB]
+Des:11 http://packages.microsoft.com/repos/code stable/main arm64 Packages [119 kB]
+Des:12 http://security.debian.org/debian-security bullseye-security/main Translation-en [123 kB]
+Des:13 http://packages.microsoft.com/repos/code stable/main armhf Packages [119 kB]
+Des:14 http://packages.microsoft.com/repos/code stable/main amd64 Packages [117 kB]
+Des:15 http://apt.postgresql.org/pub/repos/apt bullseye-pgdg/main arm64 Packages [256 kB]
+Descargados 1.334 kB en 2s (597 kB/s)
+Leyendo lista de paquetes... Hecho
+
+## Confirming "bullseye" is supported...
+
++ curl -sLf -o /dev/null 'https://deb.nodesource.com/node_19.x/dists/bullseye/Release'
+
+## Adding the NodeSource signing key to your keyring...
+
++ curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/nodesource.gpg >/dev/null
+gpg: AVISO: propiedad insegura del directorio personal '/home/sdelquin/.gnupg'
+
+## Creating apt sources list file for the NodeSource Node.js 19.x repo...
+
++ echo 'deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_19.x bullseye main' > /etc/apt/sources.list.d/nodesource.list
++ echo 'deb-src [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_19.x bullseye main' >> /etc/apt/sources.list.d/nodesource.list
+
+## Running `apt-get update` for you...
+
++ apt-get update
+Obj:1 http://security.debian.org/debian-security bullseye-security InRelease
+Obj:2 http://apt.postgresql.org/pub/repos/apt bullseye-pgdg InRelease
+Obj:3 http://deb.debian.org/debian bullseye InRelease
+Obj:4 http://deb.debian.org/debian bullseye-updates InRelease
+Obj:5 http://packages.microsoft.com/repos/code stable InRelease
+Obj:6 https://download.docker.com/linux/debian bullseye InRelease
+Obj:7 http://nginx.org/packages/debian bullseye InRelease
+Obj:8 https://packages.sury.org/php bullseye InRelease
+Des:9 https://deb.nodesource.com/node_19.x bullseye InRelease [4.586 B]
+Des:10 https://deb.nodesource.com/node_19.x bullseye/main arm64 Packages [772 B]
+Descargados 5.358 B en 1s (4.180 B/s)
+Leyendo lista de paquetes... Hecho
+
+## Run `sudo apt-get install -y nodejs` to install Node.js 19.x and npm
+## You may also need development tools to build native addons:
+     sudo apt-get install gcc g++ make
+## To install the Yarn package manager, run:
+     curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+     echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+     sudo apt-get update && sudo apt-get install yarn
+```
+
+Ahora ya podemos **instalar Node.js de forma ordinaria**:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y nodejs
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+Leyendo la información de estado... Hecho
+Se instalarán los siguientes paquetes NUEVOS:
+  nodejs
+0 actualizados, 1 nuevos se instalarán, 0 para eliminar y 78 no actualizados.
+Se necesita descargar 28,3 MB de archivos.
+Se utilizarán 183 MB de espacio de disco adicional después de esta operación.
+Des:1 https://deb.nodesource.com/node_19.x bullseye/main arm64 nodejs arm64 19.0.1-deb-1nodesource1 [28,3 MB]
+Descargados 28,3 MB en 4s (7.406 kB/s)
+Seleccionando el paquete nodejs previamente no seleccionado.
+(Leyendo la base de datos ... 230383 ficheros o directorios instalados actualmente.)
+Preparando para desempaquetar .../nodejs_19.0.1-deb-1nodesource1_arm64.deb ...
+Desempaquetando nodejs (19.0.1-deb-1nodesource1) ...
+Configurando nodejs (19.0.1-deb-1nodesource1) ...
+Procesando disparadores para man-db (2.9.4-2) ...
+```
+
+Comprobamos las versiones de Node.js y de [npm](<[https://](https://www.npmjs.com/)>) (sistema de gestión de paquetes para Node.js):
+
+```console
+sdelquin@lemon:~$ node --version
+v19.0.1
+
+sdelquin@lemon:~$ npm --version
+8.19.2
+```
+
+#### Aplicación
+
+Ahora ya podemos crear la estructura de nuestra aplicación Express. Para ello utilizamos `express-generator` una herramienta que debemos instalar de forma global en el sistema:
+
+```console
+sdelquin@lemon:~$ sudo npm install -g express-generator
+[sudo] password for sdelquin:
+npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please update to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)
+
+added 10 packages, and audited 11 packages in 2s
+
+4 vulnerabilities (1 moderate, 1 high, 2 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm notice
+npm notice New patch version of npm available! 8.19.2 -> 8.19.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v8.19.3
+npm notice Run npm install -g npm@8.19.3 to update!
+npm notice
+```
+
+Creamos la **estructura base de la aplicación**:
+
+```console
+sdelquin@lemon:~$ express --view=pug travelroad
+
+   create : travelroad/
+   create : travelroad/public/
+   create : travelroad/public/javascripts/
+   create : travelroad/public/images/
+   create : travelroad/public/stylesheets/
+   create : travelroad/public/stylesheets/style.css
+   create : travelroad/routes/
+   create : travelroad/routes/index.js
+   create : travelroad/routes/users.js
+   create : travelroad/views/
+   create : travelroad/views/error.pug
+   create : travelroad/views/index.pug
+   create : travelroad/views/layout.pug
+   create : travelroad/app.js
+   create : travelroad/package.json
+   create : travelroad/bin/
+   create : travelroad/bin/www
+
+   change directory:
+     $ cd travelroad
+
+   install dependencies:
+     $ npm install
+
+   run the app:
+     $ DEBUG=travelroad:* npm start
+```
+
+> 💡 El comando anterior creará una carpeta `travelround` con la estructura base para poder desarrollar nuestra aplicación web.
+
+Tal y como indica la salida del comando, ahora debemos **instalar las dependencias**:
+
+```console
+sdelquin@lemon:~$ cd travelroad
+
+sdelquin@lemon:~/travelroad$ npm install
+npm WARN deprecated core-js@2.6.12: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
+
+added 124 packages, and audited 125 packages in 11s
+
+8 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (2 low, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+```
+
+Ahora podemos **probar la aplicación** lanzando el servidor de desarrollo:
+
+```console
+sdelquin@lemon:~/travelroad$ DEBUG=travelroad:* npm start
+
+> travelroad@0.0.0 start
+> node ./bin/www
+
+  travelroad:server Listening on port 3000 +0ms
+```
+
+En otra pestaña de terminal, abrimos con el navegador la dirección http://localhost:3000 obteniendo un resultado como éste:
+
+![Express init](./images/express-init.png)
+
+### Acceso a base de datos
+
+Para poder acceder a la base de datos PostgreSQL necesitamos una dependencia adicional [node-postgres](https://www.npmjs.com/package/pg). Realizamos la instalación:
+
+```console
+sdelquin@lemon:~/travelroad$ npm install pg
+
+added 15 packages, and audited 140 packages in 6s
+
+8 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (2 low, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+```
+
+Siempre es interesante guardar las credenciales en un fichero "externo". En este caso vamos a trabajar con un fichero `.env` con lo que necesitaremos el paquete [dotenv](<[https://](https://www.npmjs.com/package/dotenv)>). Lo instalamos:
+
+```console
+sdelquin@lemon:~/travelroad$ npm install dotenv
+
+added 1 package, and audited 141 packages in 3s
+
+8 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (2 low, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+```
+
+En este fichero hay que
+
+### Lógica de negocio
+
+Nos queda modificar el comportamiento de la aplicación para cargar los datos y mostrarlos en una plantilla.
