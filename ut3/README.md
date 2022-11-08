@@ -6,7 +6,7 @@ Ya hemos visto la instalación de Nginx. En esta unidad de trabajo nos vamos a d
 [Hosts virtuales](#hosts-virtuales)  
 [Directivas](#directivas)  
 [Módulos](#módulos)  
-[Configuración SSL](#configuración-ssl)
+[Sitios seguros](#sitios-seguros)
 
 ## Configuración del servidor web
 
@@ -51,7 +51,7 @@ http {
 - [worker_processes](https://nginx.org/en/docs/ngx_core_module.html#worker_processes) establece el número de procesos que atienden peticiones. El valor por defecto "auto" indica que se usarán todos los _cores_ disponibles.
 - [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) establece el número simultáneo de conexiones que puede atender un _worker_. El valor por defecto es 1024.
 
-Por lo tanto, el número máximo de clientes viene dado por:
+Por lo tanto, el número máximo de clientes (inicial) viene dado por:
 
 ```
 max_clients = worker_processes * worker_connections
@@ -66,7 +66,7 @@ sdelquin@lemon:~$ sudo systemctl status nginx | grep nginx:
              └─176439 nginx: worker process
 ```
 
-Se puede ver que hay un proceso _master_ y dos _workers_. Esto se visualiza aún mejor mostrando un árbol de procesos:
+Se puede ver que hay **1 proceso _master_ y 2 _workers_**. Esto se visualiza aún mejor mostrando un árbol de procesos:
 
 ```console
 sdelquin@lemon:~$ pstree -p 176437
@@ -81,7 +81,7 @@ sdelquin@lemon:~$ nproc
 2
 ```
 
-¿Cuál es el valor máximo que puedo establecer en Nginx para número de conexiones del _worker_? Para responder a esta pregunta basta con ejecutar el comando siguiente:
+¿Cuál es el valor máximo que puedo establecer en Nginx para el número de conexiones del _worker_? Para responder a esta pregunta basta con ejecutar el comando siguiente:
 
 ```console
 sdelquin@lemon:~$ ulimit -n
@@ -104,11 +104,11 @@ nginx     192386  0.0  0.1   9904  3760 ?        S    01:33   0:00 nginx: worker
 nginx     192387  0.0  0.1   9904  3760 ?        S    01:33   0:00 nginx: worker process
 ```
 
-> Es importante tenerlo en cuenta de cara a los permisos que asignemos a ficheros y carpetas.
+> Es importante tenerlo en cuenta de cara a los permisos que asignemos a ficheros y carpetas, o incluso a la interacción con otros servicios.
 
 ### Carpeta raíz
 
-Un concepto fundamental en los servidores web es el de `root` que indica la carpeta raíz desde la que se sirven los archivos.
+Un concepto fundamental en los servidores web es el de `root` que indica la **carpeta raíz** desde la que se sirven los archivos.
 
 El valor por defecto que tiene `root` en Nginx es `/etc/nginx/html` y eso viene dado por el parámetro `--prefix` (junto a `html`) durante la fase de compilación:
 
@@ -121,7 +121,7 @@ TLS SNI support enabled
 configure arguments: (...) --prefix=/etc/nginx (...)
 ```
 
-Sin embargo, este comportamiento se puede modificar si establecemos un valor distinto para `root` en el _virtual-host_.
+Sin embargo, este comportamiento se puede modificar si establecemos un valor distinto para `root` en el _virtual host_.
 
 ## Hosts virtuales
 
@@ -193,7 +193,7 @@ Es por esto que cuando accedemos a http://localhost obtenemos esta página:
 
 ![Nginx Inicio](./images/nginx-boot.png)
 
-> 💡 &nbsp;Tras una modificación de Nginx debemos recargar el servicio para que los cambios tengan efecto.
+> 💡 &nbsp;Tras cualquier modificación de la configuración de Nginx debemos recargar el servicio para que los cambios tengan efecto.
 
 ### Creación de un host virtual
 
@@ -203,6 +203,8 @@ Para crear un _virtual host_ debemos preparar un fichero de configuración:
 sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/helloworld.conf
 ```
 
+Contenido ↓
+
 ```nginx
 server {
 	server_name helloworld;
@@ -210,7 +212,7 @@ server {
 }
 ```
 
-Podemos comprobar que la sintaxis sea correcta:
+Podemos comprobar que la sintaxis es correcta:
 
 ```console
 sdelquin@lemon:~$ sudo nginx -t
@@ -224,6 +226,8 @@ A continuación tenemos que crear un fichero de índice en la carpeta raíz:
 sdelquin@lemon:~$ mkdir -p ~/www/helloworld
 sdelquin@lemon:~$ vi ~/www/helloworld/index.html
 ```
+
+Contenido ↓
 
 ```html
 <!DOCTYPE html>
@@ -254,13 +258,13 @@ Lo único que faltaría es simular un nombre de dominio a través de la configur
 sdelquin@lemon:~$ sudo vi /etc/hosts
 ```
 
-Añadir la línea:
+Añadimos la línea:
 
 ```
 127.0.0.1	helloworld
 ```
 
-Esto hará que las peticiones a `hellworld` sean resueltas a la ip local `127.0.0.1`. Dado que el _virtual host_ está configurado para atender peticiones en ese dominio, pues todo debería funcionar:
+Esto hará que las peticiones a `hellworld` sean resueltas a la IP local `127.0.0.1`. Dado que el _virtual host_ está configurado para atender peticiones en ese dominio, todo debería funcionar correctamente:
 
 ```console
 sdelquin@lemon:~$ firefox helloworld
@@ -278,7 +282,7 @@ Los _virtual hosts_ permiten definir ubicaciones (**locations**) en su interior 
 
 A su vez, cada _location_ puede incluir las directivas correspondientes.
 
-Supongamos que nuestro "Hello World" lo queremos montar sobre http://universe/helloworld. Procedemos de la siguiente manera:
+Supongamos que nuestro "Hello World" lo queremos montar sobre la URL http://universe/helloworld. Procedemos de la siguiente manera:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
@@ -391,6 +395,8 @@ sdelquin@lemon:~$ firefox universe/files
 
 ![Nginx Autoindex](./images/nginx-autoindex.png)
 
+> 💡 El ejemplo anterior hubiera sido muy difícil de hacer con `root` ya que `/files` se añadiría a `/etc/nginx`.
+
 ### Acceso protegido
 
 En ciertos escenarios es posible que queramos añadir una validación de credenciales para acceder a un recurso web. En este caso podemos hacer uso de las **directivas de autenticación**.
@@ -400,12 +406,21 @@ Lo primero es crear un fichero de credenciales `.htpasswd` con formato `<usuario
 - Usuario: `sdelquin`
 - Contraseña: `systemd`
 
+El usuario lo podemos escribir "tal cual" en el fichero de autenticación:
+
 ```console
-sdelquin@lemon:~$ sudo sh -c "echo -n 'sdelquin:' >> /etc/nginx/.htpasswd"
-sdelquin@lemon:~$ sudo sh -c "openssl passwd -apr1 systemd >> /etc/nginx/.htpasswd"
+sdelquin@lemon:~$ echo -n 'sdelquin:' \
+| sudo tee -a /etc/nginx/.htpasswd > /dev/null
 ```
 
-> 💡 &nbsp;Estamos usando la herramienta de openssl para [computar hashes](https://www.openssl.org/docs/man1.1.1/man1/openssl-passwd.html).
+Para la contraseña, primero debemos generar un _hash_ antes de guardarla. Para ello usamos la herramienta **openssl** con el [subcomando passwd](https://www.openssl.org/docs/man1.1.1/man1/openssl-passwd.html):
+
+```console
+sdelquin@lemon:~$ openssl passwd -apr1 systemd \
+| sudo tee -a /etc/nginx/.htpasswd > /dev/null
+```
+
+> 💡 [Diferencia entre codificación, cifrado y hashing](https://hackwise.mx/cual-es-la-diferencia-entre-codificacion-cifrado-y-hashing/).
 
 Vamos a comprobar que el fichero se ha creado correctamente y que la contraseña no está en claro 😅:
 
@@ -413,6 +428,8 @@ Vamos a comprobar que el fichero se ha creado correctamente y que la contraseña
 sdelquin@lemon:~$ sudo cat /etc/nginx/.htpasswd
 sdelquin:$apr1$A.UE2T7J$qgt0pRnZ99ePuDukgi/oh/
 ```
+
+> 💡 Si nos fijamos en el _hash_ de la contraseña aparece una "cabecera" indicando el tipo de algoritmo utilizado `$apr1$` en este caso, lo que permite luego comprobar la contraseña introducida.
 
 Ahora debemos hacer una pequeña modificación a nuestro _virtual host_ para añadir la autenticación:
 
@@ -517,15 +534,17 @@ return 301 https://example.com;
 
 ### Redirecciones
 
-Como hemos visto, las [redirecciones](https://www.nginx.com/blog/creating-nginx-rewrite-rules/) son un caso especial de valores de retorno en Nginx, pero dada su importancia, lo vamos a ver en un apartado propio.
+Como hemos visto, las [redirecciones](https://www.nginx.com/blog/creating-nginx-rewrite-rules/) son un caso especial de valores de retorno en Nginx, pero dada su importancia, las vamos a tratar por separado.
 
-Veamos un primer ejemplo de redirección:
+Supogamos un primer **ejemplo de redirección**:
 
 ```nginx
 server {
     listen 80;
     listen 443 ssl;
+
     server_name www.old-name.com;
+
     return 301 $scheme://www.new-name.com$request_uri;
 }
 ```
@@ -541,43 +560,47 @@ En este ejemplo estamos redirigiendo todo el tráfico del dominio `www.old-name.
 
 ### Expresiones regulares
 
-Nginx nos permite usar **expresiones regulares** en ubicaciones (y otras directivas similares). Para ello usamos el operador `~` indicando el fragmento que debe coincidir:
+Nginx nos permite usar **expresiones regulares** en ubicaciones (y otras directivas similares). Para ello usamos el operador `~` indicando el fragmento que debe coincidir.
+
+En **un primer ejemplo**, supongamos que el usuario puede acceder a una carpeta de imágenes `img/` pero queremos denegar el acceso a las fotos de perfil:
 
 ```nginx
-location ~ ^/img/.*-profile.png {
-  return 403;
+server {
+  location /img {
+    root /usr/share/app/;
+  }
+
+  location ~ ^/img/.*-profile.(png|jpg) {
+    return 403;
+  }
 }
 ```
 
-También es posible utilizar _grupos de captura_ para manipular determinadas partes de la URL:
+En **un segundo ejemplo** vamos a utilizar los _grupos de captura_ de las expresiones regulares. En este caso vamos a redirigir una búsqueda en URL a su [query string](https://es.wikipedia.org/wiki/Query_string) correspondiente:
 
 ```nginx
-location ~ ^/query/(.*) {
-  return 301 https://domain.example/?search=$1;
+location ~ ^/query/(.*)$ {
+  return 301 /?search=$1;
 }
 ```
 
 > 💡 Si usamos el operador `=` en vez de `~` estaremos forzando a que la URL sea exactamente la que indicamos.
 
+Una herramienta interesante para probar nuestros patrones es [Nginx location match tester](<[https://](https://nginx.viraptor.info/)>).
+
 ### Orden de búsqueda
 
-A través de la directiva `try_files` de Nginx podemos probar distintas rutas definiendo un orden de búsqueda.
+A través de la directiva [try_files](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files) de Nginx podemos probar distintas opciones mediante un orden de búsqueda.
 
-Supongamos que en el siguiente ejemplo hacemos una petición a **http://www.domain.com/images/image1.gif**. El orden de búsqueda será el siguiente:
+Supongamos un escenario en el que se **queremos implementar el siguiente orden de búsqueda** sobre una carpeta de imágenes `/images`:
 
-1. `image1.gif`
-2. `image1.gif/`
-3. Devolver `/images/default.gif`
-
-La directiva `expires` indica el tiempo que será cacheado un archivo. En este caso 30 segundos.
+1. Tratar la petición como fichero.
+2. Tratar la petición como carpeta.
+3. En otro caso, devolver `/images/default.gif`
 
 ```nginx
 location /images/ {
     try_files $uri $uri/ /images/default.gif;
-}
-
-location = /images/default.gif {
-    expires 30s;
 }
 ```
 
@@ -611,11 +634,13 @@ sdelquin@lemon:~$ sudo nginx -V 2>&1 | tr ' ' '\n' | grep module
 
 Podemos inferir de la salida del comando anterior cuáles son los módulos incluidos en el proceso de compilación. La documentación de cada uno de ellos se puede consultar en https://nginx.org/en/docs/
 
-Desde la versión 1.11.5 de Nginx se pueden incorporar **módulos dinámicos**. Estos módulos permiten la carga "a posteriori" de la compilación inicial y se cargan desde la carpeta `/etc/nginx/modules`.
+Un módulo (a modo de ejemplo) que viene por defecto es [ngx_http_mp4_module](<[https://](https://nginx.org/en/docs/http/ngx_http_mp4_module.html)>) activado desde la compilación mediante el flag `--with-http_mp4_module`.
+
+Desde la versión 1.11.5 de Nginx se pueden incorporar **módulos dinámicos**. Estos módulos permiten la carga "a posteriori" de la compilación inicial desde la carpeta `/etc/nginx/modules`.
 
 > [Librerías estáticas (`*.a`) vs Librerías dinámicas (`*.so`)](https://medium.com/swlh/linux-basics-static-libraries-vs-dynamic-libraries-a7bcf8157779)
 
-Nginx se puede extender haciendo uso de módulos propios o módulos de la comunidad:
+Nginx se puede extender haciendo uso de **módulos propios** o **módulos de la comunidad**:
 
 | Módulos CORE               | Módulos de terceros                           |
 | -------------------------- | --------------------------------------------- |
@@ -623,18 +648,19 @@ Nginx se puede extender haciendo uso de módulos propios o módulos de la comuni
 
 ### Instalación de un módulo
 
-Vamos a instalar un módulo de terceros para Nginx y cargarlo dinámicamente. En este caso hemos escogido [Fancy Index](https://www.nginx.com/resources/wiki/modules/fancy_index/) que permite visualizar de manera más "bonita" un listado de ficheros.
+Vamos a **instalar un módulo de terceros para Nginx y cargarlo dinámicamente**. En este caso hemos escogido [Fancy Index](https://www.nginx.com/resources/wiki/modules/fancy_index/) que permite visualizar de manera más "bonita" un listado de ficheros. Es un `autoindex` con brillos.
 
-Dado que vamos a realizar un proceso de compilación, primero necesitamos tener instaladas ciertas dependencias:
+Los módulos pueden requerir ciertos **paquetes de soporte** de cara a su compilación. En el caso de este módulo necesitamos las librerías de desarrollo de [pcre](<[https://](https://www.pcre.org/)>):
 
 ```console
 sdelquin@lemon:~$  sudo apt install libpcre3-dev
 ```
 
-Posteriormente tenemos que **descargar el código fuente de Nginx** con la misma versión que tenemos instalada en el sistema. Para ello:
+Posteriormente tenemos que **descargar el código fuente de Nginx con la misma versión que tenemos instalada en el sistema**. Para ello:
 
 ```console
-sdelquin@lemon:~$ curl -sL https://nginx.org/download/nginx-$(/sbin/nginx -v |& cut -d '/' -f2).tar.gz | tar xvz -C /tmp
+sdelquin@lemon:~$ curl -sL https://nginx.org/download/nginx-$(/sbin/nginx -v \
+|& cut -d '/' -f2).tar.gz | tar xvz -C /tmp
 ```
 
 Ahora pasamos a **descargar el código fuente del módulo** en cuestión. En este caso el de Fancy Index:
@@ -653,12 +679,13 @@ Resolviendo deltas: 100% (534/534), listo.
 Nos movemos a la carpeta donde hemos descargado el código fuente de Nginx y realizamos la **configuración de la compilación**:
 
 ```console
-sdelquin@lemon:~$ cd /tmp/nginx-$(/sbin/nginx -v |& cut -d '/' -f2)
+sdelquin@lemon:~$ cd /tmp/nginx-1.22.0
+
 sdelquin@lemon:/tmp/nginx-1.22.0$ ./configure --add-dynamic-module=../ngx-fancyindex --with-compat
 ...
 ```
 
-A continuación generamos la librería dinámica:
+A continuación **generamos la librería dinámica**:
 
 ```console
 sdelquin@lemon:/tmp/nginx-1.22.0$ make modules
@@ -669,7 +696,6 @@ Este proceso habrá creado un fichero `.so` dentro de la carpeta `objs`. Lo copi
 
 ```console
 sdelquin@lemon:/tmp/nginx-1.22.0$ sudo cp objs/ngx_http_fancyindex_module.so /etc/nginx/modules
-sdelquin@lemon:~$ cd
 ```
 
 Para que este módulo se cargue correctamente, hay que especificarlo en el fichero de configuración de Nginx:
@@ -721,19 +747,33 @@ Ahora, si accedemos a http://universe/files veremos algo similar a lo siguiente:
 
 ![Fancy index](./images/fancy-index.png)
 
-## Configuración SSL
+## Sitios seguros
 
-Hoy en día es fundamental que los sitios web utilicen protocolo **https** y cifren el tráfico a través de un certificado de seguridad SSL (_Secure Sockets Layer_). Entre otras cosas porque [desde julio de 2018 Google marca todas las webs que no usen https como inseguras](https://es.gizmodo.com/se-acabo-a-partir-de-julio-google-chrome-marcara-toda-1822842221).
+Hoy en día es fundamental que los sitios web utilicen protocolo **https** y cifren el tráfico a través de un **certificado de seguridad TLS (_Transport Layer Security_)**.
+
+El primer motivo y más importante es por la seguridad de las comunicaciones. Pero también porque [desde julio de 2018 Google marca todas las webs que no usen https como inseguras](https://es.gizmodo.com/se-acabo-a-partir-de-julio-google-chrome-marcara-toda-1822842221).
+
+### Certificado SSL
+
+[SSL es el acrónimo de Secure Sockets Layer](https://www.websecurity.digicert.com/es/es/security-topics/what-is-ssl-tls-https) (capa de sockets seguros), la tecnología estándar para mantener segura una conexión a Internet.
+
+Hay tres tipos de versiones **SSL 1.0, 2.0 y 3.0**. La primera ni siquiera llegó a usarse realmente; las otras dos sí hasta 2011 y 2015, respectivamente. Desde ese año ya empezó a considerarse como un protocolo desaparecido.
+
+En cuanto a los certificados TLS, hay también diferentes versiones: **TLS 1.0, 1.1, 1.2 y 1.3**. Las dos últimas son las que siguen vigentes a día de hoy. Ambas se consideran seguras y perfectamente funcionales.
+
+**Por tanto, si vas a instalar un certificado SSL/TLS en tu sitio web, es imprescindible que instales la versión del protocolo 1.2 o 1.3 de TLS**.
 
 ## Let's Encrypt
 
-Los certificados de seguridad _SSL_ son emitidos por entidades certificadoras de autoridad. La gran mayoría de certificadoras cobran por los certificados, pero [Let's Encrypt](https://letsencrypt.org/) es un proyecto que surge con el objetivo de democratizar el acceso a los certificados de seguridad, emitiéndolos de forma gratuita y ofreciendo gran variedad de herramientas para trabajar con ellos.
+Los certificados de seguridad _TLS_ son emitidos por **entidades certificadoras de autoridad**. La gran mayoría de las certificadoras cobran por los certificados, pero [Let's Encrypt](https://letsencrypt.org/) es un proyecto que surge con el objetivo de democratizar el acceso a los certificados de seguridad, emitiéndolos de forma gratuita y ofreciendo gran variedad de herramientas para trabajar con ellos.
+
+> 💡 Let's Encrypt proporciona certificados X.509 para TLS.
 
 ## Certbot
 
 ### Instalación
 
-Existen [múltiples clientes](https://letsencrypt.org/docs/client-options/) de _Let's Encrypt_ que permiten validar nuestros dominios, pero la herramienta más recomendada es [Certbot](https://certbot.eff.org/).
+Existen [múltiples clientes](https://letsencrypt.org/docs/client-options/) de _Let's Encrypt_ que permiten validar nuestros dominios, pero la herramienta más extendida es [Certbot](https://certbot.eff.org/) por su facilidad de uso.
 
 La página de Certbot nos permite elegir incluso el servidor web que estamos utilizando y sobre qué sistema operativo corre.
 
@@ -760,9 +800,9 @@ sdelquin@lemon:~$ sudo apt install -y python3-certbot-nginx
 
 ### Configuración
 
-Ahora ya podemos lanzar el cliente que nos permitirá obtener los certificados SSL y configurar el sitio web que queramos para que utilice protocolo **https**.
+Ahora ya podemos lanzar el cliente que nos permitirá obtener los certificados TLS y configurar el sitio web que queramos para que utilice protocolo **https**.
 
-Vamos a configurar el host virtual para el dominio **`http://arkania.es`**:
+Vamos a configurar un host virtual para el dominio **`http://arkania.es`**:
 
 ```console
 sdelquin@lemon:~$ sudo certbot --nginx
@@ -842,7 +882,9 @@ sdelquin@lemon:~$
 
 > 💡 Las preguntas sobre email de contacto, términos de servicio y campaña EFF sólo saldrán la primera vez que ejecutamos el comando.
 
-Ahora vamos a echar un vistazo a los cambios que ha sufrido el archivo de configuración del host virtual:
+El cliente `certbot` ha llevado a cabo el [desafío http-01](https://letsencrypt.org/docs/challenge-types/#http-01-challenge) para **comprobar la veracidad del dominio**. Este desafío consiste en poner un fichero en el servidor con un token y luego comprobar que se puede acceder desde la URL establecida por el dominio, verificando que el token es el esperado.
+
+Ahora vamos a echar un vistazo a los **cambios que ha sufrido el archivo de configuración del host virtual**:
 
 ```console
 sdelquin@lemon:~$ cat /etc/nginx/conf.d/arkania.conf
@@ -921,7 +963,7 @@ Lo primero sería lanzar `certbot` para el dominio `www.arkania.es`:
 sdelquin@lemon:~$ sudo certbot --nginx -d www.arkania.es
 ```
 
-A continuación deberíamos configurar la redirección de www:
+A continuación debemos configurar la redirección de www:
 
 ```nginx
 server {
