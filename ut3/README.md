@@ -753,7 +753,7 @@ Hoy en día es fundamental que los sitios web utilicen protocolo **https** y cif
 
 El primer motivo y más importante es por la seguridad de las comunicaciones. Pero también porque [desde julio de 2018 Google marca todas las webs que no usen https como inseguras](https://es.gizmodo.com/se-acabo-a-partir-de-julio-google-chrome-marcara-toda-1822842221).
 
-### Certificado SSL
+### Certificados SSL
 
 [SSL es el acrónimo de Secure Sockets Layer](https://www.websecurity.digicert.com/es/es/security-topics/what-is-ssl-tls-https) (capa de sockets seguros), la tecnología estándar para mantener segura una conexión a Internet.
 
@@ -763,15 +763,15 @@ En cuanto a los certificados TLS, hay también diferentes versiones: **TLS 1.0, 
 
 **Por tanto, si vas a instalar un certificado SSL/TLS en tu sitio web, es imprescindible que instales la versión del protocolo 1.2 o 1.3 de TLS**.
 
-## Let's Encrypt
+### Let's Encrypt
 
 Los certificados de seguridad _TLS_ son emitidos por **entidades certificadoras de autoridad**. La gran mayoría de las certificadoras cobran por los certificados, pero [Let's Encrypt](https://letsencrypt.org/) es un proyecto que surge con el objetivo de democratizar el acceso a los certificados de seguridad, emitiéndolos de forma gratuita y ofreciendo gran variedad de herramientas para trabajar con ellos.
 
 > 💡 Let's Encrypt proporciona certificados X.509 para TLS.
 
-## Certbot
+### Certbot
 
-### Instalación
+#### Instalación
 
 Existen [múltiples clientes](https://letsencrypt.org/docs/client-options/) de _Let's Encrypt_ que permiten validar nuestros dominios, pero la herramienta más extendida es [Certbot](https://certbot.eff.org/) por su facilidad de uso.
 
@@ -798,7 +798,7 @@ A continuación debemos instalar el **plugin de Nginx para certbot**:
 sdelquin@lemon:~$ sudo apt install -y python3-certbot-nginx
 ```
 
-### Configuración
+#### Configuración
 
 Ahora ya podemos lanzar el cliente que nos permitirá obtener los certificados TLS y configurar el sitio web que queramos para que utilice protocolo **https**.
 
@@ -918,17 +918,7 @@ server {
 }
 ```
 
-### Probando el acceso seguro
-
-Antes de probar el acceso desde nuestro dominio, debemos reiniciar el servidor web para que las nuevas configuraciones surtan efecto:
-
-```console
-sdelquin@lemon:~$ sudo systemctl restart nginx
-```
-
-🔒 Ahora ya podemos acceder a http://arkania.es (incluso sin _https_) y la conexión será segura.
-
-### Renovación automática del certificado
+#### Renovación automática del certificado
 
 Los certificados de _Let's Encrypt_ tienen una validez de **90 días**, pero afortunadamente, `certbot` instala una tarea en el cron del sistema de manera que renueva los certificados antes de que expiren:
 
@@ -952,6 +942,16 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system && perl -e 'sleep int(rand(43200))' && certbot -q renew
 ```
+
+### Probando el acceso seguro
+
+Antes de probar el acceso desde nuestro dominio, debemos reiniciar el servidor web para que las nuevas configuraciones surtan efecto:
+
+```console
+sdelquin@lemon:~$ sudo systemctl restart nginx
+```
+
+🔒 Ahora ya podemos acceder a http://arkania.es (incluso sin _https_) y la conexión será segura.
 
 ### Redirección www
 
