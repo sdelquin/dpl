@@ -634,7 +634,7 @@ sdelquin@lemon:~$ sudo nginx -V 2>&1 | tr ' ' '\n' | grep module
 
 Podemos inferir de la salida del comando anterior cuáles son los módulos incluidos en el proceso de compilación. La documentación de cada uno de ellos se puede consultar en https://nginx.org/en/docs/
 
-Un módulo (a modo de ejemplo) que viene por defecto es [ngx_http_mp4_module](<[https://](https://nginx.org/en/docs/http/ngx_http_mp4_module.html)>) activado desde la compilación mediante el flag `--with-http_mp4_module`.
+Un módulo (a modo de ejemplo) que viene por defecto es [ngx_http_mp4_module](https://nginx.org/en/docs/http/ngx_http_mp4_module.html) activado desde la compilación mediante el flag `--with-http_mp4_module`.
 
 Desde la versión 1.11.5 de Nginx se pueden incorporar **módulos dinámicos**. Estos módulos permiten la carga "a posteriori" de la compilación inicial desde la carpeta `/etc/nginx/modules`.
 
