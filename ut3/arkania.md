@@ -247,17 +247,6 @@ Last login: Thu Nov  3 10:43:27 2022 from 88.8.15.135
 
 Para no tener que estar escribiendo continuamente el nombre completo de dominio `aluXXXX.arkania.es` podemos hacer uso del fichero `~/.ssh/config` y definir ciertos "alias".
 
-Lo primero será obtener la IP de nuestra máquina remota. Para ello, **desde la máquina local** ejecutamos:
-
-```console
-sdelquin@lemon:~$ host dpl.arkania.es
-dpl.arkania.es has address 193.70.86.26
-```
-
-> ⚠️ Recuerda usar tu nombre de dominio.
-
-Ahora ya podemos crear el fichero de configuración ssh:
-
 ```console
 sdelquin@lemon:~$ vi ~/.ssh/config
 ```
@@ -265,8 +254,8 @@ sdelquin@lemon:~$ vi ~/.ssh/config
 > Contenido:
 
 ```
-Host "arkania"
-    Hostname "193.70.86.26"
+Host arkania
+    Hostname aluXXXX.arkania.es
     Port 2222
 ```
 
@@ -283,6 +272,34 @@ individual files in /usr/share/doc/*/copyright.
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 Last login: Thu Nov  3 11:03:36 2022 from 88.8.15.135
+```
+
+### Backup de claves
+
+Es **muy importante** hacer una copia de seguridad de las claves generadas. Para ello ejecutamos el siguiente comando:
+
+```console
+sdelquin@lemon:~$ tar -cvzf ssh_cfg.tgz -C ~/.ssh .
+./
+./config
+./known_hosts
+./id_rsa.pub
+./id_rsa
+```
+
+Comprobamos el fichero de backup:
+
+```console
+sdelquin@lemon:~$ file ssh_cfg.tgz
+ssh_cfg.tgz: gzip compressed data, from Unix, original size modulo 2^32 10240
+```
+
+> 💡 Sería conveniente guardar este fichero de copia de seguridad en algún almacenamiento externo.
+
+El comando para **restaurar la copia de seguridad** sería el siguiente:
+
+```console
+mkdir -p ~/.ssh && tar -xvzf ssh_cfg.tgz -C ~/.ssh
 ```
 
 ## Pasos posteriores a la instalación
