@@ -929,3 +929,60 @@ sdelquin@lemon:~/travelroad$ DEBUG=travelroad:* npm start
 Y comprobamos que la dirección http://localhost:3000 nos da el resultado que esperábamos:
 
 ![Express en desarrollo](./images/express-dev.png)
+
+### Gestionando procesos
+
+Vamos a hacer uso de [pm2](<[https://](https://www.npmjs.com/package/pm2)>) un **gestor de procesos** para aplicaciones Node.js en producción.
+
+Lo primero es **instalar el paquete** de forma global en el sistema:
+
+```console
+sdelquin@lemon:~$ sudo npm install pm2 -g
+[sudo] password for sdelquin:
+npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+
+added 184 packages, and audited 185 packages in 12s
+
+12 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+```
+
+Ahora ya podemos **lanzar un proceso en background** con nuestra aplicación. Estando en la carpeta de trabajo `~/travelroad` ejecutamos el siguiente comando:
+
+```console
+sdelquin@lemon:~/travelroad$ pm2 start ./bin/www --name travelroad
+[PM2] Starting /home/sdelquin/travelroad/bin/www in fork_mode (1 instance)
+[PM2] Done.
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ travelroad         │ fork     │ 0    │ online    │ 0%       │ 22.6mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+```
+
+### Configuración de Nginx
+
+Lo único que nos queda es preparar el _virtual host_ en Nginx para comunicar con el proceso de Node.js:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    listen 80;
+    server_name travelroad;
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+```
+
+Recargamos la configuración de Nginx y accedemos a http://travelroad obteniendo el resultado esperado:
+
+![ExpressJS funcionando](./images/express-works.png)
