@@ -953,6 +953,8 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 
 🔒 Ahora ya podemos acceder a http://arkania.es (incluso sin _https_) y la conexión será segura.
 
+![Certificado Let's Encrypt](./images/lets-encrypt-cert.png)
+
 ### Redirección www
 
 Es muy habitual que la gente use el prefijo `www` al acceder a un sitio web. Es por ello que puede resultar útil configurar una redirección desde `www.arkania.es` a `arkania.es`.
