@@ -570,13 +570,13 @@ server {
     root /usr/share/app/;
   }
 
-  location ~ ^/img/.*-profile.(png|jpg) {
+  location ~ ^/img/.*-profile.(png|jpg)$ {
     return 403;
   }
 }
 ```
 
-En **un segundo ejemplo** vamos a utilizar los _grupos de captura_ de las expresiones regulares. En este caso vamos a redirigir una búsqueda en URL a su [query string](https://es.wikipedia.org/wiki/Query_string) correspondiente:
+En **un segundo ejemplo** vamos a utilizar los **grupos de captura** de las expresiones regulares. En este caso vamos a redirigir una búsqueda en URL a su [query string](https://es.wikipedia.org/wiki/Query_string) correspondiente:
 
 ```nginx
 location ~ ^/query/(.*)$ {
