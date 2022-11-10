@@ -292,7 +292,7 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/universe.conf
 
 ```nginx
 server {
-	server_name universe;
+    server_name universe;
 
     location /helloworld {
         root /home/sdelquin/www;  # /home/sdelquin/www/helloworld
