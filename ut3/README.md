@@ -650,7 +650,7 @@ Nginx se puede extender haciendo uso de **módulos propios** o **módulos de la 
 
 Vamos a **instalar un módulo de terceros para Nginx y cargarlo dinámicamente**. En este caso hemos escogido [Fancy Index](https://www.nginx.com/resources/wiki/modules/fancy_index/) que permite visualizar de manera más "bonita" un listado de ficheros. Es un `autoindex` con brillos.
 
-Los módulos pueden requerir ciertos **paquetes de soporte** de cara a su compilación. En el caso de este módulo necesitamos las librerías de desarrollo de [pcre](<[https://](https://www.pcre.org/)>):
+Los módulos pueden requerir ciertos **paquetes de soporte** de cara a su compilación. En el caso de este módulo necesitamos las librerías de desarrollo de [pcre](https://www.pcre.org/):
 
 ```console
 sdelquin@lemon:~$  sudo apt install libpcre3-dev
