@@ -44,5 +44,4 @@ text-shadow: 2px 2px 8px lightgreen;
 
 Informe explicando los pasos seguidos para resolver la tarea. Las dos personas de cada pareja deberán subir el mismo informe y la calificación será la misma para ambas.
 
-> Subir únicamente la URL al commit del repositorio:  
-> `https://github.com/<user>/dpl/blob/ffaabb62206fa0c0f350dfe0a4ba370ed00b9218/ut<X>/te<X>/README.md`
+⚡ Revisa las [instrucciones sobre entrega de tareas](../../ut0/assignment-deliveries.md).

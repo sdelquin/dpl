@@ -1,6 +1,6 @@
-# Entrega de actividades
+# Entrega de tareas
 
-La entrega de las actividades se hará vía **repositorio de GitHub**.
+La entrega de las tareas se hará vía **repositorio de GitHub**.
 
 ## Creación del repositorio
 
@@ -47,7 +47,7 @@ Si la tarea incluye acceso a cualquier URL, la **captura de pantalla** deberá i
 
 No se trata de copiar el contenido de los apuntes tal cual en el informe. Habrá cosas que harán falta y otras que no. **El objetivo es crear una historia ordenada** que tenga sentido y que transmita la sensación de haber comprendido el proceso global.
 
-## Subida de la actividad
+## Subida de la tarea
 
 Se habilitará una entrega en el **Campus Virtual** donde se tendrá que subir únicamente la URL al `README.md` incluyendo el commit específico.
 

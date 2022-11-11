@@ -41,5 +41,4 @@ Al pulsar el botón de "Generar" se tendrán que mostrar todas las imágenes cam
 
 Informe explicando los pasos seguidos para resolver la tarea.
 
-> Subir únicamente la URL al commit del repositorio:  
-> `https://github.com/<user>/dpl/blob/ffaabb62206fa0c0f350dfe0a4ba370ed00b9218/ut<X>/te<X>/README.md`
+⚡ Revisa las [instrucciones sobre entrega de tareas](../../ut0/assignment-deliveries.md).
