@@ -7,9 +7,9 @@ Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** q
 [PostgreSQL](#postgresql)  
 [Laravel](#laravel)  
 [Express](#express)  
+[Spring](#spring)  
 [Flask](#flask)  
-[Ruby on Rails](#ruby-on-rails)  
-[Spring](#spring)
+[Ruby on Rails](#ruby-on-rails)
 
 ## PostgreSQL
 
@@ -986,3 +986,635 @@ server {
 Recargamos la configuración de Nginx y accedemos a http://travelroad obteniendo el resultado esperado:
 
 ![ExpressJS funcionando](./images/express-works.png)
+
+## Spring
+
+![Logo Spring](./images/spring-logo.png)
+
+[Spring](https://spring.io/) es un un framework para el desarrollo de aplicaciones y contenedor de inversión de control, de código abierto para la plataforma Java.
+
+### Instalación
+
+#### JDK
+
+Lo primero será instalar el [Java Development Kit (JDK)](https://es.wikipedia.org/wiki/Java_Development_Kit). Existe una versión "opensource" denominada [OpenJDK](<[https://](https://openjdk.org/)>).
+
+Descargamos el paquete OpenJDK desde [su página de descargas](<[https://](https://jdk.java.net/19/)>):
+
+```console
+sdelquin@lemon:~$ curl -O --output-dir /tmp \
+https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_linux-x64_bin.tar.gz
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  186M  100  186M    0     0  11.3M      0  0:00:16  0:00:16 --:--:-- 11.6M
+```
+
+Ahora descomprimimos el contenido del paquete en `/usr/lib/jvm`:
+
+```console
+sdelquin@lemon:~$ sudo tar -xzvf /tmp/openjdk-19.0.1_linux-x64_bin.tar.gz \
+--one-top-level=/usr/lib/jvm
+```
+
+> 💡 Tener en cuenta que la última versión disponible puede variar en el tiempo.
+
+Comprobamos que todo ha ido bien y que el contenido del paquete está disponible:
+
+```console
+sdelquin@lemon:~$ ls -l /usr/lib/jvm/jdk-19.0.1/
+total 28
+drwxr-xr-x  2 root  root  4096 nov 11 14:27 bin
+drwxr-xr-x  5 root  root  4096 nov 11 14:27 conf
+drwxr-xr-x  3 root  root  4096 nov 11 14:27 include
+drwxr-xr-x  2 root  root  4096 nov 11 14:27 jmods
+drwxr-xr-x 72 root  root  4096 nov 11 14:27 legal
+drwxr-xr-x  5 root  root  4096 nov 11 14:27 lib
+-rw-r--r--  1 10668 10668 1213 sep 14 13:55 release
+```
+
+Necesitamos realizar alguna configuración adicional. Por un lado establecer **variables de entorno** adecuadas a la instalación:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/profile.d/jdk_home.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/sh
+export JAVA_HOME=/usr/lib/jvm/jdk-19.0.1/
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+Por otro lado **actualizar las alternativas** para los ejecutables:
+
+```console
+sdelquin@lemon:~$ sudo update-alternatives --install \
+"/usr/bin/java" "java" "/usr/lib/jvm/jdk-19.0.1/bin/java" 0
+
+sdelquin@lemon:~$ sudo update-alternatives --install \
+"/usr/bin/javac" "javac" "/usr/lib/jvm/jdk-19.0.1/bin/javac" 0
+
+sdelquin@lemon:~$ sudo update-alternatives --set java \
+/usr/lib/jvm/jdk-19.0.1/bin/java
+
+sdelquin@lemon:~$ sudo update-alternatives --set javac \
+/usr/lib/jvm/jdk-19.0.1/bin/javac
+```
+
+Ahora ya podemos **comprobar las versiones** de las herramientas instaladas:
+
+```console
+sdelquin@lemon:~$ java --version
+openjdk 19.0.1 2022-10-18
+OpenJDK Runtime Environment (build 19.0.1+10-21)
+OpenJDK 64-Bit Server VM (build 19.0.1+10-21, mixed mode, sharing)
+
+sdelquin@lemon:~$ javac --version
+javac 19.0.1
+```
+
+> ⚠️ En este punto se debe **cerrar la sesión** y **volver a abrirla** para que los cambios se apliquen correctamente.
+
+#### SDKMAN
+
+[SDKMAN](https://sdkman.io/) es una herramienta para gestionar versiones de kits de desarrollo de software.
+
+Para su instalación debemos comprobar que tenemos el paquete `zip` instalado en el sistema:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y zip
+```
+
+Ahora ejecutamos el siguiente script de instalación:
+
+```console
+sdelquin@lemon:~$ curl -s https://get.sdkman.io | bash
+```
+
+A continuación **activamos el punto de entrada** de la siguiente manera:
+
+```console
+sdelquin@lemon:~$ source "$HOME/.sdkman/bin/sdkman-init.sh"
+```
+
+Ya deberíamos de tener la instalación completada. Comprobamos la versión de la herramienta:
+
+```console
+sdelquin@lemon:~$ sdk version
+
+SDKMAN 5.16.0
+```
+
+#### Spring Boot
+
+Dentro de Spring, existe un subproyecto denominado [Spring Boot](https://spring.io/projects/spring-boot) que hace más sencilla la preparación de aplicaciones para ponerlas en producción. Utilizaremos esta herramienta durante el despliegue.
+
+```console
+sdelquin@lemon:~$ sdk install springboot
+
+Downloading: springboot 2.7.5
+In progress...
+########################################## 100,0%
+
+Installing: springboot 2.7.5
+Done installing!
+
+Setting springboot 2.7.5 as default.
+```
+
+Comprobamos la versión instalada:
+
+```console
+sdelquin@lemon:~$ spring --version
+Spring CLI v2.7.5
+```
+
+#### Maven
+
+[Maven](https://maven.apache.org/) es una herramienta de software para la gestión y construcción de proyectos Java.
+
+```console
+sdelquin@lemon:~$ sdk install maven
+
+Downloading: maven 3.8.6
+In progress...
+########################################## 100,0%
+
+Installing: maven 3.8.6
+Done installing!
+
+Setting maven 3.8.6 as default.
+```
+
+Comprobamos la versión instalada:
+
+```console
+sdelquin@lemon:~$ mvn --version
+Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
+Maven home: /home/sdelquin/.sdkman/candidates/maven/current
+Java version: 19.0.1, vendor: Oracle Corporation, runtime: /usr/lib/jvm/jdk-19.0.1
+Default locale: es_ES, platform encoding: UTF-8
+OS name: "linux", version: "5.10.0-18-arm64", arch: "aarch64", family: "unix"
+```
+
+### Creación del proyecto
+
+Creamos la **estructura base** del proyecto utilizando _Spring Boot_ con el siguiente comando:
+
+```console
+sdelquin@lemon:~$ spring init \
+--build=maven --dependencies=web --name=travelroad travelroad
+
+Using service at https://start.spring.io
+Project extracted to '/home/sdelquin/travelroad'
+```
+
+Listamos el contenido de la carpeta de trabajo:
+
+```console
+sdelquin@lemon:~$ tree travelroad
+travelroad
+├── HELP.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com
+    │   │       └── example
+    │   │           └── travelroad
+    │   │               └── TravelroadApplication.java
+    │   └── resources
+    │       ├── application.properties
+    │       ├── static
+    │       └── templates
+    └── test
+        └── java
+            └── com
+                └── example
+                    └── travelroad
+                        └── TravelroadApplicationTests.java
+
+14 directories, 7 files
+```
+
+### Escritura de código
+
+Tendremos que adaptar un poco la estructura inicial del proyecto para el objetivo de la aplicación que tenemos que desarrollar. Veamos la parte que nos interesa:
+
+```console
+sdelquin@lemon:~/travelroad$ tree src/main
+src/main
+├── java
+│   └── com
+│       └── example
+│           └── travelroad
+│               ├── controllers
+│               │   └── HomeController.java
+│               ├── models
+│               │   └── Place.java
+│               ├── repositories
+│               │   └── PlaceRepository.java
+│               └── TravelroadApplication.java
+└── resources
+    ├── application.properties
+    ├── static
+    └── templates
+        └── home.html
+
+10 directories, 6 files
+```
+
+#### Controlador
+
+```console
+sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/controllers/HomeController.java
+```
+
+> Contenido:
+
+```java
+package com.example.travelroad.controllers;
+
+import com.example.travelroad.models.Place;
+import com.example.travelroad.repositories.PlaceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+    private final PlaceRepository placeRepository;
+
+    @Autowired
+    public HomeController(PlaceRepository placeRepository) {
+        this.placeRepository = placeRepository;
+    }
+
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("newplace", placeRepository.findByVisited(false));
+        model.addAttribute("visited", placeRepository.findByVisited(true));
+        return "home";  // home.html
+    }
+}
+```
+
+#### Modelos
+
+```console
+sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/models/Place.java
+```
+
+> Contenido:
+
+```java
+package com.example.travelroad.models;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "places")
+public class Place {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String name;
+    private Boolean visited;
+
+    public Place() {
+    }
+
+    public Place(Long id, String name, Boolean visited) {
+
+        this.id = id;
+        this.name = name;
+        this.visited = visited;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getVisited() {
+        return visited;
+    }
+
+    public void setVisited(Boolean visited) {
+        this.visited = visited;
+    }
+}
+```
+
+#### Repositorio
+
+```console
+sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/repositories/PlaceRepository.java
+```
+
+> Contenido:
+
+```java
+package com.example.travelroad.repositories;
+
+import com.example.travelroad.models.Place;
+
+import java.util.List;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+
+@Repository
+public interface PlaceRepository extends CrudRepository<Place, Long> {
+
+    List<Place> findByName(String name);
+
+    @Query("SELECT p FROM Place p WHERE p.visited = ?1")
+    List<Place> findByVisited(Boolean visited);
+}
+```
+
+#### Plantilla
+
+```console
+sdelquin@lemon:~/travelroad$ sudo vi src/main/resources/templates/home.html
+```
+
+> Contenido:
+
+```java
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Travel Bucket List</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <h1>My Travel Bucket List</h1>
+    <h2>Places I'd Like to Visit</h2>
+    <ul th:each="place : ${newplace}">
+      <li th:text="${place.name}"></li>
+    </ul>
+
+    <h2>Places I've Already Been To</h2>
+    <ul th:each="place : ${visited}">
+      <li th:text="${place.name}"></li>
+    </ul>
+</body>
+</html>
+```
+
+#### Dependencias
+
+Maven es un gestor de dependencias. Debemos definir estas dependencias en un fichero XML:
+
+```console
+sdelquin@lemon:~/travelroad$ vi pom.xml
+```
+
+> Contenido:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.5</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>travelroad</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>travelroad</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>19</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+```
+
+#### Credenciales
+
+```console
+sdelquin@lemon:~/travelroad$ vi src/main/resources/application.properties
+```
+
+> Contenido:
+
+```ini
+spring.datasource.url=jdbc:postgresql://localhost:5432/travelroad
+spring.datasource.username=travelroad_user
+spring.datasource.password=dpl0000
+```
+
+### Proceso de construcción
+
+Para poner en funcionamiento el proyecto necesitamos dos fases que se llevarán a cabo mediante Maven:
+
+1. Compilación.
+2. Empaquetado.
+
+Para llevar a cabo la **compilación** del proyecto ejecutamos lo siguiente:
+
+```console
+sdelquin@lemon:~/travelroad$ ./mvnw compile
+```
+
+Para llevar a cabo el **empaquetado** del proyecto ejecutamos lo siguiente:
+
+```console
+sdelquin@lemon:~/travelroad$ ./mvnw package
+```
+
+Tras esto, obtendremos un archivo [JAR (Java ARchive)](https://es.wikipedia.org/wiki/Java_Archive) en la ruta:
+
+```console
+sdelquin@lemon:~/travelroad$ ls -l target/travelroad-0.0.1-SNAPSHOT.jar
+-rw-r--r-- 1 sdelquin sdelquin 39261971 nov 13 09:48 target/travelroad-0.0.1-SNAPSHOT.jar
+
+sdelquin@lemon:~/travelroad$ file target/travelroad-0.0.1-SNAPSHOT.jar
+target/travelroad-0.0.1-SNAPSHOT.jar: Java archive data (JAR)
+```
+
+Una forma de lanzar la aplicación es correr este fichero JAR:
+
+```console
+sdelquin@lemon:~/travelroad$ java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+```
+
+Esto nos permitirá acceder a http://localhost:8080 para comprobar que la aplicación funciona correctamente.
+
+### Servicio de despliegue
+
+De cara a simplificar el proceso de despliegue, podemos disponer de un script que realice los pasos del proceso de construcción:
+
+```console
+sdelquin@lemon:~/travelroad$ vi run.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+cd /home/sdelquin/travelroad
+./mvnw compile
+./mvnw package
+/usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+```
+
+A continuación creamos un fichero de servicio para gestionarlo mediante systemd:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/systemd/system/travelroad.service
+```
+
+> Contenido:
+
+```ini
+[Unit]
+Description=Spring Boot TravelRoad
+After=syslog.target
+After=network.target[Service]
+
+[Service]
+ExecStart=/home/sdelquin/travelroad/run.sh
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=travelroad
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Añadimos este servicio para que esté disponible:
+
+```console
+sdelquin@lemon:~$ sudo systemctl daemon-reload
+```
+
+Iniciamos el servicio y lo habilitamos para que se inicie en el arranque del sistema:
+
+```console
+sdelquin@lemon:~$ sudo systemctl start travelroad
+sdelquin@lemon:~$ sudo systemctl enable travelroad
+```
+
+Podemos comprobar el estado del servicio (tener en cuenta que puede tardar algún tiempo):
+
+```console
+sdelquin@lemon:~$ sudo systemctl status travelroad
+● travelroad.service - Spring Boot TravelRoad
+     Loaded: loaded (/etc/systemd/system/travelroad.service; disabled; vendor preset: enabled)
+     Active: active (running) since Sun 2022-11-13 10:41:09 WET; 32s ago
+   Main PID: 200796 (run.sh)
+      Tasks: 37 (limit: 2251)
+     Memory: 282.9M
+        CPU: 13.026s
+     CGroup: /system.slice/travelroad.service
+             ├─200796 /bin/bash /home/sdelquin/travelroad/run.sh
+             └─200941 /usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+
+nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.410  INFO 200941 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start comple>
+nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.433  INFO 200941 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing Persi>
+nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.482  INFO 200941 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM co>
+nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.589  INFO 200941 --- [           main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Comm>
+nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.684  INFO 200941 --- [           main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: o>
+nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.008  INFO 200941 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatfor>
+nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.013  INFO 200941 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManag>
+nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.264  WARN 200941 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is >
+nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.451  INFO 200941 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): >
+nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.456  INFO 200941 --- [           main] c.e.travelroad.TravelroadApplication     : Started TravelroadApplicati>
+```
+
+### Configuración de Nginx
+
+Lo último que nos queda es configurar el host virtual en Nginx y dar servicio a las peticiones:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    listen 80;
+    server_name travelroad;
+
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+}
+```
+
+Recargamos la configuración del servidor web para que los cambios surtan efecto:
+
+```console
+sdelquin@lemon:~$ sudo systemctl reload nginx
+```
+
+### Acceso a la aplicación web
+
+Con todo hecho, ya podemos probar el acceso a la aplicación web:
+
+![Spring funcionando](./images/spring-works.png)
