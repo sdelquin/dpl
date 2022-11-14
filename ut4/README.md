@@ -8,8 +8,8 @@ Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** q
 [Laravel](#laravel)  
 [Express](#express)  
 [Spring](#spring)  
-[Flask](#flask)  
-[Ruby on Rails](#ruby-on-rails)
+[Ruby on Rails](#ruby-on-rails)  
+[Flask](#flask)
 
 ## PostgreSQL
 
@@ -1618,3 +1618,573 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 Con todo hecho, ya podemos probar el acceso a la aplicación web:
 
 ![Spring funcionando](./images/spring-works.png)
+
+## Ruby on Rails
+
+![Logo Ruby on Rails](./images/rubyonrails-logo.png)
+
+[Ruby on Rails](https://rubyonrails.org/) también conocido como RoR o Rails, es un framework de aplicaciones web de código abierto escrito en el lenguaje de programación Ruby, siguiendo el paradigma del patrón Modelo Vista Controlador.
+
+### Instalación
+
+#### RVM
+
+Lo primero será instalar [Ruby Version Manager (RVM)](<[https://](https://rvm.io/)>) una herramienta en línea de comandos que permite instalar, gestionar y trabajar con múltiples entornos Ruby.
+
+Añadimos las claves GPG:
+
+```console
+sdelquin@lemon:~$ gpg2 --recv-keys \
+409B6B1796C275462A1703113804BB82D39DC0E3 \
+7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+```
+
+Ahora lanzamos el script de instalación:
+
+```console
+sdelquin@lemon:~$ curl -sSL https://get.rvm.io | bash -s stable
+Downloading https://github.com/rvm/rvm/archive/1.29.12.tar.gz
+Downloading https://github.com/rvm/rvm/releases/download/1.29.12/1.29.12.tar.gz.asc
+gpg: Firmado el vie 15 ene 2021 18:46:22 WET
+gpg:                usando RSA clave 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+gpg: Firma correcta de "Piotr Kuczynski <piotr.kuczynski@gmail.com>" [desconocido]
+gpg: ATENCIÓN: ¡Esta clave no está certificada por una firma de confianza!
+gpg:          No hay indicios de que la firma pertenezca al propietario.
+Huellas dactilares de la clave primaria: 7D2B AF1C F37B 13E2 069D  6956 105B D0E7 3949 9BDB
+GPG verified '/home/sdelquin/.rvm/archives/rvm-1.29.12.tgz'
+Installing RVM to /home/sdelquin/.rvm/
+    Adding rvm PATH line to /home/sdelquin/.profile /home/sdelquin/.mkshrc /home/sdelquin/.bashrc /home/sdelquin/.zshrc.
+    Adding rvm loading line to /home/sdelquin/.profile /home/sdelquin/.bash_profile /home/sdelquin/.zlogin.
+Installation of RVM in /home/sdelquin/.rvm/ is almost complete:
+
+  * To start using RVM you need to run `source /home/sdelquin/.rvm/scripts/rvm`
+    in all your open shell windows, in rare cases you need to reopen all shell windows.
+Thanks for installing RVM 🙏
+Please consider donating to our open collective to help us maintain RVM.
+
+👉  Donate: https://opencollective.com/rvm/donate
+```
+
+Abrimos **una nueva pestaña** para que los cambios se reflejen y podamos probar rvm:
+
+```console
+sdelquin@lemon:~$ rvm --version
+rvm 1.29.12 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
+sdelquin@lemon:~$
+```
+
+#### Ruby
+
+Ahora procedemos a instalar [Ruby](<[https://](https://www.ruby-lang.org/es/)>) usando RVM:
+
+```console
+sdelquin@lemon:~$ rvm install ruby
+Searching for binary rubies, this might take some time.
+No binary rubies available for: debian/11/arm64/ruby-3.0.0.
+Continuing with compilation. Please read 'rvm help mount' to get more information on binary rubies.
+Checking requirements for debian.
+Installing requirements for debian.
+Updating systemsdelquin password required for 'apt-get --quiet --yes update':
+.....
+Installing required packages: gawk, bison, libyaml-dev, sqlite3, libgmp-dev........
+Requirements installation successful.
+Installing Ruby from source to: /home/sdelquin/.rvm/rubies/ruby-3.0.0, this may take a while depending on your cpu(s)...
+ruby-3.0.0 - #downloading ruby-3.0.0, this may take a while depending on your connection...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 18.6M  100 18.6M    0     0  22.9M      0 --:--:-- --:--:-- --:--:-- 22.9M
+ruby-3.0.0 - #extracting ruby-3.0.0 to /home/sdelquin/.rvm/src/ruby-3.0.0.....
+ruby-3.0.0 - #configuring........................................................................
+ruby-3.0.0 - #post-configuration..
+ruby-3.0.0 - #compiling..........................................................................................
+ruby-3.0.0 - #installing.....................
+ruby-3.0.0 - #making binaries executable...
+Installed rubygems 3.2.3 is newer than 3.0.9 provided with installed ruby, skipping installation, use --force to force installation.
+ruby-3.0.0 - #gemset created /home/sdelquin/.rvm/gems/ruby-3.0.0@global
+ruby-3.0.0 - #importing gemset /home/sdelquin/.rvm/gemsets/global.gems..........................................................
+ruby-3.0.0 - #generating global wrappers........
+ruby-3.0.0 - #gemset created /home/sdelquin/.rvm/gems/ruby-3.0.0
+ruby-3.0.0 - #importing gemsetfile /home/sdelquin/.rvm/gemsets/default.gems evaluated to empty gem list
+ruby-3.0.0 - #generating default wrappers........
+ruby-3.0.0 - #adjusting #shebangs for (gem irb erb ri rdoc testrb rake).
+Install of ruby-3.0.0 - #complete
+Ruby was built without documentation, to build it run: rvm docs generate-ri
+```
+
+Tenemos que **establecer la versión por defecto** de Ruby que vamos a utilizar:
+
+```console
+sdelquin@lemon:~$ bash --login
+sdelquin@lemon:~$ rvm --default use 3.0.0
+Using /home/sdelquin/.rvm/gems/ruby-3.0.0
+sdelquin@lemon:~$ echo "source ~/.rvm/scripts/rvm" >> .bashrc
+```
+
+Comprobamos tanto la versión de Ruby como la versión de la herramienta `gem` que se utiliza para instalar paquetes (gemas):
+
+```console
+sdelquin@lemon:~$ ruby --version
+ruby 3.0.0p0 (2020-12-25 revision 95aff21468) [aarch64-linux]
+
+sdelquin@lemon:~$ gem --version
+3.2.3
+```
+
+#### Ruby on Rails
+
+Estamos en disposición de instalar Ruby on Rails:
+
+```console
+sdelquin@lemon:~$ gem install rails
+```
+
+Comprobamos igualmente la **versión instalada de Ruby on Rails**:
+
+```console
+sdelquin@lemon:~$ rails --version
+Rails 7.0.4
+```
+
+#### Requisitos de sistema
+
+Necesitamos instalar algún paquete en el sistema para dar soporte a los pasos posteriores:
+
+```console
+$ sudo apt install -y libpq-dev
+```
+
+### Creando la aplicación
+
+Rails nos provee de un subcomando para crear una nueva aplicación:
+
+```console
+sdelquin@lemon:~$ rails new travelroad --database=postgresql
+```
+
+La estructura de carpetas y ficheros queda tal que así:
+
+```console
+sdelquin@lemon:~$ ls -l travelroad
+total 68
+drwxr-xr-x 11 sdelquin sdelquin 4096 nov 14 11:28 app
+drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:28 bin
+drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 config
+-rw-r--r--  1 sdelquin sdelquin  160 nov 14 11:27 config.ru
+drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 db
+-rw-r--r--  1 sdelquin sdelquin 2268 nov 14 11:27 Gemfile
+-rw-r--r--  1 sdelquin sdelquin 5373 nov 14 11:28 Gemfile.lock
+drwxr-xr-x  4 sdelquin sdelquin 4096 nov 14 11:27 lib
+drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:28 log
+drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 public
+-rw-r--r--  1 sdelquin sdelquin  227 nov 14 11:27 Rakefile
+-rw-r--r--  1 sdelquin sdelquin  374 nov 14 11:27 README.md
+drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 storage
+drwxr-xr-x 10 sdelquin sdelquin 4096 nov 14 11:27 test
+drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 tmp
+drwxr-xr-x  3 sdelquin sdelquin 4096 nov 14 11:28 vendor
+```
+
+Podemos lanzar el servidor de desarrollo que trae Ruby on Rails para ver que todo está correcto:
+
+```console
+sdelquin@lemon:~/travelroad$ bin/rails server
+=> Booting Puma
+=> Rails 7.0.4 application starting in development
+=> Run `bin/rails server --help` for more startup options
+Puma starting in single mode...
+* Puma version: 5.6.5 (ruby 3.0.0-p0) ("Birdie's Version")
+*  Min threads: 5
+*  Max threads: 5
+*  Environment: development
+*          PID: 5193
+* Listening on http://127.0.0.1:3000
+* Listening on http://[::1]:3000
+Use Ctrl-C to stop
+Started GET "/" for 127.0.0.1 at 2022-11-13 18:36:23 +0000
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/railties-7.0.4/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/railties-7.0.4/lib/rails/templates/rails/welcome/index.html.erb (Duration: 1.1ms | Allocations: 730)
+Completed 200 OK in 7ms (Views: 3.0ms | ActiveRecord: 0.0ms | Allocations: 7022)
+```
+
+Si abrimos un navegador en http://localhost:3000 obtendremos una pantalla similar a la siguiente:
+
+![Ruby on Rails inicial](./images/rubyonrails-init.png)
+
+### Lógica de negocio
+
+#### Rutas
+
+Lo primero es editar el fichero de rutas y modificarlo convenientemente:
+
+```console
+sdelquin@lemon:~/travelroad$ vi config/routes.rb
+```
+
+> Contenido:
+
+```ruby
+Rails.application.routes.draw do
+  root "places#index"
+
+  get "/places", to: "places#index"
+end
+```
+
+#### Controlador
+
+Para crear el código base del controlador utilizamos la herramienta que nos proporciona Ruby on Rails:
+
+```console
+sdelquin@lemon:~/travelroad$ bin/rails generate controller Places index --skip-routes
+      create  app/controllers/places_controller.rb
+      invoke  erb
+      create    app/views/places
+      create    app/views/places/index.html.erb
+      invoke  test_unit
+      create    test/controllers/places_controller_test.rb
+      invoke  helper
+      create    app/helpers/places_helper.rb
+      invoke    test_unit
+```
+
+Editamos el controlador:
+
+```console
+sdelquin@lemon:~/travelroad$ vi app/controllers/places_controller.rb
+```
+
+> Contenido:
+
+```ruby
+class PlacesController < ApplicationController
+  def index
+    @newplace = Place.where(visited: false)
+    @visited = Place.where(visited: true)
+  end
+end
+```
+
+#### Modelo
+
+Para crear el código base del modelo utilizamos la herramienta que nos proporciona Ruby on Rails:
+
+```console
+sdelquin@lemon:~/travelroad$ rails generate model Place
+      invoke  active_record
+      create    db/migrate/20221114114713_create_places.rb
+      create    app/models/place.rb
+      invoke    test_unit
+      create      test/models/place_test.rb
+      create      test/fixtures/places.yml
+```
+
+#### Vista
+
+Editamos el fichero de la vista:
+
+```console
+sdelquin@lemon:~/travelroad$ vi app/views/places/index.html.erb
+```
+
+> Contenido:
+
+```ruby
+<h1>My Travel Bucket List</h1>
+
+<h2>Places I'd Like to Visit</h2>
+<ul>
+  <% @newplace.each do |place| %>
+    <li><%= place.name %></li>
+  <% end %>
+</ul>
+
+<h2>Places I've Already Been To</h2>
+<ul>
+  <% @visited.each do |place| %>
+    <li><%= place.name %></li>
+  <% end %>
+</ul>
+```
+
+#### Acceso a la base de datos
+
+Debemos especificar las credenciales de acceso a la base de datos. Para ello modificamos el fichero de configuración que provee Ruby on Rails:
+
+```console
+sdelquin@lemon:~/travelroad$ vi config/database.yml
+```
+
+> Contenido:
+
+```yaml
+# PostgreSQL. Versions 9.3 and up are supported.
+#
+# Install the pg driver:
+#   gem install pg
+# On macOS with Homebrew:
+#   gem install pg -- --with-pg-config=/usr/local/bin/pg_config
+# On macOS with MacPorts:
+#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/pg_config
+# On Windows:
+#   gem install pg
+#       Choose the win32 build.
+#       Install PostgreSQL and put its /bin directory on your path.
+#
+# Configure Using Gemfile
+# gem "pg"
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: travelroad
+
+  # The specified database role being used to connect to postgres.
+  # To create additional roles in postgres see `$ createuser --help`.
+  # When left blank, postgres will use the default role. This is
+  # the same name as the operating system user running Rails.
+  username: travelroad_user
+
+  # The password associated with the postgres role (username).
+  password: dpl0000
+
+  # Connect on a TCP socket. Omitted by default since the client uses a
+  # domain socket that doesn't need configuration. Windows does not have
+  # domain sockets, so uncomment these lines.
+  host: localhost
+
+  # The TCP port the server listens on. Defaults to 5432.
+  # If your server runs on a different port number, change accordingly.
+  port: 5432
+
+  # Schema search path. The server defaults to $user,public
+  #schema_search_path: myapp,sharedapp,public
+
+  # Minimum log levels, in increasing order:
+  #   debug5, debug4, debug3, debug2, debug1,
+  #   log, notice, warning, error, fatal, and panic
+  # Defaults to warning.
+  #min_messages: notice
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: travelroad_test
+
+# As with config/credentials.yml, you never want to store sensitive information,
+# like your database password, in your source code. If your source code is
+# ever seen by anyone, they now have access to your database.
+#
+# Instead, provide the password or a full connection URL as an environment
+# variable when you boot the app. For example:
+#
+#   DATABASE_URL="postgres://myuser:mypass@localhost/somedatabase"
+#
+# If the connection URL is provided in the special DATABASE_URL environment
+# variable, Rails will automatically merge its configuration values on top of
+# the values provided in this file. Alternatively, you can specify a connection
+# URL environment variable explicitly:
+#
+#   production:
+#     url: <%= ENV["MY_APP_DATABASE_URL"] %>
+#
+# Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
+# for a full overview on how database connection configuration can be specified.
+#
+production:
+  <<: *default
+  database: travelroad_production
+  username: travelroad
+  password: <%= ENV["TRAVELROAD_DATABASE_PASSWORD"] %>
+```
+
+#### Migraciones
+
+Dado que estamos trabajando con una base de datos y un tabla ya creadas, no nos interesa aplicar las migraciones que nos sugiere Ruby on Rails. Para no obtener un error, deshabilitamos esa opción en otro fichero de configuración del entorno de desarrollo:
+
+```console
+sdelquin@lemon:~/travelroad$ vi config/environments/development.rb
+```
+
+Tocamos sólo la siguiente línea:
+
+```ruby
+config.active_record.migration_error = false
+```
+
+### Probando la aplicación
+
+Ahora ya estamos en disposición de lanzar la aplicación en desarrollo y comprobar que todo funciona correctamente:
+
+```console
+sdelquin@lemon:~/travelroad$ bin/rails server
+=> Booting Puma
+=> Rails 7.0.4 application starting in development
+=> Run `bin/rails server --help` for more startup options
+Puma starting in single mode...
+* Puma version: 5.6.5 (ruby 3.0.0-p0) ("Birdie's Version")
+*  Min threads: 5
+*  Max threads: 5
+*  Environment: development
+*          PID: 66801
+* Listening on http://127.0.0.1:3000
+* Listening on http://[::1]:3000
+Use Ctrl-C to stop
+```
+
+Al acceder a http://localhost:3000 podemos ver que obtenemos el resultado esperado:
+
+![Ruby on Rails funcionando](./images/rubyonrails-works.png)
+
+### Configuración Nginx
+
+#### Passenger
+
+Para poder conectar Nginx con Ruby on Rails necesitamos hacer uso del módulo [Passenger](https://www.phusionpassenger.com/library/config/nginx/intro.html).
+
+Antes de nada debemos intalar la herramienta en sí:
+
+```console
+sdelquin@lemon:~$ gem install passenger
+Fetching passenger-6.0.15.gem
+Building native extensions. This could take a while...
+Successfully installed passenger-6.0.15
+Parsing documentation for passenger-6.0.15
+Installing ri documentation for passenger-6.0.15
+Done installing documentation for passenger after 17 seconds
+1 gem installed
+```
+
+Comprobamos la versión instalada:
+
+```console
+sdelquin@lemon:~$ passenger --version
+Phusion Passenger(R) 6.0.15
+```
+
+Aunque la documentación oficial se enfoca más en compilar un "nuevo" Nginx incluyendo el módulo `passenger` de forma estática, en nuestro caso vamos a incluirlo de [forma dinámica](../ut3/README.md#instalación-de-un-módulo) al Nginx "existente".
+
+Lo primero será instalar las dependencias que tiene este módulo de cara al proceso de compilación:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y libcurl4-openssl-dev
+```
+
+A continuación descargamos el código fuente de Nginx con la misma versión que el Nginx que tenemos funcionando en el sistema:
+
+```console
+curl -sL https://nginx.org/download/nginx-$(/sbin/nginx -v \
+|& cut -d '/' -f2).tar.gz | tar xvz -C /tmp
+```
+
+Nos movemos a la carpeta descargada:
+
+```console
+sdelquin@lemon:~$ cd /tmp/nginx-1.22.0/
+```
+
+Realizamos la configuración:
+
+```
+sdelquin@lemon:/tmp/nginx-1.22.0$ ./configure \
+--add-dynamic-module=$(passenger-config --nginx-addon-dir) \
+--with-compat
+```
+
+Y construimos el módulo dinámico:
+
+```console
+sdelquin@lemon:/tmp/nginx-1.22.0$ make modules
+```
+
+Como resultado de este proceso obtendremos un fichero `ngx_http_passenger_module.so` que copiaremos a la carpeta desde la que se cargan los módulos en Nginx:
+
+```console
+sdelquin@lemon:/tmp/nginx-1.22.0$ sudo cp objs/ngx_http_passenger_module.so \
+/etc/nginx/modules
+```
+
+Ya por último, para cargar el módulo en Nginx, tocamos la configuración del servicio, añadiendo la siguiente línea a `/etc/nginx/nginx.conf`:
+
+```nginx
+load_module /etc/nginx/modules/ngx_http_passenger_module.so;
+```
+
+También es necesario incluir en el fichero anterior, la ruta raíz de `passenger`. La podemos encontrar con el comando:
+
+```console
+sdelquin@lemon:~$ passenger-config --root
+/home/sdelquin/.rvm/gems/ruby-3.0.0/gems/passenger-6.0.15
+```
+
+Añadimos ahora esta ruta al fichero `/etc/nginx/nginx.conf` dentro del bloque `server { ... }` y antes de la línea `include /etc/nginx/conf.d/*.conf;`:
+
+```nginx
+passenger_root /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/passenger-6.0.15;
+```
+
+Comprobamos que la sintaxis sea correcta y reiniciamos el servidor web:
+
+```console
+sdelquin@lemon:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+sdelquin@lemon:~$ sudo systemctl restart nginx
+```
+
+#### Host virtual
+
+Creamos un nuevo fichero de configuración para dar servicio a este escenario:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    listen 80;
+    server_name travelroad;
+
+    root /home/sdelquin/travelroad/public;
+
+    passenger_enabled on;
+    passenger_app_env development;  # cambio a production si procede
+}
+```
+
+Dado que vamos a acceder a la aplicación web mediante http://travelroad hemos de añadir una configuración al entorno de desarrollo de Ruby on Rails para que lo tenga en cuenta.
+
+```console
+sdelquin@lemon:~/travelroad$ vi config/environments/development.rb
+```
+
+Añadimos justo al final:
+
+```ruby
+  ...
+  config.hosts << "travelroad"
+end
+```
+
+### Probando el despliegue
+
+Tras todos estos cambios, nos aseguramos de reiniciar (mejor que recargar por la cantidad de modificaciones/módulos que hemos tocado) el servidor web Nginx:
+
+```console
+sdelquin@lemon:~$ sudo systemctl restart nginx
+```
+
+Y finalmente accedemos a http://travelroad comprobando que es el resultado esperado:
+
+![Ruby on Rails funcionando sobre Nginx](./images/rubyonrails-nginx-works.png)
