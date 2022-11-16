@@ -31,7 +31,7 @@ Al pulsar el botón de "Generar" se tendrán que mostrar todas las imágenes cam
 
 **Notas a tener en cuenta**:
 
-- Las dependencias previas del módulo ngx_small_light se resuelven con: `sudo apt install imagemagick libpcre3 libpcre3-dev libmagickwand-dev`
+- Las dependencias previas del módulo ngx_small_light se resuelven con: `sudo apt install -y imagemagick libpcre3 libpcre3-dev libmagickwand-dev`
 
 - Se puede presuponer que siempre van a haber 20 imágenes con los nombres `image01.jpg`, `image02.jpg`, ...
 - Usar [peticiones GET del módulo ngx_small_light](https://github.com/cubicdaiya/ngx_small_light#using-get-parameters) para el tratamiento de las imágenes.
