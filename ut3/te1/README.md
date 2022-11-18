@@ -53,7 +53,7 @@ Al pulsar el botón de "Generar" se tendrán que mostrar todas las imágenes cam
 
 **Notas a tener en cuenta**:
 
-- Se puede presuponer que siempre van a haber 20 imágenes con los nombres `image01.jpg`, `image02.jpg`, ...
+- Se puede presuponer que siempre van a haber **20 imágenes** con los nombres `image01.jpg`, `image02.jpg`, ... y que las **imágenes son cuadradas**.
 - Usar [peticiones GET del módulo ngx_small_light](https://github.com/cubicdaiya/ngx_small_light#using-get-parameters) para el tratamiento de las imágenes, modificando el atributo `src` de cada `<img>`.
 - Trabajar en una carpeta dentro del `$HOME`.
 
