@@ -15,6 +15,28 @@ Para ello se pide:
 5. Incorporar certificado de seguridad (mostrar el certificado 🔒).
 6. Redirigir el subdominio `www` al dominio base (incluyendo ssl).
 
+## Módulo ngx_small_light
+
+Para la instalación del módulo [seguir las instrucciones de instalación de módulos](../README.md#instalación-de-un-módulo), teniendo en cuenta que:
+
+1. Hay que instalar las siguientes dependencias:
+
+```
+sudo apt install -y build-essential imagemagick libpcre3 libpcre3-dev libmagickwand-dev
+```
+
+2. Hay que descargar el código fuente del módulo con:
+
+```console
+git clone https://github.com/cubicdaiya/ngx_small_light.git
+```
+
+3. Hay que "configurar" el módulo, previo a la configuración de Nginx, entrando en la carpeta del módulo y ejecutando:
+
+```console
+./setup
+```
+
 ## Aplicación web
 
 La aplicación debe contener un formulario web con los siguientes campos de texto:
@@ -31,10 +53,8 @@ Al pulsar el botón de "Generar" se tendrán que mostrar todas las imágenes cam
 
 **Notas a tener en cuenta**:
 
-- Las dependencias previas del módulo ngx_small_light se resuelven con: `sudo apt install -y imagemagick libpcre3 libpcre3-dev libmagickwand-dev`
-
 - Se puede presuponer que siempre van a haber 20 imágenes con los nombres `image01.jpg`, `image02.jpg`, ...
-- Usar [peticiones GET del módulo ngx_small_light](https://github.com/cubicdaiya/ngx_small_light#using-get-parameters) para el tratamiento de las imágenes.
+- Usar [peticiones GET del módulo ngx_small_light](https://github.com/cubicdaiya/ngx_small_light#using-get-parameters) para el tratamiento de las imágenes, modificando el atributo `src` de cada `<img>`.
 - Trabajar en una carpeta dentro del `$HOME`.
 
 ## Entregable
