@@ -9,7 +9,7 @@ Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** q
 [Express](#express)  
 [Spring](#spring)  
 [Ruby on Rails](#ruby-on-rails)  
-[Flask](#flask)
+[Django](#django)
 
 ## PostgreSQL
 
@@ -2188,3 +2188,217 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 Y finalmente accedemos a http://travelroad comprobando que es el resultado esperado:
 
 ![Ruby on Rails funcionando sobre Nginx](./images/rubyonrails-nginx-works.png)
+
+## Django
+
+![Logo Django](./images/django-logo.png)
+
+[Django](https://www.djangoproject.com/) es un framework de desarrollo web de código abierto, escrito en Python, que respeta el patrón de diseño conocido como modelo–vista–controlador.
+
+### Instalación
+
+#### Python
+
+Lo primero de todo será instalar el lenguaje de programación y las herramientas Python para poder trabajar en el desarrollo de la aplicación web. Para ello basta con seguir [estas instrucciones](https://github.com/sdelquin/pro/blob/main/ut0/python-install.md).
+
+#### Entorno virtual
+
+Habitualmente en Python trabajamos con entornos virtuales lo que nos permite aislar las dependencias de nuestro proyecto con respecto a otros proyectos o al sistema.
+
+Para crear (y activar) un entorno virtual ejecutamos lo siguiente:
+
+```console
+sdelquin@lemon:~$ mkdir travelroad
+sdelquin@lemon:~$ cd travelroad
+
+sdelquin@lemon:~/travelroad$ python -m venv --prompt travelroad .venv
+sdelquin@lemon:~/travelroad$ source .venv/bin/activate
+(travelroad) sdelquin@lemon:~/travelroad$
+```
+
+> 💡 Cuando activamos un entorno virtual el prompt se modifica y aparece entre paréntesis el nombre del entorno virtual.
+
+Los nuevos paquetes que instalemos dentro del entorno virtual se almacenarán en la carpeta `.venv`:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ls -l .venv
+total 16
+drwxr-xr-x 2 sdelquin sdelquin 4096 nov 15 10:14 bin
+drwxr-xr-x 3 sdelquin sdelquin 4096 nov 15 10:14 include
+drwxr-xr-x 3 sdelquin sdelquin 4096 nov 15 10:14 lib
+lrwxrwxrwx 1 sdelquin sdelquin    3 nov 15 10:14 lib64 -> lib
+-rw-r--r-- 1 sdelquin sdelquin  219 nov 15 10:14 pyvenv.cfg
+```
+
+#### Django
+
+Para instalar Django basta con utilizar la herramienta de gestión de paquetes en Python:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ pip install django
+Collecting django
+  Downloading Django-4.1.3-py3-none-any.whl (8.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.1/8.1 MB 5.1 MB/s eta 0:00:00
+Collecting asgiref<4,>=3.5.2
+  Downloading asgiref-3.5.2-py3-none-any.whl (22 kB)
+Collecting sqlparse>=0.2.2
+  Downloading sqlparse-0.4.3-py3-none-any.whl (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.8/42.8 kB 8.3 MB/s eta 0:00:00
+Installing collected packages: sqlparse, asgiref, django
+Successfully installed asgiref-3.5.2 django-4.1.3 sqlparse-0.4.3
+```
+
+Podemos comprobar la versión instalada de Django con el siguiente comando:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ python -m django --version
+4.1.3
+```
+
+### Creación del proyecto
+
+Django proporciona una herramienta para crear la estructura base del proyecto:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ django-admin startproject main .
+```
+
+Comprobamos el contenido de la carpeta de trabajo:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ tree
+.
+├── manage.py
+└── main
+    ├── asgi.py
+    ├── __init__.py
+    ├── settings.py
+    ├── urls.py
+    └── wsgi.py
+
+1 directory, 6 files
+```
+
+Podemos lanzar el servidor de desarrollo con el siguiente comando:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ./manage.py runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+November 15, 2022 - 10:11:09
+Django version 4.1.3, using settings 'main.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+```
+
+Ahora si accedemos a http://localhost:8000 tendremos la pantalla de bienvenida de un proyecto base Django:
+
+![Django inicial](./images/django-init.png)
+
+### Código de aplicación
+
+Ahora ya estamos en disposición de empezar a montar las distintas partes de nuestra aplicación web. Django sigue el patrón **MTV (Model-Template-View)** y funciona de la siguiente manera:
+
+![Modelo MTV de Django](./image/../images/django-mtv.jpg)
+
+> Fuente: https://espifreelancer.com/mtv-django.html
+
+Un proyecto Django está formado por "aplicaciones". Lo primero será crear nuestra primera aplicación:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ./manage.py startapp places
+```
+
+A través de este comando se ha creado una carpeta para alojar la aplicación `places` con el siguiente contenido:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ls -l places
+total 24
+-rw-r--r-- 1 sdelquin sdelquin   63 nov 15 10:19 admin.py
+-rw-r--r-- 1 sdelquin sdelquin  144 nov 15 10:19 apps.py
+-rw-r--r-- 1 sdelquin sdelquin    0 nov 15 10:19 __init__.py
+drwxr-xr-x 2 sdelquin sdelquin 4096 nov 15 10:19 migrations
+-rw-r--r-- 1 sdelquin sdelquin   57 nov 15 10:19 models.py
+-rw-r--r-- 1 sdelquin sdelquin   60 nov 15 10:19 tests.py
+-rw-r--r-- 1 sdelquin sdelquin   63 nov 15 10:19 views.py
+```
+
+#### Acceso a la base de datos
+
+Antes de nada debemos instalar un paquete de soporte llamado [psycopg](https://www.psycopg.org/) que viene a ser un driver para conectar desde Python con bases de datos PostgreSQL:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ pip install psycopg2
+Collecting psycopg2
+  Downloading psycopg2-2.9.5.tar.gz (384 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 384.3/384.3 kB 4.1 MB/s eta 0:00:00
+  Preparing metadata (setup.py) ... done
+Building wheels for collected packages: psycopg2
+  Building wheel for psycopg2 (setup.py) ... done
+  Created wheel for psycopg2: filename=psycopg2-2.9.5-cp311-cp311-linux_aarch64.whl size=490810 sha256=fb4ced65205db48f43764e3023f3dfc013a00c9e4b33f7d94db4042bbe7b4be1
+  Stored in directory: /tmp/pip-ephem-wheel-cache-srnl4xia/wheels/f9/08/b1/dddce0df8eee727ef4a56fb0da4f0230de9e127e5f234881d4
+Successfully built psycopg2
+Installing collected packages: psycopg2
+Successfully installed psycopg2-2.9.5
+```
+
+Hay que establecer las credenciales para acceder a la base de datos:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi main/settings.py
+```
+
+Dejar la sección `DATABASES` tal que así:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'travelroad',
+        'USER': 'travelroad_user'
+        'PASSWORD': 'dpl0000',
+        'HOST': 'localhost',
+        'PORT': 5432,
+    }
+}
+```
+
+Django proporciona el subcomando [check](<[https://](https://docs.djangoproject.com/en/4.1/ref/django-admin/#check)>) para comprobar que todo esté "en su sitio":
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ python manage.py check --database default
+System check identified no issues (0 silenced).
+(travelroad) sdelquin@lemon:~/travelroad$
+```
+
+#### Modelos
+
+En Django existe un [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) que permite mapear clases escritas en Python con entidades relacionales de la base de datos (PostgreSQL en este caso).
+
+Vamos a escribir nuestro modelo de lugares:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi places/models.py
+```
+
+> Contenido:
+
+```python
+from django.db import models
+
+class Place(models.Model):
+    name = models.CharField(max_length=255)
+    visited = models.BooleanField()
+
+    class Meta:
+        db_table = "places"  # necesario porque ya partimos de una tabla creada
+```
+
+> 💡 Django añade por defecto a todos sus modelos una clave primaria `id` que es única y autoincremental.
+
+#### Vistas
