@@ -41,7 +41,7 @@ git clone https://github.com/cubicdaiya/ngx_small_light.git
 
 La aplicación debe contener un formulario web con los siguientes campos de texto:
 
-- Tamaño de la imagen → En píxeles
+- Tamaño de la imagen → En píxeles (corresponde al "lado": son imágenes cuadradas)
 - Ancho del borde → En píxeles
 - Color del borde → Formato hexadecimal
 - Enfoque → Formato `<radius>x<sigma>`
