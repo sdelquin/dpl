@@ -9,11 +9,12 @@ Este módulo sirve para generar "miniaturas" de imágenes _on the fly_ además d
 Para ello se pide:
 
 1. Instalar el módulo [ngx_small_light](https://github.com/cubicdaiya/ngx_small_light) y cargarlo dinámicamente en Nginx.
-2. Crear un _virtual host_ específico que atienda peticiones en el dominio https://images.aluXXXX.arkania.es.
-3. Subir las imágenes de [images.zip](./files/images.zip) a una carpeta `img` dentro de la carpeta de trabajo elegida.
-4. Crear una aplicación web que permita el tratamiento de dichas imágenes.
-5. Incorporar certificado de seguridad (mostrar el certificado 🔒).
-6. Redirigir el subdominio `www` al dominio base (incluyendo ssl).
+2. Crear un _virtual host_ específico que atienda peticiones en el dominio images.aluXXXX.arkania.es (`server_name`).
+3. Habilitar el módulo `ngx_small_light` en el virtual host sólo para el location `/img`.
+4. Subir las imágenes de [images.zip](./files/images.zip) a una carpeta `img` dentro de la carpeta de trabajo elegida.
+5. Crear una aplicación web que permita el tratamiento de dichas imágenes.
+6. Incorporar certificado de seguridad (mostrar el certificado 🔒).
+7. Redirigir el subdominio `www` al dominio base (incluyendo ssl).
 
 ## Módulo ngx_small_light
 
