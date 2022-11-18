@@ -676,6 +676,8 @@ Recibiendo objetos: 100% (944/944), 274.95 KiB | 1.52 MiB/s, listo.
 Resolviendo deltas: 100% (534/534), listo.
 ```
 
+> ⚠️ Hay algunos módulos que requieren la generación de su configuración ejecutando `./setup` desde la carpeta descargada de su código fuente.
+
 Nos movemos a la carpeta donde hemos descargado el código fuente de Nginx y realizamos la **configuración de la compilación**:
 
 ```console
