@@ -2397,8 +2397,398 @@ class Place(models.Model):
 
     class Meta:
         db_table = "places"  # necesario porque ya partimos de una tabla creada
+
+    def __str__(self):
+        return self.name
 ```
 
 > 💡 Django añade por defecto a todos sus modelos una clave primaria `id` que es única y autoincremental.
 
 #### Vistas
+
+Creamos la vista que gestionará las peticiones a la página principal:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi places/views.py
+```
+
+> Contenido:
+
+```python
+from django.http import HttpResponse
+from django.template import loader
+
+from .models import Place
+
+
+def index(request):
+    newplace = Place.objects.filter(visited=False)
+    visited = Place.objects.filter(visited=True)
+    template = loader.get_template('places/index.html')
+    context = {
+        'newplace': newplace,
+        'visited': visited,
+    }
+    return HttpResponse(template.render(context, request))
+```
+
+#### Plantillas
+
+A continuación creamos la plantilla:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ mkdir -p places/templates/places
+(travelroad) sdelquin@lemon:~/travelroad$ vi places/templates/places/index.html
+```
+
+> Contenido:
+
+```html
+<h1>My Travel Bucket List</h1>
+
+<h2>Places I'd Like to Visit</h2>
+
+<ul>
+  {% for place in newplace %}
+  <li>{{ place }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Places I've Already Been To</h2>
+
+<ul>
+  {% for place in visited %}
+  <li>{{ place }}</li>
+  {% endfor %}
+</ul>
+```
+
+#### URLs
+
+Es necesario vincular cada URL con la vista que la gestionará.
+
+Para ello, lo primero es crear el fichero de URLs para la "aplicación" `places`:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi places/urls.py
+```
+
+> Contenido:
+
+```python
+from django.urls import path
+
+from . import views
+
+app_name = 'places'
+urlpatterns = [
+    path('', views.index, name='index'),
+]
+```
+
+Y ahora enlazamos estas URLs desde el fichero principal:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi main/urls.py
+```
+
+> Contenido:
+
+```python
+"""main URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from django.urls import include, path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # NUEVA LÍNEA ↓
+    path('', include('places.urls')),
+]
+```
+
+### Probando la aplicación en local
+
+Con todo esto ya estamos en disposición de probar nuestra aplicación en un entorno de desarrollo (local):
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ./manage.py runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+November 21, 2022 - 15:40:01
+Django version 4.1.3, using settings 'main.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+```
+
+Si accedemos a http://localhost:8000 podemos observar el resultado esperado:
+
+![Django funciona desarrollo](./images/django-dev-works.png)
+
+### Servidor de aplicación
+
+Existen [múltiples alternativas para el despliegue de una aplicación Django](https://docs.djangoproject.com/en/4.1/howto/deployment/) y un amplio abanico de servidores de aplicación.
+
+En este caso vamos a elegir [gunicorn](<[https://](https://gunicorn.org/)>) como servidor [WSGI (Web Server Gateway Interface)](https://medium.com/@nachoad/que-es-wsgi-be7359c6e001) para Python.
+
+#### gunicorn
+
+La instalación de `gunicorn` es muy sencilla ya que se trata de un paquete del ecosistema Python:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ pip install gunicorn
+Collecting gunicorn
+  Using cached gunicorn-20.1.0-py3-none-any.whl (79 kB)
+Requirement already satisfied: setuptools>=3.0 in ./.venv/lib/python3.11/site-packages (from gunicorn) (65.5.0)
+Installing collected packages: gunicorn
+Successfully installed gunicorn-20.1.0
+```
+
+Una vez instalado, tenemos a nuestro alcance un script de gestión que permite lanzar el servidor:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ gunicorn main.wsgi:application
+[2022-11-21 16:13:06 +0000] [280469] [INFO] Starting gunicorn 20.1.0
+[2022-11-21 16:13:06 +0000] [280469] [INFO] Listening at: http://127.0.0.1:8000 (280469)
+[2022-11-21 16:13:06 +0000] [280469] [INFO] Using worker: sync
+[2022-11-21 16:13:06 +0000] [280470] [INFO] Booting worker with pid: 280470
+```
+
+#### Supervisor
+
+Dado que el servidor WSGI debemos matenerlo activo y con la posibilidad de gestionarlo (arrancar, parar, etc.) hemos de buscar alguna herramienta que nos ofrezca estas posibilidades.
+
+Una alternativa es usar [servicios systemd](https://es.wikipedia.org/wiki/Systemd), como hemos visto anteriormente.
+
+Pero en esta ocasión vamos a usar [Supervisor](http://supervisord.org/) que es un sistema cliente/servidor que permite monitorizar y controlar procesos en sistemas Linux/UNIX. ¡Y además está escrito en Python!
+
+Para instalarlo ejecutamos el siguiente comando:
+
+```console
+sdelquin@lemon:~$ sudo apt install -y supervisor
+[sudo] password for sdelquin:
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+Leyendo la información de estado... Hecho
+Paquetes sugeridos:
+  supervisor-doc
+Se instalarán los siguientes paquetes NUEVOS:
+  supervisor
+0 actualizados, 1 nuevos se instalarán, 0 para eliminar y 88 no actualizados.
+Se necesita descargar 309 kB de archivos.
+Se utilizarán 1.738 kB de espacio de disco adicional después de esta operación.
+Des:1 http://deb.debian.org/debian bullseye/main arm64 supervisor all 4.2.2-2 [309 kB]
+Descargados 309 kB en 0s (636 kB/s)
+Seleccionando el paquete supervisor previamente no seleccionado.
+(Leyendo la base de datos ... 235947 ficheros o directorios instalados actualmente.)
+Preparando para desempaquetar .../supervisor_4.2.2-2_all.deb ...
+Desempaquetando supervisor (4.2.2-2) ...
+Configurando supervisor (4.2.2-2) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/supervisor.service → /lib/systemd/system/supervisor.service.
+Procesando disparadores para man-db (2.9.4-2) ...
+```
+
+Podemos comprobar que el servicio está levantado y funcionando:
+
+```console
+sdelquin@lemon:~$ sudo systemctl status supervisor
+● supervisor.service - Supervisor process control system for UNIX
+     Loaded: loaded (/lib/systemd/system/supervisor.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2022-11-21 16:25:09 WET; 56s ago
+       Docs: http://supervisord.org
+   Main PID: 282865 (supervisord)
+      Tasks: 1 (limit: 2251)
+     Memory: 16.0M
+        CPU: 92ms
+     CGroup: /system.slice/supervisor.service
+             └─282865 /usr/bin/python3 /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
+
+nov 21 16:25:09 lemon systemd[1]: Started Supervisor process control system for UNIX.
+nov 21 16:25:10 lemon supervisord[282865]: 2022-11-21 16:25:10,061 CRIT Supervisor is running as ro>
+nov 21 16:25:10 lemon supervisord[282865]: 2022-11-21 16:25:10,061 WARN No file matches via include>
+nov 21 16:25:10 lemon supervisord[282865]: 2022-11-21 16:25:10,062 INFO RPC interface 'supervisor' >
+nov 21 16:25:10 lemon supervisord[282865]: 2022-11-21 16:25:10,063 CRIT Server 'unix_http_server' r>
+nov 21 16:25:10 lemon supervisord[282865]: 2022-11-21 16:25:10,063 INFO supervisord started with pi>
+```
+
+Supervisor viene con la herramienta `supervisorctl`, pero inicialmente un usuario "ordinario" no tiene permisos para usarla:
+
+```console
+sdelquin@lemon:~$ supervisorctl status
+error: <class 'PermissionError'>, [Errno 13] Permission denied: file: /usr/lib/python3/dist-packages/supervisor/xmlrpc.py line: 560
+```
+
+Para que un usuario no privilegiado pueda usar el servicio, la estrategia va a ser añadir un grupo `supervisor` con permisos para ello, y luego unir al usuario a dicho grupo.
+
+```console
+sdelquin@lemon:~$ sudo groupadd supervisor
+```
+
+Editamos la configuración de Supervisor:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/supervisor/supervisord.conf
+```
+
+Cambiar (y añadir) lo siguiente a partir de la línea 5:
+
+```ini
+...
+chmod=0770               ; socket file mode (default 0700)
+chown=root:supervisor    ; grupo 'supervisor' para usuarios no privilegiados
+...
+```
+
+Reiniciamos el servicio para que surtan efectos los cambios realizados:
+
+```console
+sdelquin@lemon:~$ sudo systemctl restart supervisor
+```
+
+Ahora añadimos el usuario al grupo creado:
+
+```console
+sdelquin@lemon:~$ sudo addgroup sdelquin supervisor
+Añadiendo al usuario `sdelquin' al grupo `supervisor' ...
+Añadiendo al usuario sdelquin al grupo supervisor
+Hecho.
+```
+
+> Para que el cambio de grupo sea efectivo, **HABRÁ QUE SALIR Y VOLVER A ENTRAR EN LA SESIÓN**.
+
+Una vez de vuelta en la sesión podemos comprobar que ya no se produce ningún error al lanzar el controlador de supervisor con nuestro usuario habitual:
+
+```console
+sdelquin@lemon:~$ supervisorctl help
+
+default commands (type help <topic>):
+=====================================
+add    exit      open  reload  restart   start   tail
+avail  fg        pid   remove  shutdown  status  update
+clear  maintail  quit  reread  signal    stop    version
+```
+
+#### Script de servicio
+
+Aunque no es totalmente obligatorio, sí puede ser de utilidad que tengamos un **script de servicio** para nuestra aplicación que se encargue de levantar `gunicorn`:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi run.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+cd "$(dirname "$0")"
+source .venv/bin/activate
+gunicorn -b unix:/tmp/travelroad.sock main.wsgi:application
+```
+
+Damos permisos de ejecución:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ chmod +x run.sh
+```
+
+#### Configuración Supervisor
+
+Lo que nos queda es crear la configuración de un proceso supervisor que lance nuestro servicio WSGI como servidor de aplicación para la aplicación Django.
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/supervisor/conf.d/travelroad.conf
+```
+
+> Contenido:
+
+```ini
+[program:travelroad]
+user = sdelquin
+command = /home/sdelquin/travelroad/run.sh
+autostart = true
+autorestart = true
+stopsignal = INT
+killasgroup = true
+stderr_logfile = /home/sdelquin/travelroad/supervisor.err.log
+stdout_logfile = /home/sdelquin/travelroad/supervisor.out.log
+```
+
+Ahora ya podemos añadir este proceso:
+
+```console
+sdelquin@lemon:~$ supervisorctl reread
+travelroad: available
+
+sdelquin@lemon:~$ supervisorctl add travelroad
+travelroad: added process group
+
+sdelquin@lemon:~$ supervisorctl status
+travelroad                       RUNNING   pid 6018, uptime 0:00:23
+```
+
+#### Nginx
+
+Por último nos queda configurar el _virtual host_ para derivar las peticiones al servidor WSGI:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    listen 80;
+    server_name travelroad;
+
+    location / {
+        proxy_pass http://travelroad;
+    }
+}
+
+upstream travelroad {
+    server unix:/tmp/travelroad.sock;
+}
+```
+
+> 💡 Tener en cuenta que la ruta del socket tiene que coincidir con el script de servicio `run.sh`.
+
+Recargamos la configuración de Nginx para que los cambios surtan efecto:
+
+```console
+sdelquin@lemon:~$ sudo systemctl reload nginx
+```
+
+### Aplicación en producción
+
+Ya podemos acceder a http://travelroad para obtener el resultado esperado:
+
+![Django funcionando](./images/django-works.png)
+
+Tener en cuenta que cuando actualicemos el código de la aplicación será necesario recargar el script de servicio para que `gunicorn` vuelva a servir la aplicación con los cambios realizados:
+
+```console
+sdelquin@lemon:~$ supervisorctl restart travelroad
+travelroad: stopped
+travelroad: started
+```
