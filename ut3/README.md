@@ -967,7 +967,13 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 
 Es muy habitual que la gente use el prefijo `www` al acceder a un sitio web. Es por ello que puede resultar útil configurar una redirección desde `www.arkania.es` a `arkania.es`.
 
-Lo primero será configurar la redirección de `www` en el _virtual host_ correspondiente:
+Lo primero será configurar la redirección de `www` en un _virtual host_ aparte:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/www-arkania.conf
+```
+
+> Contenido:
 
 ```nginx
 server {
