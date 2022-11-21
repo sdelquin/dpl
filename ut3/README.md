@@ -967,13 +967,7 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 
 Es muy habitual que la gente use el prefijo `www` al acceder a un sitio web. Es por ello que puede resultar útil configurar una redirección desde `www.arkania.es` a `arkania.es`.
 
-Lo primero sería lanzar `certbot` para el dominio `www.arkania.es`:
-
-```console
-sdelquin@lemon:~$ sudo certbot --nginx -d www.arkania.es
-```
-
-A continuación debemos configurar la redirección de www:
+Lo primero será configurar la redirección de `www` en el _virtual host_ correspondiente:
 
 ```nginx
 server {
@@ -982,3 +976,11 @@ server {
     return 301 https://arkania.es$request_uri;
 }
 ```
+
+A continuación tenemos que lanzar `certbot` para el dominio `www.arkania.es`:
+
+```console
+sdelquin@lemon:~$ sudo certbot --nginx -d www.arkania.es
+```
+
+> 💡 Es necesario tener certificado de seguridad para el subdominio `www` porque si no, las peticiones a `https://www.arkania.es` darían un error al no disponer de certificado de seguridad.
