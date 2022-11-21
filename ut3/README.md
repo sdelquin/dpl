@@ -963,6 +963,8 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 
 ### Redirección www
 
+![Meme www subdominio](./images/www-domain.png)
+
 Es muy habitual que la gente use el prefijo `www` al acceder a un sitio web. Es por ello que puede resultar útil configurar una redirección desde `www.arkania.es` a `arkania.es`.
 
 Lo primero sería lanzar `certbot` para el dominio `www.arkania.es`:
