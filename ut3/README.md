@@ -123,6 +123,8 @@ configure arguments: (...) --prefix=/etc/nginx (...)
 
 Sin embargo, este comportamiento se puede modificar si establecemos un valor distinto para `root` en el _virtual host_.
 
+> 💡 La directiva `root` se puede encontrar a nivel de `server { }` o dentro de los distintos bloques que haya en el _virtual host_.
+
 ## Hosts virtuales
 
 Nginx se configura a través de bloques de servidor denominados _**virtual hosts**_. Cada uno de ellos nos permite montar un servicio diferente.
@@ -318,9 +320,35 @@ sdelquin@lemon:~$ firefox universe/helloworld
 
 > 💡 &nbsp;Recordar que hay que incluir la entrada correspondiente en `/etc/hosts` para que el nombre de dominio se resuelva localmente.
 
+#### Heredando el root
+
+Supongamos un ejemplo como el siguiente:
+
+```nginx
+server {
+  server_name app.es;
+  root /home/sdelquin/app;
+
+  location /img {
+    ...
+  }
+
+  location /src {
+    ...
+  }
+}
+```
+
+Indicar que tanto `/img` como `/src` "heredan" el `root` especificado a nivel de servidor, quedando de la siguiente forma:
+
+- `img` → `/home/sdelquin/app/img`
+- `src` → `/home/sdelquin/app/src`
+
 ### Puerto de escucha
 
-Lo habitual es configurar el _virtual host_ para escuchar en el puerto 80 (http) mediante la directiva:
+El puerto por defecto (si no indicamos lo contrario) para cualquier _virtual host_ definido en Nginx es el **puerto 80**.
+
+La directiva para especificar el puerto de escucha es `listen`:
 
 ```nginx
 listen 80;
