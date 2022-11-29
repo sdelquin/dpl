@@ -2,14 +2,46 @@
 
 En esta unidad vamos a abordar el despliegue de aplicaciones escritas en distintos lenguajes de programación y sobre los frameworks web más utilizados en el momento.
 
-Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** que se encargará de mostrar por pantalla aquellos destinos que ya hemos visitado y aquellos que aún nos quedan por visitar.
-
+[TravelRoad](#travelroad)  
 [PostgreSQL](#postgresql)  
-[Laravel](#laravel)  
-[Express](#express)  
-[Spring](#spring)  
-[Ruby on Rails](#ruby-on-rails)  
-[Django](#django)
+[Laravel (PHP)](#laravel-php)  
+[Express (Javascript)](#express-javascript)  
+[Spring (Java)](#spring-java)  
+[Ruby on Rails (Ruby)](#ruby-on-rails-ruby)  
+[Django (Python)](#django)
+
+## TravelRoad
+
+Durante toda la unidad de trabajo vamos a **desarrollar una aplicación web muy sencilla** denominada **TravelRoad** que se encargará de acceder a la base de datos y mostrar por pantalla aquellos destinos que ya hemos visitado y aquellos que aún nos quedan por visitar.
+
+![Mockup para TravelRoad](./images/travelroad-mockup.png)
+
+Código HTML:
+
+```html
+<h1>My Travel Bucket List</h1>
+<h2>Places I'd Like to Visit</h2>
+<ul>
+  <li>Tokio</li>
+  <li>Nairobi</li>
+  <li>Denver</li>
+  <li>Moscú</li>
+  <li>Oslo</li>
+  <li>Cincinnati</li>
+  <li>Helsinki</li>
+</ul>
+
+<h2>Places I've Already Been To</h2>
+
+<ul>
+  <li>Budapest</li>
+  <li>Berlín</li>
+  <li>Lisboa</li>
+  <li>Río</li>
+</ul>
+```
+
+Esta aplicación nos servirá de punto de partida para **desplegar en producción** a través de distintas tecnologías.
 
 ## PostgreSQL
 
@@ -17,7 +49,7 @@ Vamos a desarrollar una aplicación web muy sencilla denominada **TravelRoad** q
 
 ### Instalación
 
-Para la **capa de datos** de la aplicación que vamos a desplegar, necesitamos un sistema gestor de bases de datos. Trabajaremos sobre [PostgreSQL](<[https://](https://www.postgresql.org/)>): _"The World's Most Advanced Open Source Relational Database"_.
+Para la **capa de datos** de la aplicación que vamos a desplegar, necesitamos un sistema gestor de bases de datos. Trabajaremos sobre [PostgreSQL](https://www.postgresql.org/): _"The World's Most Advanced Open Source Relational Database"_.
 
 Lo primero será **actualizar los repositorios**:
 
@@ -259,7 +291,14 @@ nov 01 11:03:54 lemon systemd[1]: Starting PostgreSQL RDBMS...
 nov 01 11:03:54 lemon systemd[1]: Finished PostgreSQL RDBMS.
 ```
 
-Ahora vamos a iniciar sesión en el sistema gestor de bases de datos:
+El **puerto por defecto en el que trabaja PostgreSQL es el 5432**:
+
+```console
+sdelquin@lemon:~$ sudo netstat -napt | grep postgres | grep -v tcp6
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      23195/postgres
+```
+
+Ahora vamos a **iniciar sesión** en el sistema gestor de bases de datos:
 
 ```console
 sdelquin@lemon:~$ sudo -u postgres psql
@@ -367,7 +406,69 @@ travelroad=> SELECT * FROM places;
 (11 filas)
 ```
 
-## Laravel
+### Acceso externo
+
+Por defecto PostgreSQL sólo permite conexiones desde _localhost_. Si queremos acceder desde fuera, tendremos que modificar algunas configuraciones.
+
+En primer lugar tendremos que "escuchar" en cualquier IP, no únicamente en localhost (valor por defecto):
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/postgresql/15/main/postgresql.conf
+```
+
+Añadir lo siguiente en la línea 64:
+
+```ini
+listen_addresses = '*'
+```
+
+En segundo lugar tendremos que otorgar permisos. PostgreSQL tiene la capacidad de controlar accesos por:
+
+- Base de datos.
+- Usuario.
+- IP de origen.
+
+En este ejemplo vamos a permitir el acceso del usuario `travelroad_user` a la base de datos `travelroad` desde cualquier IP de origen:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/postgresql/15/main/pg_hba.conf
+```
+
+Añadir al final del fichero:
+
+```conf
+host travelroad travelroad_user 0.0.0.0/0 md5
+```
+
+Una vez hechos estos cambios, debemos reiniciar el servicio PostgreSQL para que los cambios surtan efecto:
+
+```console
+sdelquin@lemon:~$ sudo systemctl restart postgresql
+```
+
+Podemos comprobar que el servicio PostgreSQL ya está escuchando en todas las IPs:
+
+```console
+sdelquin@lemon:~$ sudo netstat -napt | grep postgres | grep -v tcp6
+tcp        0      0 0.0.0.0:5432            0.0.0.0:*               LISTEN      23700/postgres
+```
+
+> 💡 `0.0.0.0` significa cualquier IP.
+
+Ahora ya podemos **acceder a nuestro servidor PostgreSQL desde cualquier máquina** utilizando el nombre de dominio/IP del servidor y las credenciales de acceso.
+
+### ✨ Ejercicio
+
+Desarrolle una aplicación en PHP que se encargue de mostrar por pantalla los destinos tal y como se indicaron en el apartado de comienzo.
+
+Indicaciones:
+
+1. Instale `sudo apt install -y php8.2-pgsql` para tener disponible la función [pg_connect](https://www.php.net/manual/es/function.pg-connect.php).
+2. Desarrolle la aplicación en local (con un virtualhost específico) que ataque a la base de datos remota.
+3. Utilice control de versiones para el código (y para el posterior despliegue).
+4. Una vez que esté todo funcionando en local, despliegue la aplicación en producción (con un virtualhost específico) modificando el acceso a PostgreSQL.
+
+## Laravel (PHP)
 
 ![Laravel Logo](./images/laravel-logo.jpg)
 
@@ -582,7 +683,7 @@ sdelquin@lemon:~$ firefox http://travelroad
 
 ![Laravel Works](./images/laravel-works.png)
 
-## Express
+## Express (Javascript)
 
 ![Express Logo](./images/express-logo.png)
 
@@ -987,7 +1088,7 @@ Recargamos la configuración de Nginx y accedemos a http://travelroad obteniendo
 
 ![ExpressJS funcionando](./images/express-works.png)
 
-## Spring
+## Spring (Java)
 
 ![Logo Spring](./images/spring-logo.png)
 
@@ -1619,7 +1720,7 @@ Con todo hecho, ya podemos probar el acceso a la aplicación web:
 
 ![Spring funcionando](./images/spring-works.png)
 
-## Ruby on Rails
+## Ruby on Rails (Ruby)
 
 ![Logo Ruby on Rails](./images/rubyonrails-logo.png)
 
@@ -2189,7 +2290,7 @@ Y finalmente accedemos a http://travelroad comprobando que es el resultado esper
 
 ![Ruby on Rails funcionando sobre Nginx](./images/rubyonrails-nginx-works.png)
 
-## Django
+## Django (Python)
 
 ![Logo Django](./images/django-logo.png)
 
