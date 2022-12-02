@@ -19,7 +19,7 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 
 1. Instale `sudo apt install -y php8.2-pgsql` para tener disponible la función [pg_connect](https://www.php.net/manual/es/function.pg-connect.php).
 2. Desarrolle en local una aplicación PHP que se encargue de mostrar los datos de [TravelRoad](../README.md#travelroad) tal y como se ha visto en clase, atacando a la base de datos local.
-3. Utilice control de versiones para alojar la aplicación dentro del repositorio: `dpl/ut3/te1`
+3. Utilice control de versiones para alojar la aplicación dentro del repositorio: `dpl/ut4/te1`
 4. Use el dominio `php.travelroad.local` para montar la aplicación en el entorno de desarrollo.
 5. Utilice [include](https://www.php.net/manual/en/function.include.php) en su código para incluir el fichero `config.php` que contendrá los datos de acceso a la base de datos y que **no deberá incluirse en el control de versiones**.
 
