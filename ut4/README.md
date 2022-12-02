@@ -106,7 +106,7 @@ sdelquin@lemon:~$ curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc 
 **Añadimos el repositorio oficial de PostgreSQL** al sistema:
 
 ```console
-sdelquin@lemon:~$ echo 'deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' \
+sdelquin@lemon:~$ echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
 | sudo tee /etc/apt/sources.list.d/postgresql.list > /dev/null
 ```
 
@@ -298,6 +298,8 @@ sdelquin@lemon:~$ sudo netstat -napt | grep postgres | grep -v tcp6
 tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      23195/postgres
 ```
 
+> 💡 El comando `netstat` se puede instalar junto a otras herramientas de red con: `sudo apt install net-tools`.
+
 Ahora vamos a **iniciar sesión** en el sistema gestor de bases de datos:
 
 ```console
@@ -317,7 +319,7 @@ sdelquin@lemon:~$ sudo -u postgres psql
 psql (15.0 (Debian 15.0-1.pgdg110+1))
 Digite «help» para obtener ayuda.
 
-postgres=# CREATE USER travelroad_user WITH ENCRYPTED PASSWORD 'dpl0000';
+postgres=# CREATE USER travelroad_user WITH PASSWORD 'dpl0000';
 CREATE ROLE
 postgres=# CREATE DATABASE travelroad WITH OWNER travelroad_user;
 CREATE DATABASE
@@ -406,6 +408,182 @@ travelroad=> SELECT * FROM places;
 (11 filas)
 ```
 
+### pgAdmin
+
+[pgAdmin](https://www.pgadmin.org/) es la plataforma más popular de código abierto para administrar PostgreSQL. Tiene una potente interfaz gráfica que facilita todas las operaciones sobre el servidor de base de datos.
+
+Es un software **escrito en Python** sobre un framework web denominado [Flask](https://flask.palletsprojects.com/en/2.2.x/).
+
+#### Dependencias
+
+Lo primero de todo será [instalar Python](https://github.com/sdelquin/pro/blob/main/ut0/python-install.md) para poder realizar la implantación de esta herramienta.
+
+#### Instalación
+
+Creamos las carpetas de trabajo con los permisos adecuados:
+
+```console
+sdelquin@lemon:~$ sudo mkdir /var/lib/pgadmin
+sdelquin@lemon:~$ sudo mkdir /var/log/pgadmin
+sdelquin@lemon:~$ sudo chown $USER /var/lib/pgadmin
+sdelquin@lemon:~$ sudo chown $USER /var/log/pgadmin
+```
+
+Creamos un entorno virtual de Python (lo activamos) e instalamos el paquete `pgadmin4`:
+
+```console
+sdelquin@lemon:~$ python -m venv pgadmin4
+sdelquin@lemon:~$ source pgadmin4/bin/activate
+
+(pgadmin4) sdelquin@lemon:~$ pip install pgadmin4
+...
+...
+...
+```
+
+> ⚠️ La salida es extensa y puede tardar un poco en terminar ya que requiere de otros paquetes de soporte.
+
+Ahora lanzamos el script de configuración en el que tendremos que dar credenciales para una cuenta "master":
+
+```console
+(pgadmin4) sdelquin@lemon:~$ pgadmin4
+NOTE: Configuring authentication for SERVER mode.
+
+Enter the email address and password to use for the initial pgAdmin user account:
+
+Email address: sdelqui@gobiernodecanarias.org
+Password:
+Retype password:
+pgAdmin 4 - Application Initialisation
+======================================
+
+Starting pgAdmin 4. Please navigate to http://127.0.0.1:5050 in your browser.
+2022-12-01 13:37:45,485: WARNING	werkzeug:	WebSocket transport not available. Install simple-websocket for improved performance.
+ * Serving Flask app 'pgadmin' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+```
+
+Aunque este script lanza un **servidor de desarrollo** en el puerto **5050** no nos interesa de momento ya que queremos desplegar con garantías. Pusamos <kbd>CTRL-C</kbd> para detener el proceso.
+
+#### Servidor en producción
+
+Para poder lanzar el servidor pgAdmin en modo producción y con garantías, necesitaremos hacer uso de un procesador de peticiones WSGI denominado `gunicorn`.
+
+Podemos instalarlo como un paquete Python adicional (dentro del entorno virtual):
+
+```console
+(pgadmin4) sdelquin@lemon:~$ pip install gunicorn
+Collecting gunicorn
+  Using cached gunicorn-20.1.0-py3-none-any.whl (79 kB)
+Requirement already satisfied: setuptools>=3.0 in ./pgadmin4/lib/python3.11/site-packages (from gunicorn) (65.5.0)
+Installing collected packages: gunicorn
+Successfully installed gunicorn-20.1.0
+
+[notice] A new release of pip available: 22.3 -> 22.3.1
+[notice] To update, run: pip install --upgrade pip
+```
+
+Ahora ya estamos en disposición de levantar el servidor pgAdmin utilizando `gunicorn`:
+
+```console
+(pgadmin4) sdelquin@lemon:~$ gunicorn \
+--chdir pgadmin4/lib/python3.11/site-packages/pgadmin4 \
+--bind unix:/tmp/pgadmin4.sock pgAdmin4:app
+[2022-12-01 13:48:27 +0000] [57576] [INFO] Starting gunicorn 20.1.0
+[2022-12-01 13:48:27 +0000] [57576] [INFO] Listening at: unix:/tmp/pgadmin4.sock (57576)
+[2022-12-01 13:48:27 +0000] [57576] [INFO] Using worker: sync
+[2022-12-01 13:48:27 +0000] [57577] [INFO] Booting worker with pid: 57577
+```
+
+> 💡 De momento dejamos este proceso corriendo en una terminal, y abirmos otra para seguir trabajando.
+
+#### Virtualhost en Nginx
+
+Lo que restaría es crear _virtual host_ en Nginx que sirva la aplicación vía web:
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/pgadmin.conf
+```
+
+> Contenido:
+
+```nginx
+server {
+    server_name pgadmin.arkania.es;
+
+    location / {
+        proxy_pass http://unix:/tmp/pgadmin4.sock;
+    }
+}
+```
+
+Recargamos la configuración de Nginx y accedemos vía web a la URL especificada:
+
+![Login de pgAdmin](./images/pgadmin-login.png)
+
+> 💡 Utilizamos las credenciales creadas al lanzar el script de configuración.
+
+#### Demonizando el servicio
+
+Obviamente no es operativo tener que mantener el proceso `gunicorn` funcionando en una terminal, por lo que vamos a crear un servicio del sistema.
+
+```console
+sdelquin@lemon:~$ sudo vi /etc/systemd/system/pgadmin.service
+```
+
+> Contenido:
+
+```ini
+[Unit]
+Description=pgAdmin
+
+[Service]
+User=sdelquin
+ExecStart=/bin/bash -c '\
+source /home/sdelquin/pgadmin4/bin/activate && \
+gunicorn --chdir /home/sdelquin/pgadmin4/lib/python3.11/site-packages/pgadmin4 \
+--bind unix:/tmp/pgadmin4.sock \
+pgAdmin4:app'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+A continuación recargamos los servicios para luego levantar pgAdmin y habilitarlo en caso de reinicio del sistema:
+
+```console
+sdelquin@lemon:~$ sudo systemctl daemon-reload
+sdelquin@lemon:~$ sudo systemctl restart pgadmin
+sdelquin@lemon:~$ sudo systemctl enable pgadmin
+```
+
+Por último comprobamos que el servicio está funcionando correctamente:
+
+```console
+sdelquin@lemon:~$ sudo systemctl is-active pgadmin
+active
+```
+
+#### Registrando un servidor
+
+Cuando conectamos a pgAdmin tenemos la posibilidad de conectar distintos servidores de bases de datos. Procederemos a registrar la base de datos de TravelRoad.
+
+Pulsamos con botón derecho y vamos a **Register → Server**:
+
+![Registro de servidor](./images/pgadmin-register1.png)
+
+Ahora configuramos el servidor. En primer lugar desde la pestaña **General**:
+
+![Registro de servidor - General](./images/pgadmin-register2.png)
+
+Y luego desde la pestaña **Connection** finalizando con el botón `Save`:
+
+![Registro de servidor - Conexión](./images/pgadmin-register3.png)
+
 ### Acceso externo
 
 Por defecto PostgreSQL sólo permite conexiones desde _localhost_. Si queremos acceder desde fuera, tendremos que modificar algunas configuraciones.
@@ -456,17 +634,6 @@ tcp        0      0 0.0.0.0:5432            0.0.0.0:*               LISTEN      
 > 💡 `0.0.0.0` significa cualquier IP.
 
 Ahora ya podemos **acceder a nuestro servidor PostgreSQL desde cualquier máquina** utilizando el nombre de dominio/IP del servidor y las credenciales de acceso.
-
-### ✨ Ejercicio
-
-Desarrolle una aplicación en PHP que se encargue de mostrar por pantalla los destinos tal y como se indicaron en el apartado de comienzo.
-
-Indicaciones:
-
-1. Instale `sudo apt install -y php8.2-pgsql` para tener disponible la función [pg_connect](https://www.php.net/manual/es/function.pg-connect.php).
-2. Desarrolle la aplicación en local (con un virtualhost específico) que ataque a la base de datos remota.
-3. Utilice control de versiones para el código (y para el posterior despliegue).
-4. Una vez que esté todo funcionando en local, despliegue la aplicación en producción (con un virtualhost específico) modificando el acceso a PostgreSQL.
 
 ## Laravel (PHP)
 
