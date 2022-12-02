@@ -557,7 +557,7 @@ A continuación recargamos los servicios para luego levantar pgAdmin y habilitar
 
 ```console
 sdelquin@lemon:~$ sudo systemctl daemon-reload
-sdelquin@lemon:~$ sudo systemctl restart pgadmin
+sdelquin@lemon:~$ sudo systemctl start pgadmin
 sdelquin@lemon:~$ sudo systemctl enable pgadmin
 ```
 
