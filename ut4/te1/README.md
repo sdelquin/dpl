@@ -11,6 +11,8 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 3. Instale **pgAdmin** tanto en desarrollo como en producción. Para desarrollo use el dominio `pgadmin.local` y para producción use el dominio `pgadmin.aluXXXX.arkania.es`. Utilice credenciales distintas y añada certificado de seguridad en la máquina de producción.
 4. Acceda a **pgAdmin** y conecte un nuevo servidor **TravelRoad** con las credenciales aportadas, tanto en desarrollo como en producción.
 
+> 💡 Incluya en el informe la URL donde está desplegado pgAdmin y las credenciales de acceso.
+
 ## Aplicación PHP
 
 ### Entorno de desarrollo
@@ -21,6 +23,8 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 4. Use el dominio `php.travelroad.local` para montar la aplicación en el entorno de desarrollo.
 5. Utilice [include](https://www.php.net/manual/en/function.include.php) en su código para incluir el fichero `config.php` que contendrá los datos de acceso a la base de datos y que **no deberá incluirse en el control de versiones**.
 
+> 💡 Incluya en el informe el enlace al código fuente de la aplicación.
+
 ### Entorno de producción
 
 1. Clone el repositorio en la máquina de producción.
@@ -28,9 +32,11 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 3. Configure un _virtual host_ en producción para servir la aplicación PHP en el dominio `php.travelroad.aluXXXX.arkania.es`.
 4. Incluya certificado de seguridad y redirección `www`.
 
+> 💡 Incluya en el informe la URL donde está desplegada la aplicación.
+
 ## Despliegue
 
-1. Cree un shell-script `deploy.sh` en la carpeta de trabajo del repositorio que se conecte por ssh a la máquina de producción y ejecute un `git pull` para actualizar los cambios.
+1. Cree un shell-script `deploy.sh` (con permisos de ejecución) en la carpeta de trabajo del repositorio, que se conecte por ssh a la máquina de producción y ejecute un `git pull` para actualizar los cambios.
 2. Pruebe este script tras haber realizado algún cambio en la aplicación.
 
 ## Entregable
