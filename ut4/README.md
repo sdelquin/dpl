@@ -416,7 +416,15 @@ Es un software **escrito en Python** sobre un framework web denominado [Flask](h
 
 #### Dependencias
 
-Lo primero de todo será [instalar Python](https://github.com/sdelquin/pro/blob/main/ut0/python-install.md) para poder realizar la implantación de esta herramienta.
+Lo primero de dodo será instalar **Python**. Aunque existen paquetes precompilados en la paquetería de los distintos sistemas operativos, vamos a descargar la última versión desde la página oficial y compilar los fuentes para nuestro sistema.
+
+Dado que Python instala ciertas herramientas ejecutables en línea de comandos, es necesario aseguramos que la ruta a estos binarios está en el `PATH`:
+
+```console
+echo 'export PATH=~/.local/bin:$PATH' >> .bashrc && source .bashrc
+```
+
+Ahora ya se pueden seguir [las instrucciones de instalación de Python](https://github.com/sdelquin/pro/blob/main/ut0/python-install.md) para realizar la implantación de esta herramienta.
 
 #### Instalación
 
@@ -2468,6 +2476,8 @@ Y finalmente accedemos a http://travelroad comprobando que es el resultado esper
 #### Python
 
 Lo primero de todo será instalar el lenguaje de programación y las herramientas Python para poder trabajar en el desarrollo de la aplicación web. Para ello basta con seguir [estas instrucciones](https://github.com/sdelquin/pro/blob/main/ut0/python-install.md).
+
+> 💡 Recordar que [se debe añadir la ruta](#pgadmin) `~/.local/bin` al `PATH` para que los binarios instalados por paquetes de Python se puedan localizar fácilmente.
 
 #### Entorno virtual
 
