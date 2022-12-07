@@ -477,7 +477,7 @@ Starting pgAdmin 4. Please navigate to http://127.0.0.1:5050 in your browser.
 
 Aunque este script lanza un **servidor de desarrollo** en el puerto **5050** no nos interesa de momento ya que queremos desplegar con garantías. Pusamos <kbd>CTRL-C</kbd> para detener el proceso.
 
-> 💡 Para desactivar el entorno virtual podemos ejecutar `deactivate` o pulsar <kbd>CTRL-D</kbd>.
+> 💡 Para desactivar el entorno virtual podemos ejecutar `deactivate`.
 
 #### Servidor en producción
 
