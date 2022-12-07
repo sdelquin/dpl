@@ -440,6 +440,7 @@ sdelquin@lemon:~$ sudo chown $USER /var/log/pgadmin
 Creamos un entorno virtual de Python (lo activamos) e instalamos el paquete `pgadmin4`:
 
 ```console
+sdelquin@lemon:~$ cd $HOME
 sdelquin@lemon:~$ python -m venv pgadmin4
 sdelquin@lemon:~$ source pgadmin4/bin/activate
 
@@ -475,6 +476,8 @@ Starting pgAdmin 4. Please navigate to http://127.0.0.1:5050 in your browser.
 ```
 
 Aunque este script lanza un **servidor de desarrollo** en el puerto **5050** no nos interesa de momento ya que queremos desplegar con garantías. Pusamos <kbd>CTRL-C</kbd> para detener el proceso.
+
+> 💡 Para desactivar el entorno virtual podemos ejecutar `deactivate` o pulsar <kbd>CTRL-D</kbd>.
 
 #### Servidor en producción
 
@@ -3036,16 +3039,11 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 
 ```nginx
 server {
-    listen 80;
     server_name travelroad;
 
     location / {
-        proxy_pass http://travelroad;
+        proxy_pass http://unix:/tmp/travelroad.sock;
     }
-}
-
-upstream travelroad {
-    server unix:/tmp/travelroad.sock;
 }
 ```
 
