@@ -421,18 +421,18 @@ sdelquin@lemon:~$ sudo apt install -y lsb-release ca-certificates \
 apt-transport-https software-properties-common gnupg2
 ```
 
-Añadimos el **repositorio externo** desde donde descargarnos la última versión de PHP-FPM:
-
-```console
-sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" \
-| sudo tee /etc/apt/sources.list.d/sury-php.list
-```
-
-**Importamos la clave** [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del repositorio:
+**Importamos la clave** [GPG](https://es.wikipedia.org/wiki/GNU_Privacy_Guard) del **repositorio externo** desde donde descargarnos la última versión de PHP-FPM:
 
 ```console
 sdelquin@lemon:~$ curl -fsSL  https://packages.sury.org/php/apt.gpg \
 | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury.gpg
+```
+
+Ahora añadimos el **repositorio externo** en cuestión:
+
+```console
+sdelquin@lemon:~$ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" \
+| sudo tee /etc/apt/sources.list.d/sury-php.list
 ```
 
 Confirmamos que el **repositorio está disponible** tras actualizar las fuentes:
