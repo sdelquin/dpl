@@ -11,7 +11,7 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 3. Instale **pgAdmin** tanto en desarrollo como en producción. Para desarrollo use el dominio `pgadmin.local` y para producción use el dominio `pgadmin.aluXXXX.arkania.es`. Utilice credenciales distintas y añada certificado de seguridad en la máquina de producción.
 4. Acceda a **pgAdmin** y conecte un nuevo servidor **TravelRoad** con las credenciales aportadas, tanto en desarrollo como en producción.
 
-> 💡 Incluya en el informe la URL donde está desplegado pgAdmin y las credenciales de acceso.
+> 💡 Incluya en el informe la URL donde está desplegado pgAdmin.
 
 ## Aplicación PHP
 
@@ -43,4 +43,6 @@ El objetivo de esta tarea es preparar la infraestructura de la capa de datos par
 
 Informe explicando los pasos seguidos para resolver la tarea.
 
-⚡ Revisa las [instrucciones sobre entrega de tareas](../../ut0/assignment-deliveries.md).
+> 💡 Añada en el texto de la entrega las credenciales para acceder al **pgAdmin remoto**.
+
+⚡ Revise las [instrucciones sobre entrega de tareas](../../ut0/assignment-deliveries.md).
