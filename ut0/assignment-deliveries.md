@@ -39,6 +39,8 @@ Los informes que incluyan **comandos en terminal**, estos habrán de **tomarse c
 
 Habrá que incluir **tanto el comando como su salida**.
 
+**No es necesario poner el comando "en texto"** antes de la captura de pantalla, basta con la propia captura de pantalla que ya incluye el comando y su salida.
+
 ## URLs
 
 Si la tarea incluye acceso a cualquier URL, la **captura de pantalla** deberá incluir la **barra de direcciones** del navegador.
