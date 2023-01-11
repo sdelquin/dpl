@@ -4,6 +4,7 @@ En esta unidad vamos a abordar el despliegue de aplicaciones escritas en distint
 
 [TravelRoad](#travelroad)  
 [PostgreSQL](#postgresql)  
+[Framework Web](#framework-web)  
 [Laravel (PHP)](#laravel-php)  
 [Express (Javascript)](#express-javascript)  
 [Spring (Java)](#spring-java)  
@@ -646,17 +647,40 @@ tcp        0      0 0.0.0.0:5432            0.0.0.0:*               LISTEN      
 
 Ahora ya podemos **acceder a nuestro servidor PostgreSQL desde cualquier máquina** utilizando el nombre de dominio/IP del servidor y las credenciales de acceso.
 
+## Framework Web
+
+Un **framework para aplicaciones web** (o framework web) es un framework diseñado para **apoyar el desarrollo de sitios web dinámicos, aplicaciones web y servicios web**.
+
+Este tipo de frameworks **intenta aliviar el exceso de carga asociado con actividades comunes usadas en desarrollos web**. Por ejemplo, muchos framework proporcionan bibliotecas para acceder a bases de datos, estructuras para plantillas y gestión de sesiones, y con frecuencia facilitan la reutilización de código.
+
+Aunque cada framework web tiene sus particularidades, todos comparten una arquitectura común. En el siguiente esquema se muestran **los principales componentes** que intervienen en la gestión de una petición:
+
+![Framework Web](./images/web-framework.svg)
+
+| Componente      | Cometido                                                                                                                                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Models**      | Modelos de datos. Pueden trabajar directamente sobre la base de datos con SQL o bien utilizar un [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) (Object Relational Mapping) para abstraer la información. |
+| **Routes**      | Rutas. Este componente se encarga de decidir qué controlador debe gestionar cada ruta de la URL de entrada (`/hello`, `/blog`, `/join`, etc.)                                                                                     |
+| **Views**       | Vistas. Se encargan de presentar la información "renderizando" plantillas con los datos que recibe. Pueden utilizar un motor de plantillas para esta tarea ([Template Engine](https://en.wikipedia.org/wiki/Template_processor)). |
+| **Controllers** | Controladores. Bloques de código encargados de llevar a cabo la **lógica de negocio** teniendo a su disposición los datos y las plantillas. Devuelven la respuesta HTML que se hace llegar al cliente.                            |
+
+### Servidor de desarrollo vs producción
+
+Muchos de los framework web ya traen incorporado un **servidor de desarrollo** que levanta un _servidor web ligero_ pensado para que podamos desarrollar nuestra aplicación en un entorno local controlado. Algunos puertos habituales del servidor de desarrollo son el 8000, 8080, 3000, 5000, etc.
+
+Usar un servidor de desarrollo en una máquina de producción se considera una **mala práctica** y está desaconsejado. Para ello disponemos de un **servidor de producción** tipo _Nginx_ que es capaz de gestionar multitud de peticiones con un comportamiento estable y un alto rendimiento. Trabaja habitualmente en los puertos 80 y 443.
+
 ## Laravel (PHP)
 
 ![Laravel Logo](./images/laravel-logo.jpg)
 
-[Laravel](https://laravel.com/) es un framework de código abierto para desarrollar aplicaciones y servicios web con **PHP**.
+[Laravel](https://laravel.com/) es un **framework de código abierto** para desarrollar aplicaciones y servicios web con **PHP**.
 
 ### Instalación
 
 #### Composer
 
-Lo primero que necesitamos es un gestor de dependencias para PHP. Vamos a instalar [Composer](<[https://](https://getcomposer.org/)>):
+Lo primero que necesitamos es un **gestor de dependencias para PHP**. Vamos a instalar [Composer](https://getcomposer.org/):
 
 ```console
 sdelquin@lemon:~$ curl -fsSL https://raw.githubusercontent.com/composer/getcomposer.org/main/web/installer \
@@ -675,29 +699,59 @@ Composer version 2.4.4 2022-10-27 14:39:29
 Necesitamos **ciertos módulos PHP** habilitados en el sistema. Para ello instalamos los siguientes paquetes soporte:
 
 ```console
-sdelquin@lemon:~$ sudo apt install -y php8.2-mbstring php8.2-xml php8.2-bcmath php8.2-curl php8.2-pgsql
+sdelquin@lemon:~$ sudo apt install -y php8.2-mbstring php8.2-xml \
+php8.2-bcmath php8.2-curl php8.2-pgsql
 ```
+
+| Paquete                                                     | Descripción                                     |
+| ----------------------------------------------------------- | ----------------------------------------------- |
+| [mbstring](https://www.php.net/manual/es/book.mbstring.php) | Gestión de cadenas de caracteres multibyte      |
+| [xml](https://www.php.net/manual/es/book.xml.php)           | Análisis XML                                    |
+| [bcmath](https://www.php.net/manual/en/book.bc.php)         | Operaciones matemáticas de precisión arbitraria |
+| [curl](https://www.php.net/manual/es/book.curl.php)         | Cliente de cURL                                 |
+| [pgsql](https://www.php.net/manual/es/book.pgsql.php)       | Herramientas para PostgreSQL                    |
 
 #### Aplicación
 
-Ahora ya podemos crear la estructura de nuestra aplicación Laravel. Para ello utilizamos `composer`:
+Ahora ya podemos **crear la estructura** de nuestra aplicación Laravel. Para ello utilizamos `composer` indicando el paquete [laravel/laravel](https://packagist.org/packages/laravel/laravel) junto al nombre de la aplicación:
 
 ```console
-sdelquin@lemon:~$ composer create-project --prefer-dist laravel/laravel travelroad
+sdelquin@lemon:~$ composer create-project laravel/laravel travelroad
 ```
 
-> 💡 El comando anterior creará una carpeta `travelround` con todas las dependencias que necesitamos.
-
-Entramos en la carpeta de trabajo y probamos [artisan](https://laravel.com/docs/9.x/artisan), la interfaz en línea de comandos para Laravel:
+Vemos que se ha creado una carpeta `travelroad` con el andamio (_scaffolding_) para empezar a trabajar:
 
 ```console
-sdelquin@lemon:~$ cd travelroad/
+sdelquin@lemon:~/travelroad$ ls -l
+total 352K
+-rw-r--r--  1 sdelquin sdelquin  263 ene  2 14:45 vite.config.js
+drwxr-xr-x  4 sdelquin sdelquin 4,0K ene  2 14:45 tests
+drwxr-xr-x  5 sdelquin sdelquin 4,0K ene  2 14:45 storage
+drwxr-xr-x  2 sdelquin sdelquin 4,0K ene  2 14:45 routes
+drwxr-xr-x  5 sdelquin sdelquin 4,0K ene  2 14:45 resources
+-rw-r--r--  1 sdelquin sdelquin 4,1K ene  2 14:45 README.md
+drwxr-xr-x  2 sdelquin sdelquin 4,0K ene  2 14:45 public
+-rw-r--r--  1 sdelquin sdelquin 1,2K ene  2 14:45 phpunit.xml
+-rw-r--r--  1 sdelquin sdelquin  286 ene  2 14:45 package.json
+drwxr-xr-x  3 sdelquin sdelquin 4,0K ene  2 14:45 lang
+drwxr-xr-x  5 sdelquin sdelquin 4,0K ene  2 14:45 database
+drwxr-xr-x  2 sdelquin sdelquin 4,0K ene  2 14:45 config
+-rw-r--r--  1 sdelquin sdelquin 1,8K ene  2 14:45 composer.json
+drwxr-xr-x  3 sdelquin sdelquin 4,0K ene  2 14:45 bootstrap
+-rwxr-xr-x  1 sdelquin sdelquin 1,7K ene  2 14:45 artisan
+drwxr-xr-x  7 sdelquin sdelquin 4,0K ene  2 14:45 app
+-rw-r--r--  1 sdelquin sdelquin 280K ene 10 09:29 composer.lock
+drwxr-xr-x 39 sdelquin sdelquin 4,0K ene 10 09:29 vendor
+```
 
-sdelquin@lemon:~/travelroad$ php artisan --version
+Entramos en la carpeta de trabajo y probamos que se ha instalado correctamente [artisan](https://laravel.com/docs/9.x/artisan), **la interfaz en línea de comandos para Laravel**:
+
+```console
+sdelquin@lemon:~/travelroad$ ./artisan --version
 Laravel Framework 9.38.0
 ```
 
-Ahora tenemos que **configurar ciertas variables** en el fichero `.env`:
+Por defecto se ha creado un **fichero de configuración** `.env` durante el andamiaje. Abrimos este fichero y **modificamos ciertos valores** para especificar credenciales de acceso:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi .env
@@ -719,13 +773,11 @@ DB_PASSWORD=dpl0000
 
 ### Configuración Nginx
 
-Lo primero será fijar los **permisos adecuados a los ficheros del proyecto** para que los servicios Nginx+PHP-FPM pueda trabajar sin errores de acceso:
+Lo primero será fijar los **permisos adecuados a los ficheros del proyecto** para que los servicios Nginx+PHP-FPM puedan trabajar sin errores de acceso.
+
+Existen un par de carpetas en las que se puede almacenar información. Ajustamos los permisos:
 
 ```console
-sdelquin@lemon:~$ cd ~/travelroad/
-
-sdelquin@lemon:~/travelroad$ sudo chown -R $USER:nginx .
-
 sdelquin@lemon:~/travelroad$ sudo chgrp -R nginx storage bootstrap/cache
 sdelquin@lemon:~/travelroad$ sudo chmod -R ug+rwx storage bootstrap/cache
 ```
@@ -740,36 +792,19 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 
 ```nginx
 server {
-    listen 80;
     server_name travelroad;
-    root /home/sdelquin/travelroad/public;
-
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
-    add_header X-Content-Type-Options "nosniff";
+    root /home/sdelquin/travelroad.php/public;
 
     index index.html index.htm index.php;
-
-    charset utf-8;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
     location ~ \.php$ {
         fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-        fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
     }
 }
 ```
@@ -786,7 +821,7 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 sdelquin@lemon:~$ sudo systemctl reload nginx
 ```
 
-Ya podemos abrir el navegador en http://travelroad para ver que todo está funcionando correctamente:
+Si ahora abrimos el navegador en http://travelroad veremos una página de inicio (_launching_) con información general sobre el framework:
 
 ```console
 sdelquin@lemon:~$ firefox http://travelroad
@@ -801,7 +836,6 @@ Nos queda modificar el comportamiento de la aplicación para cargar los datos y 
 Lo primero es **cambiar el código de la ruta**:
 
 ```console
-sdelquin@lemon:~$ cd travelroad/
 sdelquin@lemon:~/travelroad$ vi routes/web.php
 ```
 
@@ -810,17 +844,18 @@ sdelquin@lemon:~/travelroad$ vi routes/web.php
 ```php
 <?php
 
+// https://laravel.com/api/6.x/Illuminate/Support/Facades/DB.html
 use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
-  $visited = DB::select('select * from places where visited = ?', [1]);
-  $togo = DB::select('select * from places where visited = ?', [0]);
+  $wished = DB::select('select * from places where visited = false');
+  $visited = DB::select('select * from places where visited = true');
 
-  return view('travelroad', ['visited' => $visited, 'togo' => $togo ] );
+  return view('travelroad', ['wished' => $wished, 'visited' => $visited]);
 });
 ```
 
-Lo segundo es **escribir la plantilla** que renderiza los datos:
+Lo segundo es **escribir la plantilla** que renderiza los datos. **Renderizar una plantilla** significa sustituir las variables por sus valores y así obtener un HTML final. Utilizaremos [Blade](https://laravel.com/docs/9.x/blade) como **motor de plantillas** incluido en Laravel.
 
 ```console
 sdelquin@lemon:~/travelroad$ vi resources/views/travelroad.blade.php
@@ -838,8 +873,8 @@ sdelquin@lemon:~/travelroad$ vi resources/views/travelroad.blade.php
     <h1>My Travel Bucket List</h1>
     <h2>Places I'd Like to Visit</h2>
     <ul>
-      @foreach ($togo as $newplace)
-      <li>{{ $newplace->name }}</li>
+      @foreach ($wished as $place)
+      <li>{{ $place->name }}</li>
       @endforeach
     </ul>
 
@@ -853,7 +888,7 @@ sdelquin@lemon:~/travelroad$ vi resources/views/travelroad.blade.php
 </html>
 ```
 
-Ya podemos abrir el navegador en http://travelroad para ver que todo está funcionando correctamente:
+Ya podemos abrir el navegador en http://travelroad y comprobar que todo está funcionando correctamente:
 
 ```console
 sdelquin@lemon:~$ firefox http://travelroad
@@ -964,7 +999,7 @@ Configurando nodejs (19.0.1-deb-1nodesource1) ...
 Procesando disparadores para man-db (2.9.4-2) ...
 ```
 
-Comprobamos las versiones de Node.js y de [npm](<[https://](https://www.npmjs.com/)>) (sistema de gestión de paquetes para Node.js):
+Comprobamos las versiones de Node.js y de [npm](https://www.npmjs.com/) (sistema de gestión de paquetes para Node.js):
 
 ```console
 sdelquin@lemon:~$ node --version
@@ -976,7 +1011,7 @@ sdelquin@lemon:~$ npm --version
 
 #### Aplicación
 
-Ahora ya podemos crear la estructura de nuestra aplicación Express. Para ello utilizamos `express-generator` una herramienta que debemos instalar de forma global en el sistema:
+Ahora ya podemos crear la estructura (andamiaje) de nuestra aplicación Express. Para ello utilizamos `express-generator` una herramienta que debemos instalar de forma global en el sistema:
 
 ```console
 sdelquin@lemon:~$ sudo npm install -g express-generator
@@ -998,7 +1033,7 @@ npm notice Run npm install -g npm@8.19.3 to update!
 npm notice
 ```
 
-Creamos la **estructura base de la aplicación**:
+Creamos la **estructura base de la aplicación** indicando que las vistas (plantillas) van a utilizar [pug](https://pugjs.org/api/getting-started.html) como **motor de plantillas**:
 
 ```console
 sdelquin@lemon:~$ express --view=pug travelroad
@@ -1031,13 +1066,24 @@ sdelquin@lemon:~$ express --view=pug travelroad
      $ DEBUG=travelroad:* npm start
 ```
 
-> 💡 El comando anterior creará una carpeta `travelround` con la estructura base para poder desarrollar nuestra aplicación web.
+El comando anterior creará una carpeta `travelroad` con la estructura base para poder desarrollar nuestra aplicación web:
+
+```console
+sdelquin@lemon:~/travelroad$ ls -l
+total 128
+-rw-r--r--   1 sdelquin sdelquin  1074 nov  7 16:46 app.js
+drwxr-xr-x   2 sdelquin sdelquin  4096 ene  9 19:42 bin
+drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 16:20 config
+-rw-r--r--   1 sdelquin sdelquin   347 nov  7 17:11 package.json
+-rw-r--r--   1 sdelquin sdelquin 94744 nov  7 17:11 package-lock.json
+drwxr-xr-x   5 sdelquin sdelquin  4096 nov  7 16:46 public
+drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 16:59 routes
+drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 17:02 views
+```
 
 Tal y como indica la salida del comando, ahora debemos **instalar las dependencias**:
 
 ```console
-sdelquin@lemon:~$ cd travelroad
-
 sdelquin@lemon:~/travelroad$ npm install
 npm WARN deprecated core-js@2.6.12: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
 
@@ -1056,6 +1102,8 @@ To address all issues, run:
 
 Run `npm audit` for details.
 ```
+
+> 💡 `npm install` obtiene las dependencias del fichero `package.json` y almacena los paquetes en la carpeta `node_modules`.
 
 Ahora podemos **probar la aplicación** lanzando el servidor de desarrollo:
 
@@ -1116,7 +1164,7 @@ To address all issues, run:
 Run `npm audit` for details.
 ```
 
-En este fichero hay que guardar la cadena de conexión a la base de datos PostgreSQL:
+En este fichero hay que guardar [la cadena de conexión](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING) a la base de datos PostgreSQL:
 
 ```console
 sdelquin@lemon:~/travelroad$ echo 'PSQL_CONNECTION=postgresql://travelroad_user:dpl0000@localhost:5432/travelroad' > .env
@@ -1157,20 +1205,18 @@ sdelquin@lemon:~/travelroad$ vi routes/index.js
 
 ```js
 const db = require("../config/database");
-var express = require("express");
-var router = express.Router();
+let express = require("express");
+let router = express.Router();
 
 /* GET home page. */
 router.get("/", async function (req, res, next) {
-  const { rows: newplace } = await db.query(
-    "SELECT * FROM places WHERE visited=$1",
-    [0]
+  const { rows: wished } = await db.query(
+    "SELECT * FROM places WHERE visited=false"
   );
   const { rows: visited } = await db.query(
-    "SELECT * FROM places WHERE visited=$1",
-    [1]
+    "SELECT * FROM places WHERE visited=true"
   );
-  res.render("index", { newplace, visited });
+  res.render("index", { wished, visited });
 });
 
 module.exports = router;
@@ -1185,13 +1231,11 @@ sdelquin@lemon:~/travelroad$ vi views/index.pug
 > Contenido:
 
 ```pug
-extends layout
-
 block content
   h1= "My Travel Bucket List"
   h2= "Places I'd Like to Visit"
   ul
-    each place in newplace
+    each place in wished
       li= place.name
   h2= "Places I've Already Been To"
   ul
@@ -1216,7 +1260,7 @@ Vamos a hacer uso de [pm2](<[https://](https://www.npmjs.com/package/pm2)>) un *
 Lo primero es **instalar el paquete** de forma global en el sistema:
 
 ```console
-sdelquin@lemon:~$ sudo npm install pm2 -g
+sdelquin@lemon:~$ sudo npm install -g pm2
 [sudo] password for sdelquin:
 npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
 
@@ -1253,7 +1297,6 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 
 ```nginx
 server {
-    listen 80;
     server_name travelroad;
 
     location / {
@@ -1270,15 +1313,15 @@ Recargamos la configuración de Nginx y accedemos a http://travelroad obteniendo
 
 ![Logo Spring](./images/spring-logo.png)
 
-[Spring](https://spring.io/) es un un framework para el desarrollo de aplicaciones y contenedor de inversión de control, de código abierto para la plataforma Java.
+[Spring](https://spring.io/) es un framework de código abierto que da soporte para el desarrollo de **aplicaciones y páginas webs basadas en Java**. Se trata de uno de los entornos más populares y ayuda a crear aplicaciones con un alto rendimiento empleando objetos de Java sencillos.
 
 ### Instalación
 
 #### JDK
 
-Lo primero será instalar el [Java Development Kit (JDK)](https://es.wikipedia.org/wiki/Java_Development_Kit). Existe una versión "opensource" denominada [OpenJDK](<[https://](https://openjdk.org/)>).
+Lo primero será instalar el [Java Development Kit (JDK)](https://es.wikipedia.org/wiki/Java_Development_Kit). Existe una versión "opensource" denominada [OpenJDK](https://openjdk.org/).
 
-Descargamos el paquete OpenJDK desde [su página de descargas](<[https://](https://jdk.java.net/19/)>):
+Descargamos el paquete OpenJDK desde [su página de descargas](https://jdk.java.net/19/):
 
 ```console
 sdelquin@lemon:~$ curl -O --output-dir /tmp \
@@ -1311,7 +1354,9 @@ drwxr-xr-x  5 root  root  4096 nov 11 14:27 lib
 -rw-r--r--  1 10668 10668 1213 sep 14 13:55 release
 ```
 
-Necesitamos realizar alguna configuración adicional. Por un lado establecer **variables de entorno** adecuadas a la instalación:
+Necesitamos realizar alguna configuración adicional para que el JDK funcione correctamente.
+
+Por un lado establecer **variables de entorno** adecuadas a la instalación:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/profile.d/jdk_home.sh
@@ -1357,7 +1402,7 @@ javac 19.0.1
 
 #### SDKMAN
 
-[SDKMAN](https://sdkman.io/) es una herramienta para gestionar versiones de kits de desarrollo de software.
+[SDKMAN](https://sdkman.io/) es una herramienta que **permite gestionar versiones de kits de desarrollo** de software (entre ellos Java).
 
 Para su instalación debemos comprobar que tenemos el paquete `zip` instalado en el sistema:
 
@@ -1387,7 +1432,9 @@ SDKMAN 5.16.0
 
 #### Spring Boot
 
-Dentro de Spring, existe un subproyecto denominado [Spring Boot](https://spring.io/projects/spring-boot) que hace más sencilla la preparación de aplicaciones para ponerlas en producción. Utilizaremos esta herramienta durante el despliegue.
+Dentro de Spring, existe un subproyecto denominado [Spring Boot](https://spring.io/projects/spring-boot) que **facilita la preparación de aplicaciones Spring para ponerlas en producción**. Utilizaremos esta herramienta durante el despliegue.
+
+Para instalarla hacemos uso de SDKMAN:
 
 ```console
 sdelquin@lemon:~$ sdk install springboot
@@ -1411,7 +1458,7 @@ Spring CLI v2.7.5
 
 #### Maven
 
-[Maven](https://maven.apache.org/) es una herramienta de software para la gestión y construcción de proyectos Java.
+[Maven](https://maven.apache.org/) es una herramienta enfocada a la construcción de proyectos Java que permite la gestión de dependencias.
 
 ```console
 sdelquin@lemon:~$ sdk install maven
@@ -1481,7 +1528,7 @@ travelroad
 
 ### Escritura de código
 
-Tendremos que adaptar un poco la estructura inicial del proyecto para el objetivo de la aplicación que tenemos que desarrollar. Veamos la parte que nos interesa:
+Tendremos que adaptar un poco la estructura inicial del proyecto para cumplir con el objetivo de la aplicación que tenemos que desarrollar. Veamos la parte que nos interesa:
 
 ```console
 sdelquin@lemon:~/travelroad$ tree src/main
@@ -1535,7 +1582,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("newplace", placeRepository.findByVisited(false));
+        model.addAttribute("wished", placeRepository.findByVisited(false));
         model.addAttribute("visited", placeRepository.findByVisited(true));
         return "home";  // home.html
     }
@@ -1633,14 +1680,14 @@ public interface PlaceRepository extends CrudRepository<Place, Long> {
 #### Plantilla
 
 ```console
-sdelquin@lemon:~/travelroad$ sudo vi src/main/resources/templates/home.html
+sdelquin@lemon:~/travelroad$ vi src/main/resources/templates/home.html
 ```
 
 > Contenido:
 
 ```java
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <title>My Travel Bucket List</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1648,7 +1695,7 @@ sdelquin@lemon:~/travelroad$ sudo vi src/main/resources/templates/home.html
 <body>
     <h1>My Travel Bucket List</h1>
     <h2>Places I'd Like to Visit</h2>
-    <ul th:each="place : ${newplace}">
+    <ul th:each="place : ${wished}">
       <li th:text="${place.name}"></li>
     </ul>
 
@@ -1662,7 +1709,7 @@ sdelquin@lemon:~/travelroad$ sudo vi src/main/resources/templates/home.html
 
 #### Dependencias
 
-Maven es un gestor de dependencias. Debemos definir estas dependencias en un fichero XML:
+Maven es un **gestor de dependencias**. Por tanto debemos definir estas dependencias en un fichero XML:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi pom.xml
@@ -1773,6 +1820,8 @@ sdelquin@lemon:~/travelroad$ file target/travelroad-0.0.1-SNAPSHOT.jar
 target/travelroad-0.0.1-SNAPSHOT.jar: Java archive data (JAR)
 ```
 
+> 💡 El fichero generado tiene la versión `0.0.1-SNAPSHOT`. Esto se puede cambiar modificando la etiqueta `<version>` del fichero `pom.xml`.
+
 Una forma de lanzar la aplicación es correr este fichero JAR:
 
 ```console
@@ -1800,7 +1849,7 @@ cd /home/sdelquin/travelroad
 /usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
 ```
 
-A continuación creamos un fichero de servicio para gestionarlo mediante systemd:
+A continuación creamos un **fichero de servicio** para gestionarlo mediante **systemd**:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/systemd/system/travelroad.service
@@ -1877,7 +1926,6 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 
 ```nginx
 server {
-    listen 80;
     server_name travelroad;
 
     location / {
@@ -1902,13 +1950,13 @@ Con todo hecho, ya podemos probar el acceso a la aplicación web:
 
 ![Logo Ruby on Rails](./images/rubyonrails-logo.png)
 
-[Ruby on Rails](https://rubyonrails.org/) también conocido como RoR o Rails, es un framework de aplicaciones web de código abierto escrito en el lenguaje de programación Ruby, siguiendo el paradigma del patrón Modelo Vista Controlador.
+[Ruby on Rails](https://rubyonrails.org/) también conocido como **RoR o Rails**, es un framework de aplicaciones web de código abierto escrito en el lenguaje de programación Ruby, siguiendo el paradigma del patrón **Modelo Vista Controlador**.
 
 ### Instalación
 
 #### RVM
 
-Lo primero será instalar [Ruby Version Manager (RVM)](<[https://](https://rvm.io/)>) una herramienta en línea de comandos que permite instalar, gestionar y trabajar con múltiples entornos Ruby.
+Lo primero que necesitaremos será instalar [Ruby Version Manager (RVM)](<[https://](https://rvm.io/)>) una herramienta en línea de comandos que permite instalar, gestionar y trabajar con múltiples **entornos Ruby**.
 
 Añadimos las claves GPG:
 
@@ -1944,12 +1992,11 @@ Please consider donating to our open collective to help us maintain RVM.
 👉  Donate: https://opencollective.com/rvm/donate
 ```
 
-Abrimos **una nueva pestaña** para que los cambios se reflejen y podamos probar rvm:
+Abrimos **una nueva pestaña** para que los cambios se reflejen y podamos probar RVM:
 
 ```console
 sdelquin@lemon:~$ rvm --version
 rvm 1.29.12 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
-sdelquin@lemon:~$
 ```
 
 #### Ruby
@@ -2011,13 +2058,13 @@ sdelquin@lemon:~$ gem --version
 
 #### Ruby on Rails
 
-Estamos en disposición de instalar Ruby on Rails:
+Estamos ya en disposición de instalar **Ruby on Rails**:
 
 ```console
 sdelquin@lemon:~$ gem install rails
 ```
 
-Comprobamos igualmente la **versión instalada de Ruby on Rails**:
+Comprobamos ahora la **versión instalada de Ruby on Rails**:
 
 ```console
 sdelquin@lemon:~$ rails --version
@@ -2026,7 +2073,7 @@ Rails 7.0.4
 
 #### Requisitos de sistema
 
-Necesitamos instalar algún paquete en el sistema para dar soporte a los pasos posteriores:
+Necesitamos instalar **algún paquete en el sistema para dar soporte** a los pasos posteriores. En este caso nos hace falta [libpq](https://www.postgresql.org/docs/9.5/libpq.html) una librería de sistema para acceso a bases de datos PostgreSQL:
 
 ```console
 $ sudo apt install -y libpq-dev
@@ -2034,7 +2081,7 @@ $ sudo apt install -y libpq-dev
 
 ### Creando la aplicación
 
-Rails nos provee de un subcomando para crear una nueva aplicación:
+Rails nos provee de un subcomando para crear una nueva aplicación. Incluimos el nombre de la aplicación y el tipo de base de datos que vamos a utilizar:
 
 ```console
 sdelquin@lemon:~$ rails new travelroad --database=postgresql
@@ -2063,7 +2110,7 @@ drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 tmp
 drwxr-xr-x  3 sdelquin sdelquin 4096 nov 14 11:28 vendor
 ```
 
-Podemos lanzar el servidor de desarrollo que trae Ruby on Rails para ver que todo está correcto:
+Podemos lanzar el **servidor de desarrollo** que trae Ruby on Rails para ver que todo está correcto:
 
 ```console
 sdelquin@lemon:~/travelroad$ bin/rails server
