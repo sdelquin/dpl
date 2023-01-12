@@ -527,7 +527,7 @@ server {
     server_name pgadmin.arkania.es;
 
     location / {
-        proxy_pass http://unix:/tmp/pgadmin4.sock;
+        proxy_pass http://unix:/tmp/pgadmin4.sock;  # socket UNIX
     }
 }
 ```
@@ -1300,7 +1300,7 @@ server {
     server_name travelroad;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3000;  # socket TCP
     }
 }
 ```
@@ -1356,7 +1356,7 @@ drwxr-xr-x  5 root  root  4096 nov 11 14:27 lib
 
 Necesitamos realizar alguna configuración adicional para que el JDK funcione correctamente.
 
-Por un lado establecer **variables de entorno** adecuadas a la instalación:
+Por un lado establecer **variables de entorno** adecuadas a la instalación. Básicamente indicar dónde se encuentran los ejecutables de Java modificando la variable de entorno PATH:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/profile.d/jdk_home.sh
@@ -1386,6 +1386,11 @@ sdelquin@lemon:~$ sudo update-alternatives --set javac \
 /usr/lib/jvm/jdk-19.0.1/bin/javac
 ```
 
+Por lo tanto **disponemos de**:
+
+- [javac](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html) → es el compilador del lenguaje de programación Java.
+- [java](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html) → es la herramienta para ejecutar programas escritos en Java.
+
 Ahora ya podemos **comprobar las versiones** de las herramientas instaladas:
 
 ```console
@@ -1410,7 +1415,7 @@ Para su instalación debemos comprobar que tenemos el paquete `zip` instalado en
 sdelquin@lemon:~$ sudo apt install -y zip
 ```
 
-Ahora ejecutamos el siguiente script de instalación:
+Ahora ejecutamos el siguiente **script de instalación**:
 
 ```console
 sdelquin@lemon:~$ curl -s https://get.sdkman.io | bash
@@ -1458,7 +1463,7 @@ Spring CLI v2.7.5
 
 #### Maven
 
-[Maven](https://maven.apache.org/) es una herramienta enfocada a la construcción de proyectos Java que permite la gestión de dependencias.
+[Maven](https://maven.apache.org/) es una herramienta enfocada a la construcción de proyectos Java que permite la gestión de dependencias. Su instalación también es a través de SDKMAN:
 
 ```console
 sdelquin@lemon:~$ sdk install maven
@@ -1484,13 +1489,20 @@ Default locale: es_ES, platform encoding: UTF-8
 OS name: "linux", version: "5.10.0-18-arm64", arch: "aarch64", family: "unix"
 ```
 
+> 💡 Existen otras herramientas para construcción de proyectos Java. Aquí podemos citar [Gradle](https://gradle.org/).
+
 ### Creación del proyecto
 
 Creamos la **estructura base** del proyecto utilizando _Spring Boot_ con el siguiente comando:
 
 ```console
 sdelquin@lemon:~$ spring init \
---build=maven --dependencies=web --name=travelroad travelroad
+--build=maven \
+--dependencies=web \
+--group=edu.dpl \
+--name=travelroad \
+--description=TravelRoad \
+travelroad
 
 Using service at https://start.spring.io
 Project extracted to '/home/sdelquin/travelroad'
@@ -1508,8 +1520,8 @@ travelroad
 └── src
     ├── main
     │   ├── java
-    │   │   └── com
-    │   │       └── example
+    │   │   └── edu
+    │   │       └── dpl
     │   │           └── travelroad
     │   │               └── TravelroadApplication.java
     │   └── resources
@@ -1518,8 +1530,8 @@ travelroad
     │       └── templates
     └── test
         └── java
-            └── com
-                └── example
+            └── edu
+                └── dpl
                     └── travelroad
                         └── TravelroadApplicationTests.java
 
@@ -1528,14 +1540,31 @@ travelroad
 
 ### Escritura de código
 
-Tendremos que adaptar un poco la estructura inicial del proyecto para cumplir con el objetivo de la aplicación que tenemos que desarrollar. Veamos la parte que nos interesa:
+Tendremos que adaptar un poco la estructura inicial del proyecto para cumplir con el objetivo de la aplicación que tenemos que desarrollar.
+
+Dentro de la carpeta `src/main` tendremos que organizar los distintos módulos **(controlador, modelo y plantilla)** que componen la aplicación de la siguiente manera:
+
+```console
+sdelquin@lemon:~/travelroad$ mkdir -p src/main/java/edu/dpl/travelroad/controllers
+sdelquin@lemon:~/travelroad$ touch src/main/java/edu/dpl/travelroad/controllers/HomeController.java
+
+sdelquin@lemon:~/travelroad$ mkdir -p src/main/java/edu/dpl/travelroad/models
+sdelquin@lemon:~/travelroad$ touch src/main/java/edu/dpl/travelroad/models/Place.java
+
+sdelquin@lemon:~/travelroad$ mkdir -p src/main/java/edu/dpl/travelroad/repositories
+sdelquin@lemon:~/travelroad$ touch src/main/java/edu/dpl/travelroad/repositories/PlaceRepository.java
+
+sdelquin@lemon:~/travelroad$ touch src/main/resources/templates/home.html
+```
+
+Tras esto, la estructura del proyecto quedaría tal que así:
 
 ```console
 sdelquin@lemon:~/travelroad$ tree src/main
 src/main
 ├── java
-│   └── com
-│       └── example
+│   └── edu
+│       └── dpl
 │           └── travelroad
 │               ├── controllers
 │               │   └── HomeController.java
@@ -1556,16 +1585,16 @@ src/main
 #### Controlador
 
 ```console
-sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/controllers/HomeController.java
+sdelquin@lemon:~/travelroad$ vi src/main/java/edu/dpl/travelroad/controllers/HomeController.java
 ```
 
 > Contenido:
 
 ```java
-package com.example.travelroad.controllers;
+package edu.dpl.travelroad.controllers;
 
-import com.example.travelroad.models.Place;
-import com.example.travelroad.repositories.PlaceRepository;
+import edu.dpl.travelroad.models.Place;
+import edu.dpl.travelroad.repositories.PlaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -1592,13 +1621,13 @@ public class HomeController {
 #### Modelos
 
 ```console
-sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/models/Place.java
+sdelquin@lemon:~/travelroad$ vi src/main/java/edu/dpl/travelroad/models/Place.java
 ```
 
 > Contenido:
 
 ```java
-package com.example.travelroad.models;
+package edu.dpl.travelroad.models;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -1652,15 +1681,15 @@ public class Place {
 #### Repositorio
 
 ```console
-sdelquin@lemon:~/travelroad$ vi src/main/java/com/example/travelroad/repositories/PlaceRepository.java
+sdelquin@lemon:~/travelroad$ vi src/main/java/edu/dpl/travelroad/repositories/PlaceRepository.java
 ```
 
 > Contenido:
 
 ```java
-package com.example.travelroad.repositories;
+package edu.dpl.travelroad.repositories;
 
-import com.example.travelroad.models.Place;
+import edu.dpl.travelroad.models.Place;
 
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
@@ -1678,6 +1707,8 @@ public interface PlaceRepository extends CrudRepository<Place, Long> {
 ```
 
 #### Plantilla
+
+Para la plantilla vamos a utilizar [Thymeleaf](https://www.thymeleaf.org/a) un **motor de plantillas** moderno para Java:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi src/main/resources/templates/home.html
@@ -1728,11 +1759,11 @@ sdelquin@lemon:~/travelroad$ vi pom.xml
 		<version>2.7.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
+	<groupId>edu.dpl</groupId>
 	<artifactId>travelroad</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>travelroad</name>
-	<description>Demo project for Spring Boot</description>
+	<description>TravelRoad</description>
 	<properties>
 		<java.version>19</java.version>
 	</properties>
@@ -1777,6 +1808,17 @@ sdelquin@lemon:~/travelroad$ vi pom.xml
 </project>
 ```
 
+Listado de dependencias:
+
+| Dependencia                                                                                                                | Responsabilidad                                          |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [spring-boot-starter-web](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web)             | Andamiaje de la aplicación web.                          |
+| [spring-boot-starter-test](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test)           | Andamiaje de tests para la aplicación web.               |
+| [spring-boot-starter-thymeleaf](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf) | Motor de plantillas.                                     |
+| [spring-boot-starter-data-jpa](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa)   | Capa de persistencia Java.                               |
+| [postgresql](https://mvnrepository.com/artifact/org.postgresql/postgresql)                                                 | Driver para conectar a bases de datos PostgreSQL (JDBC). |
+| [spring-boot-maven-plugin](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-maven-plugin)           | Plugin de Spring Boot para usar Maven.                   |
+
 #### Credenciales
 
 ```console
@@ -1793,7 +1835,7 @@ spring.datasource.password=dpl0000
 
 ### Proceso de construcción
 
-Para poner en funcionamiento el proyecto necesitamos dos fases que se llevarán a cabo mediante Maven:
+Para poner en funcionamiento el proyecto necesitamos **dos fases que se llevarán a cabo mediante Maven**:
 
 1. Compilación.
 2. Empaquetado.
@@ -1813,8 +1855,8 @@ sdelquin@lemon:~/travelroad$ ./mvnw package
 Tras esto, obtendremos un archivo [JAR (Java ARchive)](https://es.wikipedia.org/wiki/Java_Archive) en la ruta:
 
 ```console
-sdelquin@lemon:~/travelroad$ ls -l target/travelroad-0.0.1-SNAPSHOT.jar
--rw-r--r-- 1 sdelquin sdelquin 39261971 nov 13 09:48 target/travelroad-0.0.1-SNAPSHOT.jar
+sdelquin@lemon:~/travelroad$ ls target/travelroad-0.0.1-SNAPSHOT.jar
+target/travelroad-0.0.1-SNAPSHOT.jar
 
 sdelquin@lemon:~/travelroad$ file target/travelroad-0.0.1-SNAPSHOT.jar
 target/travelroad-0.0.1-SNAPSHOT.jar: Java archive data (JAR)
@@ -1822,13 +1864,13 @@ target/travelroad-0.0.1-SNAPSHOT.jar: Java archive data (JAR)
 
 > 💡 El fichero generado tiene la versión `0.0.1-SNAPSHOT`. Esto se puede cambiar modificando la etiqueta `<version>` del fichero `pom.xml`.
 
-Una forma de lanzar la aplicación es correr este fichero JAR:
+Una forma de lanzar la aplicación es **correr el fichero JAR generado**:
 
 ```console
 sdelquin@lemon:~/travelroad$ java -jar target/travelroad-0.0.1-SNAPSHOT.jar
 ```
 
-Esto nos permitirá acceder a http://localhost:8080 para comprobar que la aplicación funciona correctamente.
+Esto nos permitirá acceder a http://localhost:8080 y comprobar que la aplicación funciona correctamente.
 
 ### Servicio de despliegue
 
@@ -1847,6 +1889,12 @@ cd /home/sdelquin/travelroad
 ./mvnw compile
 ./mvnw package
 /usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+```
+
+Asignamos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x run.sh
 ```
 
 A continuación creamos un **fichero de servicio** para gestionarlo mediante **systemd**:
@@ -1874,20 +1922,20 @@ SyslogIdentifier=travelroad
 WantedBy=multi-user.target
 ```
 
-Añadimos este servicio para que esté disponible:
+**Añadimos este servicio** para que esté disponible:
 
 ```console
 sdelquin@lemon:~$ sudo systemctl daemon-reload
 ```
 
-Iniciamos el servicio y lo habilitamos para que se inicie en el arranque del sistema:
+**Iniciamos el servicio y lo habilitamos** para que se inicie en el arranque del sistema:
 
 ```console
 sdelquin@lemon:~$ sudo systemctl start travelroad
 sdelquin@lemon:~$ sudo systemctl enable travelroad
 ```
 
-Podemos comprobar el estado del servicio (tener en cuenta que puede tardar algún tiempo):
+Podemos comprobar el **estado del servicio** (tener en cuenta que puede tardar algún tiempo):
 
 ```console
 sdelquin@lemon:~$ sudo systemctl status travelroad
@@ -1916,7 +1964,7 @@ nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.456  INFO 200941 -
 
 ### Configuración de Nginx
 
-Lo último que nos queda es configurar el host virtual en Nginx y dar servicio a las peticiones:
+Lo último que nos queda es configurar el host virtual en Nginx para dar servicio a las peticiones:
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
@@ -1929,12 +1977,12 @@ server {
     server_name travelroad;
 
     location / {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:8080;  # socket TCP
     }
 }
 ```
 
-Recargamos la configuración del servidor web para que los cambios surtan efecto:
+**Recargamos la configuración** del servidor web para que los cambios surtan efecto:
 
 ```console
 sdelquin@lemon:~$ sudo systemctl reload nginx
@@ -1942,7 +1990,7 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 
 ### Acceso a la aplicación web
 
-Con todo hecho, ya podemos probar el acceso a la aplicación web:
+Con todo esto hecho, ya podemos probar el acceso a la aplicación web visitando http://travelroad:
 
 ![Spring funcionando](./images/spring-works.png)
 
@@ -2081,7 +2129,7 @@ $ sudo apt install -y libpq-dev
 
 ### Creando la aplicación
 
-Rails nos provee de un subcomando para crear una nueva aplicación. Incluimos el nombre de la aplicación y el tipo de base de datos que vamos a utilizar:
+Rails nos provee de un subcomando para crear una nueva aplicación (andamiaje). Incluimos el nombre de la aplicación y el tipo de base de datos que vamos a utilizar:
 
 ```console
 sdelquin@lemon:~$ rails new travelroad --database=postgresql
@@ -2126,11 +2174,6 @@ Puma starting in single mode...
 * Listening on http://127.0.0.1:3000
 * Listening on http://[::1]:3000
 Use Ctrl-C to stop
-Started GET "/" for 127.0.0.1 at 2022-11-13 18:36:23 +0000
-Processing by Rails::WelcomeController#index as HTML
-  Rendering /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/railties-7.0.4/lib/rails/templates/rails/welcome/index.html.erb
-  Rendered /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/railties-7.0.4/lib/rails/templates/rails/welcome/index.html.erb (Duration: 1.1ms | Allocations: 730)
-Completed 200 OK in 7ms (Views: 3.0ms | ActiveRecord: 0.0ms | Allocations: 7022)
 ```
 
 Si abrimos un navegador en http://localhost:3000 obtendremos una pantalla similar a la siguiente:
@@ -2159,10 +2202,10 @@ end
 
 #### Controlador
 
-Para crear el código base del controlador utilizamos la herramienta que nos proporciona Ruby on Rails:
+Para crear el código base del controlador utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
 
 ```console
-sdelquin@lemon:~/travelroad$ bin/rails generate controller Places index --skip-routes
+sdelquin@lemon:~/travelroad$ bin/rails generate controller Places index
       create  app/controllers/places_controller.rb
       invoke  erb
       create    app/views/places
@@ -2185,7 +2228,7 @@ sdelquin@lemon:~/travelroad$ vi app/controllers/places_controller.rb
 ```ruby
 class PlacesController < ApplicationController
   def index
-    @newplace = Place.where(visited: false)
+    @wished = Place.where(visited: false)
     @visited = Place.where(visited: true)
   end
 end
@@ -2193,7 +2236,7 @@ end
 
 #### Modelo
 
-Para crear el código base del modelo utilizamos la herramienta que nos proporciona Ruby on Rails:
+Para crear el código base del modelo utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
 
 ```console
 sdelquin@lemon:~/travelroad$ rails generate model Place
@@ -2220,7 +2263,7 @@ sdelquin@lemon:~/travelroad$ vi app/views/places/index.html.erb
 
 <h2>Places I'd Like to Visit</h2>
 <ul>
-  <% @newplace.each do |place| %>
+  <% @wished.each do |place| %>
     <li><%= place.name %></li>
   <% end %>
 </ul>
@@ -2334,7 +2377,7 @@ production:
 
 #### Migraciones
 
-Dado que estamos trabajando con una base de datos y un tabla ya creadas, no nos interesa aplicar las migraciones que nos sugiere Ruby on Rails. Para no obtener un error, deshabilitamos esa opción en otro fichero de configuración del entorno de desarrollo:
+Dado que estamos trabajando con **una base de datos y un tabla ya creadas**, no nos interesa aplicar las migraciones que nos sugiere _Ruby on Rails_. Para no obtener un error, deshabilitamos esa opción en otro fichero de configuración del entorno de desarrollo:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi config/environments/development.rb
@@ -2348,7 +2391,7 @@ config.active_record.migration_error = false
 
 ### Probando la aplicación
 
-Ahora ya estamos en disposición de lanzar la aplicación en desarrollo y comprobar que todo funciona correctamente:
+Ahora ya estamos en disposición de [levantar el servidor de desarrollo](https://guides.rubyonrails.org/command_line.html#bin-rails-server) y comprobar que todo funciona correctamente:
 
 ```console
 sdelquin@lemon:~/travelroad$ bin/rails server
@@ -3089,7 +3132,7 @@ server {
     server_name travelroad;
 
     location / {
-        proxy_pass http://unix:/tmp/travelroad.sock;
+        proxy_pass http://unix:/tmp/travelroad.sock;  # socket UNIX
     }
 }
 ```
