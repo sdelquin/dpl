@@ -2522,7 +2522,6 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 
 ```nginx
 server {
-    listen 80;
     server_name travelroad;
 
     root /home/sdelquin/travelroad/public;
@@ -2562,7 +2561,7 @@ Y finalmente accedemos a http://travelroad comprobando que es el resultado esper
 
 ![Logo Django](./images/django-logo.png)
 
-[Django](https://www.djangoproject.com/) es un framework de desarrollo web de código abierto, escrito en Python, que respeta el patrón de diseño conocido como modelo–vista–controlador.
+[Django](https://www.djangoproject.com/) es un framework para desarrollo web de código abierto, escrito en Python, que respeta el patrón de diseño conocido como **modelo–vista–controlador** (MVC).
 
 ### Instalación
 
@@ -2574,9 +2573,9 @@ Lo primero de todo será instalar el lenguaje de programación y las herramienta
 
 #### Entorno virtual
 
-Habitualmente en Python trabajamos con entornos virtuales lo que nos permite aislar las dependencias de nuestro proyecto con respecto a otros proyectos o al sistema.
+Habitualmente en Python trabajamos con **entornos virtuales** lo que nos permite aislar las dependencias de nuestro proyecto con respecto a otros proyectos o al sistema operativo.
 
-Para crear (y activar) un entorno virtual ejecutamos lo siguiente:
+Para **crear (y activar) un entorno virtual** ejecutamos lo siguiente:
 
 ```console
 sdelquin@lemon:~$ mkdir travelroad
@@ -2603,7 +2602,7 @@ lrwxrwxrwx 1 sdelquin sdelquin    3 nov 15 10:14 lib64 -> lib
 
 #### Django
 
-Para instalar Django basta con utilizar la herramienta de gestión de paquetes en Python:
+Para **instalar Django** (y sus dependencias) basta con utilizar la herramienta de gestión de paquetes en Python denominada [pip](https://pip.pypa.io/en/stable/) (_Package Installer for Python_):
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ pip install django
@@ -2619,7 +2618,7 @@ Installing collected packages: sqlparse, asgiref, django
 Successfully installed asgiref-3.5.2 django-4.1.3 sqlparse-0.4.3
 ```
 
-Podemos comprobar la versión instalada de Django con el siguiente comando:
+Podemos **comprobar la versión instalada de Django** con el siguiente comando:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ python -m django --version
@@ -2628,7 +2627,7 @@ Podemos comprobar la versión instalada de Django con el siguiente comando:
 
 ### Creación del proyecto
 
-Django proporciona una herramienta para crear la estructura base del proyecto:
+Django proporciona la herramienta [django-admin](https://docs.djangoproject.com/en/4.1/ref/django-admin/) para crear la estructura base del proyecto:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ django-admin startproject main .
@@ -2650,7 +2649,7 @@ Comprobamos el contenido de la carpeta de trabajo:
 1 directory, 6 files
 ```
 
-Podemos lanzar el servidor de desarrollo con el siguiente comando:
+Podemos lanzar el **servidor de desarrollo** con la herramienta [manage.py](https://docs.djangoproject.com/en/4.1/ref/django-admin/) que ya viene incluida en el andamiaje del proyecto:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ ./manage.py runserver
@@ -2667,19 +2666,19 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
 
-Ahora si accedemos a http://localhost:8000 tendremos la pantalla de bienvenida de un proyecto base Django:
+Ahora si accedemos a http://localhost:8000 tendremos **la pantalla de bienvenida** de un proyecto base Django:
 
 ![Django inicial](./images/django-init.png)
 
 ### Código de aplicación
 
-Ahora ya estamos en disposición de empezar a montar las distintas partes de nuestra aplicación web. Django sigue el patrón **MTV (Model-Template-View)** y funciona de la siguiente manera:
+Ahora ya estamos en disposición de empezar a montar las distintas partes de nuestra aplicación web. Django sigue el patrón **MTV (Model-Template-View)** que es análogo al modelo MVC. Funciona de la siguiente manera:
 
 ![Modelo MTV de Django](./image/../images/django-mtv.jpg)
 
 > Fuente: https://espifreelancer.com/mtv-django.html
 
-Un proyecto Django está formado por "aplicaciones". Lo primero será crear nuestra primera aplicación:
+Un proyecto **Django está formado por "aplicaciones"**. Lo primero será crear nuestra primera aplicación:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ ./manage.py startapp places
@@ -2701,7 +2700,7 @@ drwxr-xr-x 2 sdelquin sdelquin 4096 nov 15 10:19 migrations
 
 #### Acceso a la base de datos
 
-Antes de nada debemos instalar un paquete de soporte llamado [psycopg](https://www.psycopg.org/) que viene a ser un driver para conectar desde Python con bases de datos PostgreSQL:
+Antes de nada debemos instalar un paquete de soporte denominado [psycopg](https://www.psycopg.org/) que viene a ser un driver para **conectar Python con bases de datos PostgreSQL**:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ pip install psycopg2
@@ -2718,7 +2717,7 @@ Installing collected packages: psycopg2
 Successfully installed psycopg2-2.9.5
 ```
 
-Hay que establecer las credenciales para acceder a la base de datos:
+Hay que establecer las **credenciales de acceso a la base de datos**:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ vi main/settings.py
@@ -2739,17 +2738,16 @@ DATABASES = {
 }
 ```
 
-Django proporciona el subcomando [check](<[https://](https://docs.djangoproject.com/en/4.1/ref/django-admin/#check)>) para comprobar que todo esté "en su sitio":
+Django proporciona el subcomando [check](https://docs.djangoproject.com/en/4.1/ref/django-admin/#check) dentro de `manage.py` para comprobar que todo esté correcto:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ python manage.py check --database default
 System check identified no issues (0 silenced).
-(travelroad) sdelquin@lemon:~/travelroad$
 ```
 
 #### Modelos
 
-En Django existe un [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) que permite mapear clases escritas en Python con entidades relacionales de la base de datos (PostgreSQL en este caso).
+En Django existe un [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) que permite **mapear clases escritas en Python con entidades relacionales de la base de datos** (PostgreSQL en este caso).
 
 Vamos a escribir nuestro modelo de lugares:
 
@@ -2767,13 +2765,14 @@ class Place(models.Model):
     visited = models.BooleanField()
 
     class Meta:
-        db_table = "places"  # necesario porque ya partimos de una tabla creada
+        # ↓ necesario porque ya partimos de una tabla creada ↓
+        db_table = "places"
 
     def __str__(self):
         return self.name
 ```
 
-> 💡 Django añade por defecto a todos sus modelos una clave primaria `id` que es única y autoincremental.
+> 💡 Django añade automáticamente por defecto a todos sus modelos una clave primaria `id` que es única y autoincremental.
 
 #### Vistas
 
@@ -2793,11 +2792,11 @@ from .models import Place
 
 
 def index(request):
-    newplace = Place.objects.filter(visited=False)
+    wished = Place.objects.filter(visited=False)
     visited = Place.objects.filter(visited=True)
     template = loader.get_template('places/index.html')
     context = {
-        'newplace': newplace,
+        'wished': wished,
         'visited': visited,
     }
     return HttpResponse(template.render(context, request))
@@ -2820,7 +2819,7 @@ A continuación creamos la plantilla:
 <h2>Places I'd Like to Visit</h2>
 
 <ul>
-  {% for place in newplace %}
+  {% for place in wished %}
   <li>{{ place }}</li>
   {% endfor %}
 </ul>
@@ -2852,6 +2851,7 @@ from django.urls import path
 from . import views
 
 app_name = 'places'
+
 urlpatterns = [
     path('', views.index, name='index'),
 ]
@@ -2946,11 +2946,11 @@ Una vez instalado, tenemos a nuestro alcance un script de gestión que permite l
 
 #### Supervisor
 
-Dado que el servidor WSGI debemos matenerlo activo y con la posibilidad de gestionarlo (arrancar, parar, etc.) hemos de buscar alguna herramienta que nos ofrezca estas posibilidades.
+Dado que el servidor WSGI **debemos matenerlo activo y con la posibilidad de gestionarlo** (arrancar, parar, etc.) hemos de buscar alguna herramienta que nos ofrezca estas posibilidades.
 
-Una alternativa es usar [servicios systemd](https://es.wikipedia.org/wiki/Systemd), como hemos visto anteriormente.
+Una alternativa es usar [servicios systemd](https://es.wikipedia.org/wiki/Systemd), como hemos visto anteriormente (Java Spring).
 
-Pero en esta ocasión vamos a usar [Supervisor](http://supervisord.org/) que es un sistema cliente/servidor que permite monitorizar y controlar procesos en sistemas Linux/UNIX. ¡Y además está escrito en Python!
+Pero en esta ocasión vamos a usar [Supervisor](http://supervisord.org/) que es un **sistema cliente/servidor que permite monitorizar y controlar procesos en sistemas Linux/UNIX**... ¡Y además está escrito en Python!
 
 Para instalarlo ejecutamos el siguiente comando:
 
@@ -3008,7 +3008,7 @@ sdelquin@lemon:~$ supervisorctl status
 error: <class 'PermissionError'>, [Errno 13] Permission denied: file: /usr/lib/python3/dist-packages/supervisor/xmlrpc.py line: 560
 ```
 
-Para que un usuario no privilegiado pueda usar el servicio, la estrategia va a ser añadir un grupo `supervisor` con permisos para ello, y luego unir al usuario a dicho grupo.
+Para que un usuario no privilegiado pueda usar el servicio, la estrategia a seguir es añadir un grupo `supervisor` con permisos para ello, y luego unir al usuario a dicho grupo.
 
 ```console
 sdelquin@lemon:~$ sudo groupadd supervisor
@@ -3084,7 +3084,7 @@ Damos permisos de ejecución:
 
 #### Configuración Supervisor
 
-Lo que nos queda es crear la configuración de un proceso supervisor que lance nuestro servicio WSGI como servidor de aplicación para la aplicación Django.
+Lo que nos queda es **crear la configuración de un proceso supervisor** que lance nuestro servicio WSGI como servidor de aplicación para la aplicación Django.
 
 ```console
 sdelquin@lemon:~$ sudo vi /etc/supervisor/conf.d/travelroad.conf
@@ -3147,7 +3147,7 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 
 ### Aplicación en producción
 
-Ya podemos acceder a http://travelroad para obtener el resultado esperado:
+Ya podemos acceder a http://travelroad obteniendo el resultado esperado:
 
 ![Django funcionando](./images/django-works.png)
 
