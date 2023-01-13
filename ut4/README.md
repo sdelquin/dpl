@@ -2212,7 +2212,7 @@ end
 Para crear el código base del [modelo](https://guides.rubyonrails.org/active_model_basics.html) utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
 
 ```console
-sdelquin@lemon:~/travelroad$ rails generate model Place
+sdelquin@lemon:~/travelroad$ bin/rails generate model Place
       invoke  active_record
       create    db/migrate/20221114114713_create_places.rb
       create    app/models/place.rb
@@ -2705,7 +2705,7 @@ DATABASES = {
 Django proporciona el subcomando [check](https://docs.djangoproject.com/en/4.1/ref/django-admin/#check) dentro de `manage.py` para comprobar que todo esté correcto:
 
 ```console
-(travelroad) sdelquin@lemon:~/travelroad$ python manage.py check --database default
+(travelroad) sdelquin@lemon:~/travelroad$ ./manage.py check
 System check identified no issues (0 silenced).
 ```
 
@@ -2977,7 +2977,7 @@ Una vez instalado, tenemos a nuestro alcance un script de gestión que permite l
 
 #### Supervisor
 
-Dado que el servidor WSGI **debemos matenerlo activo y con la posibilidad de gestionarlo** (arrancar, parar, etc.) hemos de buscar alguna herramienta que nos ofrezca estas posibilidades.
+Dado que el servidor WSGI **debemos mantenerlo activo y con la posibilidad de gestionarlo** (arrancar, parar, etc.) hemos de buscar alguna herramienta que nos ofrezca estas posibilidades.
 
 Una alternativa es usar [servicios systemd](https://es.wikipedia.org/wiki/Systemd), como hemos visto anteriormente (Java Spring).
 
