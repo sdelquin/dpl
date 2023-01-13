@@ -1699,8 +1699,6 @@ import org.springframework.data.jpa.repository.Query;
 @Repository
 public interface PlaceRepository extends CrudRepository<Place, Long> {
 
-    List<Place> findByName(String name);
-
     @Query("SELECT p FROM Place p WHERE p.visited = ?1")
     List<Place> findByVisited(Boolean visited);
 }
@@ -1708,7 +1706,7 @@ public interface PlaceRepository extends CrudRepository<Place, Long> {
 
 #### Plantilla
 
-Para la plantilla vamos a utilizar [Thymeleaf](https://www.thymeleaf.org/a) un **motor de plantillas** moderno para Java:
+Para la plantilla vamos a utilizar [Thymeleaf](https://www.thymeleaf.org/) un **motor de plantillas** moderno para Java:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi src/main/resources/templates/home.html
@@ -1840,6 +1838,8 @@ Para poner en funcionamiento el proyecto necesitamos **dos fases que se llevará
 1. Compilación.
 2. Empaquetado.
 
+La herramienta que usamos para ello es Maven, pero en el propio andamiaje de la aplicación ya se incluye un [Maven Wrapper](https://maven.apache.org/wrapper/) denominado `mvnw` que incluye todo lo necesario para poder construir el proyecto.
+
 Para llevar a cabo la **compilación** del proyecto ejecutamos lo siguiente:
 
 ```console
@@ -1870,6 +1870,8 @@ Una forma de lanzar la aplicación es **correr el fichero JAR generado**:
 sdelquin@lemon:~/travelroad$ java -jar target/travelroad-0.0.1-SNAPSHOT.jar
 ```
 
+Dentro del empaquetado también se incluye [Tomcat](https://tomcat.apache.org/) un **servidor de aplicaciones para Java** que se puede usar perfectamente en producción.
+
 Esto nos permitirá acceder a http://localhost:8080 y comprobar que la aplicación funciona correctamente.
 
 ### Servicio de despliegue
@@ -1886,9 +1888,13 @@ sdelquin@lemon:~/travelroad$ vi run.sh
 #!/bin/bash
 
 cd /home/sdelquin/travelroad
+
 ./mvnw compile
 ./mvnw package
-/usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+
+# ↓ Último fichero JAR generado
+JAR=`ls target/*.jar -t | head -1`
+/usr/bin/java -jar $JAR
 ```
 
 Asignamos permisos de ejecución:
@@ -1909,9 +1915,10 @@ sdelquin@lemon:~$ sudo vi /etc/systemd/system/travelroad.service
 [Unit]
 Description=Spring Boot TravelRoad
 After=syslog.target
-After=network.target[Service]
+After=network.target
 
 [Service]
+User=sdelquin
 ExecStart=/home/sdelquin/travelroad/run.sh
 Restart=always
 StandardOutput=syslog
@@ -2158,7 +2165,7 @@ drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 tmp
 drwxr-xr-x  3 sdelquin sdelquin 4096 nov 14 11:28 vendor
 ```
 
-Podemos lanzar el **servidor de desarrollo** que trae Ruby on Rails para ver que todo está correcto:
+Ruby on Rails trae incorporado el **servidor de aplicación** [Puma](https://github.com/puma/puma) que lo podemos lanzar en modo "desarrollo" para comprobar que todo esté funcionando correctamente:
 
 ```console
 sdelquin@lemon:~/travelroad$ bin/rails server
@@ -2184,7 +2191,7 @@ Si abrimos un navegador en http://localhost:3000 obtendremos una pantalla simila
 
 #### Rutas
 
-Lo primero es editar el fichero de rutas y modificarlo convenientemente:
+Lo primero es editar el fichero de [rutas](https://guides.rubyonrails.org/routing.html) y modificarlo convenientemente:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi config/routes.rb
@@ -2200,9 +2207,23 @@ Rails.application.routes.draw do
 end
 ```
 
+#### Modelo
+
+Para crear el código base del [modelo](https://guides.rubyonrails.org/active_model_basics.html) utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
+
+```console
+sdelquin@lemon:~/travelroad$ rails generate model Place
+      invoke  active_record
+      create    db/migrate/20221114114713_create_places.rb
+      create    app/models/place.rb
+      invoke    test_unit
+      create      test/models/place_test.rb
+      create      test/fixtures/places.yml
+```
+
 #### Controlador
 
-Para crear el código base del controlador utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
+Para crear el código base del [controlador](https://guides.rubyonrails.org/action_controller_overview.html) utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
 
 ```console
 sdelquin@lemon:~/travelroad$ bin/rails generate controller Places index
@@ -2234,21 +2255,9 @@ class PlacesController < ApplicationController
 end
 ```
 
-#### Modelo
-
-Para crear el código base del modelo utilizamos [la herramienta que nos proporciona Ruby on Rails](https://guides.rubyonrails.org/command_line.html#bin-rails-generate):
-
-```console
-sdelquin@lemon:~/travelroad$ rails generate model Place
-      invoke  active_record
-      create    db/migrate/20221114114713_create_places.rb
-      create    app/models/place.rb
-      invoke    test_unit
-      create      test/models/place_test.rb
-      create      test/fixtures/places.yml
-```
-
 #### Vista
+
+Para la vista vamos a utilizar [ERB](https://github.com/ruby/erb) un **motor de plantillas** sencillo pero potente para Ruby.
 
 Editamos el fichero de la vista:
 
@@ -2287,22 +2296,6 @@ sdelquin@lemon:~/travelroad$ vi config/database.yml
 > Contenido:
 
 ```yaml
-# PostgreSQL. Versions 9.3 and up are supported.
-#
-# Install the pg driver:
-#   gem install pg
-# On macOS with Homebrew:
-#   gem install pg -- --with-pg-config=/usr/local/bin/pg_config
-# On macOS with MacPorts:
-#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/pg_config
-# On Windows:
-#   gem install pg
-#       Choose the win32 build.
-#       Install PostgreSQL and put its /bin directory on your path.
-#
-# Configure Using Gemfile
-# gem "pg"
-#
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -2312,72 +2305,28 @@ default: &default
 
 development:
   <<: *default
-  database: travelroad
-
-  # The specified database role being used to connect to postgres.
-  # To create additional roles in postgres see `$ createuser --help`.
-  # When left blank, postgres will use the default role. This is
-  # the same name as the operating system user running Rails.
   username: travelroad_user
-
-  # The password associated with the postgres role (username).
   password: dpl0000
-
-  # Connect on a TCP socket. Omitted by default since the client uses a
-  # domain socket that doesn't need configuration. Windows does not have
-  # domain sockets, so uncomment these lines.
+  database: travelroad
   host: localhost
-
-  # The TCP port the server listens on. Defaults to 5432.
-  # If your server runs on a different port number, change accordingly.
   port: 5432
 
-  # Schema search path. The server defaults to $user,public
-  #schema_search_path: myapp,sharedapp,public
+production:
+  <<: *default
+  database: travelroad
+  username: travelroad_user
+  password: <%= ENV["TRAVELROAD_DATABASE_PASSWORD"] %>
+  host: localhost
+  port: 5432
 
-  # Minimum log levels, in increasing order:
-  #   debug5, debug4, debug3, debug2, debug1,
-  #   log, notice, warning, error, fatal, and panic
-  # Defaults to warning.
-  #min_messages: notice
-
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
 test:
   <<: *default
   database: travelroad_test
-
-# As with config/credentials.yml, you never want to store sensitive information,
-# like your database password, in your source code. If your source code is
-# ever seen by anyone, they now have access to your database.
-#
-# Instead, provide the password or a full connection URL as an environment
-# variable when you boot the app. For example:
-#
-#   DATABASE_URL="postgres://myuser:mypass@localhost/somedatabase"
-#
-# If the connection URL is provided in the special DATABASE_URL environment
-# variable, Rails will automatically merge its configuration values on top of
-# the values provided in this file. Alternatively, you can specify a connection
-# URL environment variable explicitly:
-#
-#   production:
-#     url: <%= ENV["MY_APP_DATABASE_URL"] %>
-#
-# Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
-# for a full overview on how database connection configuration can be specified.
-#
-production:
-  <<: *default
-  database: travelroad_production
-  username: travelroad
-  password: <%= ENV["TRAVELROAD_DATABASE_PASSWORD"] %>
 ```
 
 #### Migraciones
 
-Dado que estamos trabajando con **una base de datos y un tabla ya creadas**, no nos interesa aplicar las migraciones que nos sugiere _Ruby on Rails_. Para no obtener un error, deshabilitamos esa opción en otro fichero de configuración del entorno de desarrollo:
+Dado que estamos trabajando con **una base de datos y una tabla ya creadas**, no nos interesa aplicar las migraciones que nos sugiere _Ruby on Rails_. Para no obtener un error, deshabilitamos esa opción en otro fichero de configuración del entorno de desarrollo:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi config/environments/development.rb
@@ -2484,7 +2433,18 @@ sdelquin@lemon:/tmp/nginx-1.22.0$ sudo cp objs/ngx_http_passenger_module.so \
 Ya por último, para cargar el módulo en Nginx, tocamos la configuración del servicio, añadiendo la siguiente línea a `/etc/nginx/nginx.conf`:
 
 ```nginx
+...
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+# ↓ Añadir esta línea
 load_module /etc/nginx/modules/ngx_http_passenger_module.so;
+# ↑ Añadir esta línea
+
+events {
+    worker_connections  1024;
+}
+...
 ```
 
 También es necesario incluir en el fichero anterior, la ruta raíz de `passenger`. La podemos encontrar con el comando:
@@ -2494,10 +2454,21 @@ sdelquin@lemon:~$ passenger-config --root
 /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/passenger-6.0.15
 ```
 
-Añadimos ahora esta ruta al fichero `/etc/nginx/nginx.conf` dentro del bloque `server { ... }` y antes de la línea `include /etc/nginx/conf.d/*.conf;`:
+Añadimos ahora esta ruta al fichero `/etc/nginx/nginx.conf` dentro del bloque `http { ... }` y antes de la línea `include /etc/nginx/conf.d/*.conf;`:
 
 ```nginx
-passenger_root /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/passenger-6.0.15;
+...
+
+http {
+  ...
+  #gzip  on;
+
+  # ↓ Añadir esta línea
+  passenger_root /home/sdelquin/.rvm/gems/ruby-3.0.0/gems/passenger-6.0.15;
+  # ↑ Añadir esta línea
+
+  include /etc/nginx/conf.d/*.conf;
+}
 ```
 
 Comprobamos que la sintaxis sea correcta y reiniciamos el servidor web:
@@ -2527,25 +2498,18 @@ server {
     root /home/sdelquin/travelroad/public;
 
     passenger_enabled on;
-    passenger_app_env development;  # cambio a production si procede
+    passenger_app_env production;
+    passenger_env_var TRAVELROAD_DATABASE_PASSWORD dpl0000;
 }
 ```
 
-Dado que vamos a acceder a la aplicación web mediante http://travelroad hemos de añadir una configuración al entorno de desarrollo de Ruby on Rails para que lo tenga en cuenta.
+### Probando el despliegue
+
+Es el momento de [generar los assets](https://guides.rubyonrails.org/asset_pipeline.html) de la aplicación (CSS, Javascript, ...):
 
 ```console
-sdelquin@lemon:~/travelroad$ vi config/environments/development.rb
+sdelquin@lemon:~/travelroad$ bin/rails assets:precompile
 ```
-
-Añadimos justo al final:
-
-```ruby
-  ...
-  config.hosts << "travelroad"
-end
-```
-
-### Probando el despliegue
 
 Tras todos estos cambios, nos aseguramos de reiniciar (mejor que recargar por la cantidad de modificaciones/módulos que hemos tocado) el servidor web Nginx:
 
