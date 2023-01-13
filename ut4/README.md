@@ -2852,7 +2852,7 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     # NUEVA LÍNEA ↓
-    path('', include('places.urls')),
+    path('', include('places.urls', 'places')),
 ]
 ```
 
@@ -2878,6 +2878,73 @@ Quit the server with CONTROL-C.
 Si accedemos a http://localhost:8000 podemos observar el resultado esperado:
 
 ![Django funciona desarrollo](./images/django-dev-works.png)
+
+### Despliegue en producción
+
+Queremos que las credenciales a la base de datos sea un elemento configurable en función del entorno en el que estemos trabajando.
+
+Esto lo podemos conseguir (entre otros) mediante un paquete de Python denominado [prettyconf](https://github.com/osantana/prettyconf) que sirve para **cargar variables de entorno mediate un fichero de configuración**.
+
+Realizamos la instalación del paquete (ojo tener activo el entorno virtual Python):
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ pip install prettyconf
+Collecting prettyconf
+  Using cached prettyconf-2.2.1.tar.gz (11 kB)
+  Preparing metadata (setup.py) ... done
+Building wheels for collected packages: prettyconf
+  Building wheel for prettyconf (setup.py) ... done
+  Created wheel for prettyconf: filename=prettyconf-2.2.1-py2.py3-none-any.whl size=9797 sha256=300e63f4a8afcfc43446bef750e270e9a2a070a28dc9e27c66c22276779bd65c
+  Stored in directory: /home/sdelquin/.cache/pip/wheels/58/75/59/2aa05b767025506114499da0585a6004bd1b8171e0b141c577
+Successfully built prettyconf
+Installing collected packages: prettyconf
+Successfully installed prettyconf-2.2.1
+```
+
+Modificamos las siguientes líneas del fichero `settings.py` para aprovechar las funcionalidades de este paquete:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi main/settings.py
+```
+
+> Contenido:
+
+```python
+...
+from pathlib import Path
+# ↓ Nueva línea
+from prettyconf import config
+# ↑ Nueva línea
+...
+DEBUG = config('DEBUG', default=True, cast=config.boolean)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=config.list)
+...
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='travelroad'),
+        'USER': config('DB_USERNAME', default='travelroad_user'),
+        'PASSWORD': config('DB_PASSWORD', default='dpl0000'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default=5432, cast=int)
+    }
+}
+...
+```
+
+Ahora creamos un fichero `.env` que contendrá las configuraciones concretas para el entorno de producción:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi .env
+```
+
+> Contenido:
+
+```ini
+DEBUG=0
+ALLOWED_HOSTS='travelroad'
+#DB_PASSWORD='supersecret'
+```
 
 ### Servidor de aplicación
 
@@ -3064,8 +3131,8 @@ autostart = true
 autorestart = true
 stopsignal = INT
 killasgroup = true
-stderr_logfile = /home/sdelquin/travelroad/supervisor.err.log
-stdout_logfile = /home/sdelquin/travelroad/supervisor.out.log
+stderr_logfile = /var/log/supervisor/travelroad.err.log
+stdout_logfile = /var/log/supervisor/travelroad.out.log
 ```
 
 Ahora ya podemos añadir este proceso:
