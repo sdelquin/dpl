@@ -2,7 +2,7 @@
 
 ### TAREA EVALUABLE
 
-El objetivo de esta tarea es **desplegar aplicaciones web** con distintas _frameworks_ y lenguajes de programación.
+El objetivo de esta tarea es **desplegar aplicaciones web** con distintos _frameworks_ y lenguajes de programación.
 
 Sobre la aplicación **TravelRoad** (vista en clase) se pide desplegar en las siguientes tecnologías:
 
@@ -32,6 +32,7 @@ Se pide **modificar ligeramente la aplicación original TravelRoad** ajustándol
 
 ## Aspectos comunes a todos los despliegues
 
+- Trabajar cada framework en una carpeta con su nombre: `laravel`, `express`, `spring`, `ror` y `django`.
 - Identificar cada framework en la página de inicio (_"Powered by"_).
 - Ignorar información sensible del control de versiones.
 - Utilizar un script de despliegue ajustado a cada caso.
