@@ -2,7 +2,7 @@
 
 ### TAREA EVALUABLE
 
-El objetivo de esta tarea es **desplegar aplicaciones web** con distintos _frameworks_ y lenguajes de programación.
+El objetivo de esta tarea es **desplegar aplicaciones web** con distintas _frameworks_ y lenguajes de programación.
 
 Sobre la aplicación **TravelRoad** (vista en clase) se pide desplegar en las siguientes tecnologías:
 
@@ -16,7 +16,7 @@ Sobre la aplicación **TravelRoad** (vista en clase) se pide desplegar en las si
 
 ## Personalización de la aplicación
 
-Se pide modificar ligeramente la aplicación original TravelRoad ajustándola a las siguientes pantallas:
+Se pide **modificar ligeramente la aplicación original TravelRoad** ajustándola a las siguientes pantallas:
 
 ### Pantalla de inicio
 
