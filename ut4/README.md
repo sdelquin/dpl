@@ -2092,7 +2092,7 @@ sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 
 #### RVM
 
-Lo primero que necesitaremos será instalar [Ruby Version Manager (RVM)](<[https://](https://rvm.io/)>) una herramienta en línea de comandos que permite instalar, gestionar y trabajar con múltiples **entornos Ruby**.
+Lo primero que necesitaremos será instalar [Ruby Version Manager (RVM)](https://rvm.io/) una herramienta en línea de comandos que permite instalar, gestionar y trabajar con múltiples **entornos Ruby**.
 
 Añadimos las claves GPG:
 
@@ -2301,6 +2301,8 @@ sdelquin@lemon:~/travelroad$ bin/rails generate model Place
       create      test/models/place_test.rb
       create      test/fixtures/places.yml
 ```
+
+En la salida del comando anterior podemos ver un fichero de **migraciones** en la carpeta `migrate`. Las migraciones incluyen los cambios a aplicar en la base de datos cuando creamos o modificamos cualquier modelo (de datos).
 
 #### Controlador
 
@@ -2652,10 +2654,8 @@ Habitualmente en Python trabajamos con **entornos virtuales** lo que nos permite
 Para **crear (y activar) un entorno virtual** ejecutamos lo siguiente:
 
 ```console
-sdelquin@lemon:~$ mkdir travelroad
-sdelquin@lemon:~$ cd travelroad
-
 sdelquin@lemon:~/travelroad$ python -m venv --prompt travelroad .venv
+
 sdelquin@lemon:~/travelroad$ source .venv/bin/activate
 (travelroad) sdelquin@lemon:~/travelroad$
 ```
@@ -2722,6 +2722,8 @@ Comprobamos el contenido de la carpeta de trabajo:
 
 1 directory, 6 files
 ```
+
+> 💡 A diferencia de Ruby on Rails, Django sigue un patrón "minimalista" donde el andamiaje es modesto y con muy pocos ficheros iniciales.
 
 Podemos lanzar el **servidor de desarrollo** con la herramienta [manage.py](https://docs.djangoproject.com/en/4.1/ref/django-admin/) que ya viene incluida en el andamiaje del proyecto:
 
@@ -2940,21 +2942,6 @@ Y ahora enlazamos estas URLs desde el fichero principal:
 > Contenido:
 
 ```python
-"""main URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
