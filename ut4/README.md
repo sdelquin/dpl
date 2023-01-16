@@ -1309,6 +1309,32 @@ Recargamos la configuración de Nginx y accedemos a http://travelroad obteniendo
 
 ![ExpressJS funcionando](./images/express-works.png)
 
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+  pm2 restart travelroad --update-env
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
+```
+
 ## Spring (Java)
 
 ![Logo Spring](./images/spring-logo.png)
@@ -1874,9 +1900,11 @@ Dentro del empaquetado también se incluye [Tomcat](https://tomcat.apache.org/) 
 
 Esto nos permitirá acceder a http://localhost:8080 y comprobar que la aplicación funciona correctamente.
 
-### Servicio de despliegue
+> 💡 Tener en cuenta que la carpeta `target` no debe estar dentro de control de versiones.
 
-De cara a simplificar el proceso de despliegue, podemos disponer de un script que realice los pasos del proceso de construcción:
+### Entorno de producción
+
+De cara a simplificar el proceso de despliegue en el entorno de producción, podemos disponer de un script que realice los pasos del proceso de construcción:
 
 ```console
 sdelquin@lemon:~/travelroad$ vi run.sh
@@ -1967,6 +1995,32 @@ nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.013  INFO 200941 -
 nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.264  WARN 200941 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is >
 nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.451  INFO 200941 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): >
 nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.456  INFO 200941 --- [           main] c.e.travelroad.TravelroadApplication     : Started TravelroadApplicati>
+```
+
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+  sudo systemctl restart travelroad
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
 
 ### Configuración de Nginx
@@ -2511,6 +2565,8 @@ Es el momento de [generar los assets](https://guides.rubyonrails.org/asset_pipel
 sdelquin@lemon:~/travelroad$ bin/rails assets:precompile
 ```
 
+> 💡 El comando anterior genera los _assets_ en la carpeta `public/assets`. **Esta carpeta no debería estar dentro del control de versiones**.
+
 Tras todos estos cambios, nos aseguramos de reiniciar (mejor que recargar por la cantidad de modificaciones/módulos que hemos tocado) el servidor web Nginx:
 
 ```console
@@ -2520,6 +2576,33 @@ sdelquin@lemon:~$ sudo systemctl restart nginx
 Y finalmente accedemos a http://travelroad comprobando que es el resultado esperado:
 
 ![Ruby on Rails funcionando sobre Nginx](./images/rubyonrails-nginx-works.png)
+
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+  bin/rails assets:precompile
+  sudo systemctl reload nginx
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
+```
 
 ## Django (Python)
 
@@ -3102,7 +3185,7 @@ Aunque no es totalmente obligatorio, sí puede ser de utilidad que tengamos un *
 ```bash
 #!/bin/bash
 
-cd "$(dirname "$0")"
+cd $(dirname $0)
 source .venv/bin/activate
 gunicorn -b unix:/tmp/travelroad.sock main.wsgi:application
 ```
@@ -3188,4 +3271,36 @@ Tener en cuenta que cuando actualicemos el código de la aplicación será neces
 sdelquin@lemon:~$ supervisorctl restart travelroad
 travelroad: stopped
 travelroad: started
+```
+
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+
+  # source .venv/bin/activate
+  # pip install -r requirements.txt
+  # python manage.py migrate
+  # python manage.py collectstatic --no-input
+
+  supervisorctl restart travelroad
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
