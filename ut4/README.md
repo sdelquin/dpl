@@ -311,6 +311,8 @@ Digite «help» para obtener ayuda.
 postgres=#
 ```
 
+> 💡 El comando anterior ejecuta la herramienta cliente `psql` con el usuario `postgres` que es el que está habilitado por defecto para acceder a la administración de la base de datos.
+
 ### Base de datos
 
 Vamos a crear una **base de datos** y un **rol de acceso** a la misma:
@@ -482,7 +484,7 @@ Aunque este script lanza un **servidor de desarrollo** en el puerto **5050** no 
 
 #### Servidor en producción
 
-Para poder lanzar el servidor pgAdmin en modo producción y con garantías, necesitaremos hacer uso de un procesador de peticiones WSGI denominado `gunicorn`.
+Para poder lanzar el servidor pgAdmin en modo producción y con garantías, necesitaremos hacer uso de un **procesador de peticiones WSGI** denominado `gunicorn`.
 
 Podemos instalarlo como un paquete Python adicional (dentro del entorno virtual):
 
@@ -666,7 +668,7 @@ Aunque cada framework web tiene sus particularidades, todos comparten una arquit
 
 ### Servidor de desarrollo vs producción
 
-Muchos de los framework web ya traen incorporado un **servidor de desarrollo** que levanta un _servidor web ligero_ pensado para que podamos desarrollar nuestra aplicación en un entorno local controlado. Algunos puertos habituales del servidor de desarrollo son el 8000, 8080, 3000, 5000, etc.
+Muchos de los framework web ya traen incorporado un **servidor de desarrollo** que levanta un _servidor web ligero_ pensado para que podamos desarrollar nuestra aplicación en un entorno local controlado. Algunos puertos habituales del servidor de desarrollo son el 8000, 8080, 3000, 5000, etc. (siempre puertos no privilegiados > 1024).
 
 Usar un servidor de desarrollo en una máquina de producción se considera una **mala práctica** y está desaconsejado. Para ello disponemos de un **servidor de producción** tipo _Nginx_ que es capaz de gestionar multitud de peticiones con un comportamiento estable y un alto rendimiento. Trabaja habitualmente en los puertos 80 y 443.
 
@@ -793,7 +795,7 @@ sdelquin@lemon:~$ sudo vi /etc/nginx/conf.d/travelroad.conf
 ```nginx
 server {
     server_name travelroad;
-    root /home/sdelquin/travelroad.php/public;
+    root /home/sdelquin/travelroad/public;
 
     index index.html index.htm index.php;
 
@@ -895,6 +897,31 @@ sdelquin@lemon:~$ firefox http://travelroad
 ```
 
 ![Laravel Works](./images/laravel-works.png)
+
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
+```
 
 ## Express (Javascript)
 
