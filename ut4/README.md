@@ -1942,7 +1942,7 @@ sdelquin@lemon:~/travelroad$ vi run.sh
 ```bash
 #!/bin/bash
 
-cd /home/sdelquin/travelroad
+cd $(dirname $0)
 
 ./mvnw compile
 ./mvnw package
@@ -2024,32 +2024,6 @@ nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.451  INFO 200941 -
 nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.456  INFO 200941 --- [           main] c.e.travelroad.TravelroadApplication     : Started TravelroadApplicati>
 ```
 
-### Script de despliegue
-
-Veamos un ejemplo de **script de despliegue** para esta aplicación:
-
-```console
-sdelquin@lemon:~/travelroad$ vi deploy.sh
-```
-
-> Contenido:
-
-```bash
-#!/bin/bash
-
-ssh arkania "
-  cd $(dirname $0)
-  git pull
-  sudo systemctl restart travelroad
-"
-```
-
-Damos permisos de ejecución:
-
-```console
-sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
-```
-
 ### Configuración de Nginx
 
 Lo último que nos queda es configurar el host virtual en Nginx para dar servicio a las peticiones:
@@ -2081,6 +2055,32 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 Con todo esto hecho, ya podemos probar el acceso a la aplicación web visitando http://travelroad:
 
 ![Spring funcionando](./images/spring-works.png)
+
+### Script de despliegue
+
+Veamos un ejemplo de **script de despliegue** para esta aplicación:
+
+```console
+sdelquin@lemon:~/travelroad$ vi deploy.sh
+```
+
+> Contenido:
+
+```bash
+#!/bin/bash
+
+ssh arkania "
+  cd $(dirname $0)
+  git pull
+  sudo systemctl restart travelroad
+"
+```
+
+Damos permisos de ejecución:
+
+```console
+sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
+```
 
 ## Ruby on Rails (Ruby)
 
