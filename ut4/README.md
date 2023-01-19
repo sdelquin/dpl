@@ -898,6 +898,40 @@ sdelquin@lemon:~$ firefox http://travelroad
 
 ![Laravel Works](./images/laravel-works.png)
 
+### Producción
+
+Hay que tener en cuenta un detalle. La carpeta `vendor` está fuera de control de versiones por una entrada que se crea automáticamente un el fichero `.gitignore` del "scaffolding" que realiza Laravel:
+
+```console
+sdelquin@lemon:~/travelroad$ grep vendor .gitignore
+/vendor
+```
+
+Esta carpeta contiene todas las dependencias del proyecto. Por lo tanto, **cuando hagamos el despliegue en producción**, debemos ejecutar el siguiente comando para crear esta carpeta e instalar todas las dependencias necesarias:
+
+```console
+sdelquin@lemon:~/travelroad$ composer install
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Nothing to install, update or remove
+Generating optimized autoload files
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover --ansi
+
+   INFO  Discovering packages.
+
+  laravel/sail .............................................................................. DONE
+  laravel/sanctum ........................................................................... DONE
+  laravel/tinker ............................................................................ DONE
+  nesbot/carbon ............................................................................. DONE
+  nunomaduro/collision ...................................................................... DONE
+  nunomaduro/termwind ....................................................................... DONE
+  spatie/laravel-ignition ................................................................... DONE
+
+81 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+```
+
 ### Script de despliegue
 
 Veamos un ejemplo de **script de despliegue** para esta aplicación:
@@ -914,6 +948,7 @@ sdelquin@lemon:~/travelroad$ vi deploy.sh
 ssh arkania "
   cd $(dirname $0)
   git pull
+  composer install
 "
 ```
 
