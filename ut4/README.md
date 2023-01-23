@@ -2279,6 +2279,43 @@ drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 tmp
 drwxr-xr-x  3 sdelquin sdelquin 4096 nov 14 11:28 vendor
 ```
 
+Para que la **conexión a la base de datos** funcione correctamente debemos establecer las credenciales de inicio de sesión en PostgreSQL. Para ello utilizamos uno de los ficheros que provee Ruby on Rails en su andamiaje:
+
+```console
+sdelquin@lemon:~/travelroad$ vi config/database.yml
+```
+
+> Contenido:
+
+```yaml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  username: travelroad_user
+  password: dpl0000
+  database: travelroad
+  host: localhost
+  port: 5432
+
+production:
+  <<: *default
+  database: travelroad
+  username: travelroad_user
+  password: <%= ENV["TRAVELROAD_DATABASE_PASSWORD"] %>
+  host: localhost
+  port: 5432
+
+test:
+  <<: *default
+  database: travelroad_test
+```
+
 Ruby on Rails trae incorporado el **servidor de aplicación** [Puma](https://github.com/puma/puma) que lo podemos lanzar en modo "desarrollo" para comprobar que todo esté funcionando correctamente:
 
 ```console
@@ -2399,45 +2436,6 @@ sdelquin@lemon:~/travelroad$ vi app/views/places/index.html.erb
     <li><%= place.name %></li>
   <% end %>
 </ul>
-```
-
-#### Acceso a la base de datos
-
-Debemos especificar las credenciales de acceso a la base de datos. Para ello modificamos el fichero de configuración que provee Ruby on Rails:
-
-```console
-sdelquin@lemon:~/travelroad$ vi config/database.yml
-```
-
-> Contenido:
-
-```yaml
-default: &default
-  adapter: postgresql
-  encoding: unicode
-  # For details on connection pooling, see Rails configuration guide
-  # https://guides.rubyonrails.org/configuring.html#database-pooling
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
-development:
-  <<: *default
-  username: travelroad_user
-  password: dpl0000
-  database: travelroad
-  host: localhost
-  port: 5432
-
-production:
-  <<: *default
-  database: travelroad
-  username: travelroad_user
-  password: <%= ENV["TRAVELROAD_DATABASE_PASSWORD"] %>
-  host: localhost
-  port: 5432
-
-test:
-  <<: *default
-  database: travelroad_test
 ```
 
 #### Migraciones
