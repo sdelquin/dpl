@@ -1135,9 +1135,7 @@ sdelquin@lemon:~/travelroad$ ls -l
 total 128
 -rw-r--r--   1 sdelquin sdelquin  1074 nov  7 16:46 app.js
 drwxr-xr-x   2 sdelquin sdelquin  4096 ene  9 19:42 bin
-drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 16:20 config
 -rw-r--r--   1 sdelquin sdelquin   347 nov  7 17:11 package.json
--rw-r--r--   1 sdelquin sdelquin 94744 nov  7 17:11 package-lock.json
 drwxr-xr-x   5 sdelquin sdelquin  4096 nov  7 16:46 public
 drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 16:59 routes
 drwxr-xr-x   2 sdelquin sdelquin  4096 nov  8 17:02 views
