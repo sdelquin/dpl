@@ -1919,7 +1919,7 @@ spring.datasource.password=dpl0000
 
 ### Proceso de construcción
 
-Para poner en funcionamiento el proyecto necesitamos **dos fases que se llevarán a cabo mediante Maven**:
+Para poner en funcionamiento el proyecto necesitamos **dos [fases](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html) que se llevarán a cabo mediante Maven**:
 
 1. Compilación.
 2. Empaquetado.
@@ -1977,8 +1977,7 @@ sdelquin@lemon:~/travelroad$ vi run.sh
 
 cd $(dirname $0)
 
-./mvnw compile
-./mvnw package
+./mvnw package  # el empaquetado ya incluye la compilación
 
 # ↓ Último fichero JAR generado
 JAR=`ls target/*.jar -t | head -1`
@@ -2803,6 +2802,29 @@ drwxr-xr-x 2 sdelquin sdelquin 4096 nov 15 10:19 migrations
 -rw-r--r-- 1 sdelquin sdelquin   57 nov 15 10:19 models.py
 -rw-r--r-- 1 sdelquin sdelquin   60 nov 15 10:19 tests.py
 -rw-r--r-- 1 sdelquin sdelquin   63 nov 15 10:19 views.py
+```
+
+Hemos de **activar esta aplicación** para que Django sea consciente de que existe. Para ello añadimos esta línea en el fichero `main/settings.py`:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi main/settings.py
+```
+
+> Contenido:
+
+```python
+...
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Nueva línea ↓
+    'places.apps.PlacesConfig',
+]
+...
 ```
 
 #### Acceso a la base de datos
