@@ -5,7 +5,7 @@ En el despliegue de una aplicación web pueden aparecer distintos servicios de r
 [FTP](#ftp)  
 [SSH](#ssh)  
 [DNS](#dns)  
-[LDAP](#ldap)
+[LDAP](#ldap)  
 [GitHub](#github)
 
 ## FTP
@@ -482,12 +482,24 @@ De cara al **despliegue de una aplicación web** es casi imprescindible **adquir
 
 Los nombres de dominio se pueden comprar en multitud de empresas que ofrecen estos servicios. Un ejemplo es [dondominio.com](https://dondominio.com).
 
-Aunque los precios pueden variar, suele ser un servicio relativamente barato. Un dominio `.es` está en torno a 7€ anuales.
+Aunque los precios pueden variar, suele ser un servicio relativamente barato. Por ejemplo un dominio `.es` está en torno a 7€ anuales.
 
 Una vez que hayamos comprado nuestro flamante nombre de dominio, debemos entrar a gestionar la **Zona DNS** y añadir, al menos, un **registro tipo A** donde hacer apuntar el nombre de dominio a la IP de la máquina que dispone de los servicios (servidor SSH, servidor WEB, base de datos, etc.)
+
+![Registro A](./images/a-record.svg)
 
 > 💡 Es posible usar "wildcards" en los registros DNS para asignar todos los subdominios de un dominio. Por ejemplo: `*.arkania.es`
 
 ## LDAP
+
+El **protocolo ligero de acceso a directorios** (en inglés: **L**ightweight **D**irectory **A**ccess **P**rotocol, también conocido por sus siglas de LDAP) hace referencia a un _protocolo a nivel de aplicación_ que permite el acceso a un _servicio de directorio_ ordenado y distribuido para buscar diversa información en un entorno de red.
+
+Un **directorio** es un conjunto de objetos con atributos organizados en una manera lógica y jerárquica. Habitualmente, almacena la **información de autenticación (usuario y contraseña)** y es utilizado para autenticarse aunque es posible almacenar otra información (datos de contacto del usuario, ubicación de diversos recursos de la red, permisos, certificados, etc). A manera de síntesis, **LDAP es un protocolo de acceso unificado a un conjunto de información sobre una red**.
+
+### OpenLDAP
+
+OpenLDAP es una **implementación libre y de código abierto** del protocolo Lightweight Directory Access Protocol (LDAP).
+
+Muchas distribuciones GNU/Linux incluyen el software OpenLDAP para el soporte LDAP. Este software también corre en plataformas BSD, AIX, HP-UX, Mac OS X, Solaris y Microsoft Windows.
 
 ## GitHub
