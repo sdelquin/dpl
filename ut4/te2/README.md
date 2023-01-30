@@ -39,6 +39,16 @@ Se pide **modificar ligeramente la aplicación original TravelRoad** ajustándol
 - Incluir certificado de seguridad.
 - Incluir al final de cada sección del informe un enlace a la url de la aplicación desplegada.
 
+## Estructura del informe
+
+Dado que es una actividad extensa, se recomienda hacer un `README.md` con enlaces a:
+
+- `laravel.md`
+- `express.md`
+- `spring.md`
+- `ror.md`
+- `django.md`
+
 ## Entregable
 
 - Informe explicando los pasos seguidos para resolver la tarea.
