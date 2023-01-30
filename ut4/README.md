@@ -1990,10 +1990,11 @@ Asignamos permisos de ejecución:
 sdelquin@lemon:~/travelroad$ chmod +x run.sh
 ```
 
-A continuación creamos un **fichero de servicio** para gestionarlo mediante **systemd**:
+A continuación creamos un **fichero de servicio (de usuario)** para gestionarlo mediante **systemd**:
 
 ```console
-sdelquin@lemon:~$ sudo vi /etc/systemd/system/travelroad.service
+sdelquin@lemon:~$ mkdir -p ~/.config/systemd/user
+sdelquin@lemon:~$ vi ~/.config/systemd/user/travelroad.service
 ```
 
 > Contenido:
@@ -2001,59 +2002,46 @@ sdelquin@lemon:~$ sudo vi /etc/systemd/system/travelroad.service
 ```ini
 [Unit]
 Description=Spring Boot TravelRoad
-After=syslog.target
-After=network.target
 
 [Service]
-User=sdelquin
+Type=simple
+StandardOutput=journal
 ExecStart=/home/sdelquin/travelroad/run.sh
-Restart=always
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=travelroad
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
-**Añadimos este servicio** para que esté disponible:
+> 💡 Ojo modificar el campo `ExecStart` con la ruta correcta al script de arranque.
+
+**Habilitamos el servicio** para que se arranque automáticamente:
 
 ```console
-sdelquin@lemon:~$ sudo systemctl daemon-reload
+sdelquin@lemon:~$ systemctl --user enable travelroad.service
+Created symlink /home/sdelquin/.config/systemd/user/default.target.wants/travelroad.service → /home/sdelquin/.config/systemd/user/travelroad.service.
 ```
 
-**Iniciamos el servicio y lo habilitamos** para que se inicie en el arranque del sistema:
+**Iniciamos el servicio** para comprobar su funcionamiento:
 
 ```console
-sdelquin@lemon:~$ sudo systemctl start travelroad
-sdelquin@lemon:~$ sudo systemctl enable travelroad
+sdelquin@lemon:~$ systemctl --user start travelroad.service
 ```
 
 Podemos comprobar el **estado del servicio** (tener en cuenta que puede tardar algún tiempo):
 
 ```console
-sdelquin@lemon:~$ sudo systemctl status travelroad
+sdelquin@lemon:~$ systemctl --user status travelroad.service
 ● travelroad.service - Spring Boot TravelRoad
-     Loaded: loaded (/etc/systemd/system/travelroad.service; disabled; vendor preset: enabled)
-     Active: active (running) since Sun 2022-11-13 10:41:09 WET; 32s ago
-   Main PID: 200796 (run.sh)
+     Loaded: loaded (/home/sdelquin/.config/systemd/user/travelroad.service; enabled; vendor preset>
+     Active: active (running) since Mon 2023-01-30 19:22:53 WET; 1min 2s ago
+   Main PID: 101634 (run.sh)
       Tasks: 37 (limit: 2251)
-     Memory: 282.9M
-        CPU: 13.026s
-     CGroup: /system.slice/travelroad.service
-             ├─200796 /bin/bash /home/sdelquin/travelroad/run.sh
-             └─200941 /usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
-
-nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.410  INFO 200941 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start comple>
-nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.433  INFO 200941 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing Persi>
-nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.482  INFO 200941 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM co>
-nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.589  INFO 200941 --- [           main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Comm>
-nov 13 10:41:15 lemon travelroad[200941]: 2022-11-13 10:41:15.684  INFO 200941 --- [           main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: o>
-nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.008  INFO 200941 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatfor>
-nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.013  INFO 200941 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManag>
-nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.264  WARN 200941 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is >
-nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.451  INFO 200941 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): >
-nov 13 10:41:16 lemon travelroad[200941]: 2022-11-13 10:41:16.456  INFO 200941 --- [           main] c.e.travelroad.TravelroadApplication     : Started TravelroadApplicati>
+     Memory: 387.5M
+        CPU: 13.715s
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/travelroad.service
+             ├─101634 /bin/bash /home/sdelquin/travelroad/run.sh
+             └─101763 /usr/bin/java -jar target/travelroad-0.0.1-SNAPSHOT.jar
+...
 ```
 
 ### Configuración de Nginx
@@ -2104,11 +2092,11 @@ sdelquin@lemon:~/travelroad$ vi deploy.sh
 ssh arkania "
   cd $(dirname $0)
   git pull
-  sudo systemctl restart travelroad
+  systemctl --user restart travelroad.service
 "
 ```
 
-Damos permisos de ejecución:
+Finalizamos dando permisos de ejecución:
 
 ```console
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
