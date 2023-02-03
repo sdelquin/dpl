@@ -2506,8 +2506,9 @@ sdelquin@lemon:~$ sudo apt install -y libcurl4-openssl-dev libpcre3-dev
 A continuación descargamos el código fuente de Nginx con la misma versión que el Nginx que tenemos funcionando en el sistema:
 
 ```console
-sdelquin@lemon:~$ curl -sL https://nginx.org/download/nginx-$(/sbin/nginx -v \
-|& cut -d '/' -f2).tar.gz | tar xvz -C /tmp
+sdelquin@lemon:~$ curl -sL \
+https://nginx.org/download/nginx-$(/sbin/nginx -v |& cut -d '/' -f2).tar.gz |
+tar xvz -C /tmp
 ```
 
 Nos movemos a la carpeta descargada:
