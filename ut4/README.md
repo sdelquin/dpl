@@ -2248,22 +2248,28 @@ La estructura de carpetas y ficheros queda tal que así:
 ```console
 sdelquin@lemon:~$ ls -l travelroad
 total 68
-drwxr-xr-x 11 sdelquin sdelquin 4096 nov 14 11:28 app
-drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:28 bin
-drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 config
--rw-r--r--  1 sdelquin sdelquin  160 nov 14 11:27 config.ru
-drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 db
--rw-r--r--  1 sdelquin sdelquin 2268 nov 14 11:27 Gemfile
--rw-r--r--  1 sdelquin sdelquin 5373 nov 14 11:28 Gemfile.lock
-drwxr-xr-x  4 sdelquin sdelquin 4096 nov 14 11:27 lib
-drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:28 log
-drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 public
--rw-r--r--  1 sdelquin sdelquin  227 nov 14 11:27 Rakefile
--rw-r--r--  1 sdelquin sdelquin  374 nov 14 11:27 README.md
-drwxr-xr-x  2 sdelquin sdelquin 4096 nov 14 11:27 storage
-drwxr-xr-x 10 sdelquin sdelquin 4096 nov 14 11:27 test
-drwxr-xr-x  5 sdelquin sdelquin 4096 nov 14 11:28 tmp
-drwxr-xr-x  3 sdelquin sdelquin 4096 nov 14 11:28 vendor
+drwxr-xr-x 11 sdelquin sdelquin 4096 feb  3 15:23 app
+drwxr-xr-x  2 sdelquin sdelquin 4096 feb  3 15:23 bin
+drwxr-xr-x  5 sdelquin sdelquin 4096 feb  3 15:23 config
+-rw-r--r--  1 sdelquin sdelquin  160 feb  3 15:22 config.ru
+drwxr-xr-x  2 sdelquin sdelquin 4096 feb  3 15:22 db
+-rw-r--r--  1 sdelquin sdelquin 2282 feb  3 15:22 Gemfile
+-rw-r--r--  1 sdelquin sdelquin 5520 feb  3 15:23 Gemfile.lock
+drwxr-xr-x  4 sdelquin sdelquin 4096 feb  3 15:22 lib
+drwxr-xr-x  2 sdelquin sdelquin 4096 feb  3 15:23 log
+drwxr-xr-x  2 sdelquin sdelquin 4096 feb  3 15:22 public
+-rw-r--r--  1 sdelquin sdelquin  227 feb  3 15:22 Rakefile
+-rw-r--r--  1 sdelquin sdelquin  374 feb  3 15:22 README.md
+drwxr-xr-x  2 sdelquin sdelquin 4096 feb  3 15:22 storage
+drwxr-xr-x 10 sdelquin sdelquin 4096 feb  3 15:22 test
+drwxr-xr-x  5 sdelquin sdelquin 4096 feb  3 15:23 tmp
+drwxr-xr-x  3 sdelquin sdelquin 4096 feb  3 15:23 vendor
+```
+
+Aunque no lo veamos (a priori), sí **se ha creado un "repositorio git"** dentro de esta carpeta. Para que no nos genere conflicto con nuestro propio repositorio, se recomienda borrar esta carpeta:
+
+```console
+sdelquin@lemon:~/travelroad$ rm -r .git
 ```
 
 Para que la **conexión a la base de datos** funcione correctamente debemos establecer las credenciales de inicio de sesión en PostgreSQL. Para ello utilizamos uno de los ficheros que provee Ruby on Rails en su andamiaje:
@@ -2494,7 +2500,7 @@ Aunque la documentación oficial se enfoca más en compilar un "nuevo" Nginx inc
 Lo primero será instalar las dependencias que tiene este módulo de cara al proceso de compilación:
 
 ```console
-sdelquin@lemon:~$ sudo apt install -y libcurl4-openssl-dev
+sdelquin@lemon:~$ sudo apt install -y libcurl4-openssl-dev libpcre3-dev
 ```
 
 A continuación descargamos el código fuente de Nginx con la misma versión que el Nginx que tenemos funcionando en el sistema:
@@ -2641,7 +2647,7 @@ ssh arkania "
   cd $(dirname $0)
   git pull
   bin/rails assets:precompile
-  sudo systemctl reload nginx
+  passenger-config restart-app .
 "
 ```
 
