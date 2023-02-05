@@ -5,14 +5,13 @@ En el despliegue de una aplicación web pueden aparecer distintos servicios de r
 [FTP](#ftp)  
 [SSH](#ssh)  
 [DNS](#dns)  
-[LDAP](#ldap)  
-[GitHub](#github)
+[LDAP](#ldap)
 
 ## FTP
 
 El protocolo clásico para la transferencia de archivos en Internet se denomina **FTP (File Transfer Protocol)**. Con el estado actual de Internet y las múltiples opciones de trasferencia de archivos en la web puede parecer algo innecesario pero sigue siendo una opción sencilla y específica por lo que aún se sigue utilizando en algunos ámbitos.
 
-FTP se ajusta a una arquitectura cliente/servidor como todo lo que hemos visto hasta ahora. En Linux existen muchos servidores FTP diferentes. La elección puede ser bastante subjetiva pero nos decantamos por **vsFTPd (Very Secure FTP Daemon)** ya que es el servidor FTP por defecto en las principales distribuciones de Linux lo que lo hace más sencilla de instalar y además se considera más seguro.
+FTP se ajusta a una arquitectura cliente/servidor como todo lo que hemos visto hasta ahora. En Linux existen muchos servidores FTP diferentes. La elección puede ser bastante subjetiva pero nos vamos a decantar por **vsFTPd (Very Secure FTP Daemon)** ya que es el servidor FTP por defecto en las principales distribuciones de Linux lo que lo hace más sencillo de instalar y además se considera más seguro.
 
 ### Instalación del servidor
 
@@ -209,7 +208,7 @@ tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      
 
 #### Cliente
 
-El cliente SSH se puede instalar igualmente de manera muy simple:
+El cliente SSH se puede instalar igualmente de manera muy simple (y también forma parte del ecosistema OpenSSH):
 
 ```console
 sdelquin@lemon:~$ sudo apt install -y openssh-client
@@ -319,7 +318,7 @@ Comandos disponibles **en local**:
 | `lls`    | Listar el contenido de la carpeta actual |
 | `lmkdir` | Crear una nueva carpeta                  |
 | `lpwd`   | Mostrar la carpeta de trabajo            |
-| `!<cmd>` | Ejecuta cualquier comando (en local)     |
+| `!<cmd>` | Ejecutar cualquier comando (en local)    |
 
 > 💡 Es una especie de FTP "vitaminado" y con comunicaciones cifradas.
 
@@ -382,11 +381,13 @@ Now try logging into the machine, with:   "ssh 'dpl.arkania.es'"
 and check to make sure that only the key(s) you wanted were added.
 ```
 
+> 💡 El comando anterior añade la clave pública al fichero remoto `~/.ssh/authorized_keys`.
+
 Ahora ya podemos acceder por ssh a la máquina remota sin necesidad de usar claves "en línea":
 
 ```console
 sdelquin@lemon:~$ ssh dpl.arkania.es
-Linux vps-fc1b46ec 5.10.0-19-cloud-amd64 #1 SMP Debian 5.10.149-2 (2022-10-21) x86_64
+Linux arkania 5.10.0-19-cloud-amd64 #1 SMP Debian 5.10.149-2 (2022-10-21) x86_64
 
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the
@@ -395,12 +396,14 @@ individual files in /usr/share/doc/*/copyright.
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 Last login: Wed Nov  2 16:21:14 2022 from 193.146.93.24
-sdelquin@vps-fc1b46ec:~$
+sdelquin@arkania:~$
 ```
 
 ## DNS
 
-El **sistema de nombres de dominio** (Domain Name System o **DNS**, por sus siglas en inglés)​ es un sistema de nomenclatura **jerárquico** y **distribuido** para dispositivos conectados a redes IP como Internet o una red privada. Su función más importante es "traducir" nombres inteligibles para las personas en identificadores binarios asociados con los equipos conectados a la red, esto con el propósito de poder localizar y direccionar estos equipos mundialmente.
+El **sistema de nombres de dominio** (Domain Name System o **DNS**, por sus siglas en inglés)​ es un sistema de nomenclatura **jerárquico** y **distribuido** para dispositivos conectados a redes IP como Internet o una red privada.
+
+Su función más importante es **"traducir" nombres entendibles para las personas en identificadores numéricos asociados a máquinas**, con el propósito de poder localizar y direccionar estos equipos mundialmente.
 
 ### Procedimiento de resolución
 
@@ -496,10 +499,414 @@ El **protocolo ligero de acceso a directorios** (en inglés: **L**ightweight **D
 
 Un **directorio** es un conjunto de objetos con atributos organizados en una manera lógica y jerárquica. Habitualmente, almacena la **información de autenticación (usuario y contraseña)** y es utilizado para autenticarse aunque es posible almacenar otra información (datos de contacto del usuario, ubicación de diversos recursos de la red, permisos, certificados, etc). A manera de síntesis, **LDAP es un protocolo de acceso unificado a un conjunto de información sobre una red**.
 
+Existen varias implementaciones para el protocolo LDAP. Aquí nos vamos a centrar en _OpenLDAP_. Pero también es relevante citar [Directorio Activo](https://es.wikipedia.org/wiki/Active_Directory) de Microsoft. Este servicio se utiliza, por ejemplo, en el [Sistema Centralizado de Autenticación (CAS)](https://www.gobiernodecanarias.org/sso/login) del Gobierno de Canarias.
+
 ### OpenLDAP
 
 OpenLDAP es una **implementación libre y de código abierto** del protocolo Lightweight Directory Access Protocol (LDAP).
 
 Muchas distribuciones GNU/Linux incluyen el software OpenLDAP para el soporte LDAP. Este software también corre en plataformas BSD, AIX, HP-UX, Mac OS X, Solaris y Microsoft Windows.
 
-## GitHub
+#### Instalación
+
+Como siempre, lo primero que debemos hacer es actualizar el repositorio de paquetes Debian:
+
+```console
+sdelquin@arkania:~$ sudo apt update
+[sudo] password for sdelquin:
+Hit:1 http://deb.debian.org/debian bullseye InRelease
+Get:2 http://deb.debian.org/debian bullseye-updates InRelease [44.1 kB]
+Get:3 http://security.debian.org/debian-security bullseye-security InRelease [48.4 kB]
+Hit:4 http://nginx.org/packages/debian bullseye InRelease
+Get:5 http://deb.debian.org/debian bullseye-backports InRelease [49.0 kB]
+Hit:6 http://apt.postgresql.org/pub/repos/apt bullseye-pgdg InRelease
+Get:7 http://deb.debian.org/debian bullseye-backports/main Sources.diff/Index [63.3 kB]
+Get:8 http://deb.debian.org/debian bullseye-backports/main amd64 Packages.diff/Index [63.3 kB]
+Get:9 http://deb.debian.org/debian bullseye-backports/main Sources T-2023-02-04-0803.23-F-2023-02-03-0803.55.pdiff [1859 B]
+Get:9 http://deb.debian.org/debian bullseye-backports/main Sources T-2023-02-04-0803.23-F-2023-02-03-0803.55.pdiff [1859 B]
+Get:10 http://deb.debian.org/debian bullseye-backports/main amd64 Packages T-2023-02-03-2003.49-F-2023-02-03-0203.39.pdiff [18.0 kB]
+Get:10 http://deb.debian.org/debian bullseye-backports/main amd64 Packages T-2023-02-03-2003.49-F-2023-02-03-0203.39.pdiff [18.0 kB]
+Hit:11 https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/bullseye pgadmin4 InRelease
+Fetched 288 kB in 1s (286 kB/s)
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+All packages are up to date.
+```
+
+Ahora instalaremos los paquetes de OpenLDAP `slapd` y `ldap-utils`. El paquete `slapd` es el paquete principal de OpenLDAP, y `ldap-utils` proporciona utilidades de línea de comandos para gestionar el servidor OpenLDAP:
+
+```console
+sdelquin@arkania:~$ sudo apt install -y slapd ldap-utils
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  libodbc1
+Suggested packages:
+  libsasl2-modules-gssapi-mit | libsasl2-modules-gssapi-heimdal libmyodbc odbc-postgresql tdsodbc unixodbc-bin
+The following NEW packages will be installed:
+  ldap-utils libodbc1 slapd
+0 upgraded, 3 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1879 kB of archives.
+After this operation, 5971 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bullseye/main amd64 libodbc1 amd64 2.3.6-0.1+b1 [224 kB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 slapd amd64 2.4.57+dfsg-3+deb11u1 [1448 kB]
+Get:3 http://deb.debian.org/debian bullseye/main amd64 ldap-utils amd64 2.4.57+dfsg-3+deb11u1 [206 kB]
+Fetched 1879 kB in 0s (10.0 MB/s)
+Preconfiguring packages ...
+```
+
+Este comando lanzará un **asistente para la configuración** de `slapd`. Lo primero será introducir una contraseña del usuario administrador de OpenLDAP:
+
+![slapd paso 1](./images/slapd1.png)
+
+Y a continuación confirmarla:
+
+![slapd paso 2](./images/slapd2.png)
+
+Una vez introducida la contraseña de administrador, pulsamos <kbd>ENTER</kbd> y la instalación terminará de configurar el resto de paquetes:
+
+```console
+Selecting previously unselected package libodbc1:amd64.
+(Reading database ... 43268 files and directories currently installed.)
+Preparing to unpack .../libodbc1_2.3.6-0.1+b1_amd64.deb ...
+Unpacking libodbc1:amd64 (2.3.6-0.1+b1) ...
+Selecting previously unselected package slapd.
+Preparing to unpack .../slapd_2.4.57+dfsg-3+deb11u1_amd64.deb ...
+Unpacking slapd (2.4.57+dfsg-3+deb11u1) ...
+Selecting previously unselected package ldap-utils.
+Preparing to unpack .../ldap-utils_2.4.57+dfsg-3+deb11u1_amd64.deb ...
+Unpacking ldap-utils (2.4.57+dfsg-3+deb11u1) ...
+Setting up ldap-utils (2.4.57+dfsg-3+deb11u1) ...
+Setting up libodbc1:amd64 (2.3.6-0.1+b1) ...
+Setting up slapd (2.4.57+dfsg-3+deb11u1) ...
+  Creating new user openldap... done.
+  Creating initial configuration... done.
+  Creating LDAP directory... done.
+Processing triggers for man-db (2.9.4-2) ...
+Processing triggers for libc-bin (2.31-13+deb11u5) ...
+sdelquin@arkania:~$
+```
+
+#### Configuración
+
+Después de haber instalado los paquetes de OpenLDAP, ahora debemos configurar el servidor OpenLDAP:
+
+```console
+sdelquin@arkania:~$ sudo dpkg-reconfigure slapd
+```
+
+Seleccionamos "No" cuando se te pregunte si borrar/omitir la antigua configuración de OpenLDAP. Esto mantendrá la antigua configuración disponible:
+
+![slapd paso 3](./images/slapd3.png)
+
+Ahora introducimos el nombre de dominio del servidor OpenLDAP:
+
+![slapd paso 4](./images/slapd4.png)
+
+Introducimos el nombre de la organización:
+
+![slapd paso 5](./images/slapd5.png)
+
+Ahora introducimos la contraseña de administrador de OpenLDAP:
+
+![slapd paso 6](./images/slapd6.png)
+
+Y confirmamos la contraseña de administrador de OpenLDAP:
+
+![slapd paso 7](./images/slapd7.png)
+
+En la siguiente pantalla indicamos que no queremos borrar la base de datos slapd en el caso de que eliminemos slapd:
+
+![slapd paso 8](./images/slapd8.png)
+
+En la última pantalla seleccionamos que sí queremos borrar antiguas bases de datos:
+
+![slapd paso 9](./images/slapd9.png)
+
+Con esto se termina la configuración de los paquetes OpenLDAP:
+
+```console
+  Backing up /etc/ldap/slapd.d in /var/backups/slapd-2.4.57+dfsg-3+deb11u1... done.
+  Moving old database directory to /var/backups:
+  - directory unknown... done.
+  Creating initial configuration... done.
+  Creating LDAP directory... done.
+```
+
+Para verificar la configuración de OpenLDAP, usamos el comando `slapcat`:
+
+```console
+sdelquin@arkania:~$ sudo slapcat
+[sudo] password for sdelquin:
+dn: dc=ldap,dc=dpl,dc=arkania,dc=es
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: DPL
+dc: ldap
+structuralObjectClass: organization
+entryUUID: f6037018-38c1-103d-8cda-5ba518d097c3
+creatorsName: cn=admin,dc=ldap,dc=dpl,dc=arkania,dc=es
+createTimestamp: 20230204102516Z
+entryCSN: 20230204102516.161360Z#000000#000#000000
+modifiersName: cn=admin,dc=ldap,dc=dpl,dc=arkania,dc=es
+modifyTimestamp: 20230204102516Z
+```
+
+Para que los cambios se apliquen correctamente debemos reiniciar el servicio:
+
+```console
+sdelquin@arkania:~$ sudo systemctl restart slapd
+```
+
+Comprobamos el estado del servicio slapd:
+
+```console
+sdelquin@arkania:~$ sudo systemctl status slapd
+● slapd.service - LSB: OpenLDAP standalone server (Lightweight Directory Access Protocol)
+     Loaded: loaded (/etc/init.d/slapd; generated)
+    Drop-In: /usr/lib/systemd/system/slapd.service.d
+             └─slapd-remain-after-exit.conf
+     Active: active (running) since Sat 2023-02-04 10:39:22 UTC; 31s ago
+       Docs: man:systemd-sysv-generator(8)
+    Process: 1278139 ExecStart=/etc/init.d/slapd start (code=exited, status=0/SUCCESS)
+      Tasks: 3 (limit: 2302)
+     Memory: 3.0M
+        CPU: 25ms
+     CGroup: /system.slice/slapd.service
+             └─1278146 /usr/sbin/slapd -h ldap:/// ldapi:/// -g openldap -u openldap -F /etc/ldap/slapd.d
+
+Feb 04 10:39:22 arkania systemd[1]: Starting LSB: OpenLDAP standalone server (Lightweight Directory Access Protocol)...
+Feb 04 10:39:22 arkania slapd[1278145]: @(#) $OpenLDAP: slapd 2.4.57+dfsg-3+deb11u1 (May 14 2022 18:32:57) $
+                                                     Debian OpenLDAP Maintainers <pkg-openldap-devel@lists.alioth.debian.org>
+Feb 04 10:39:22 arkania slapd[1278146]: slapd starting
+Feb 04 10:39:22 arkania slapd[1278139]: Starting OpenLDAP: slapd.
+Feb 04 10:39:22 arkania systemd[1]: Started LSB: OpenLDAP standalone server (Lightweight Directory Access Protocol).
+```
+
+Podemos comprobar que el servicio OpenLDAP está escuchando en el puerto **389**:
+
+```console
+sdelquin@vps-fc1b46ec:~$ sudo netstat -tulpn | grep slapd
+tcp        0      0 0.0.0.0:389             0.0.0.0:*               LISTEN      1278146/slapd
+tcp6       0      0 :::389                  :::*                    LISTEN      1278146/slapd
+```
+
+#### Estructura OpenLDAP
+
+Como ya se ha comentado previamente, la estructura de un servidor LDAP es jerárquica. Se construye a partir de elementos de distinta naturaleza. En nuestro caso vamos a montar un OpenLDAP siguiendo este modelo:
+
+![Modelo OpenLDAP](./images/openldap.svg)
+
+#### Añadir grupo de usuarios
+
+El servidor OpenLDAP se suele utilizar para la autenticación en un grupo de ordenadores o servidores. Y en este paso, vamos a configurar un **grupo de usuarios** en el servidor OpenLDAP utilizando un archivo con formato [LDIF](https://en.wikipedia.org/wiki/LDAP_Data_Interchange_Format) (LDAP Data Interchange Format).
+
+LDIF es un formato de archivo que contiene entradas LDAP y puede utilizarse para gestionar usuarios y grupos en el servidor OpenLDAP:
+
+```console
+sdelquin@arkania:~$ sudo vi /etc/ldap/users.ldif
+```
+
+> Contenido:
+
+```ldif
+dn: ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es
+objectClass: organizationalUnit
+```
+
+A continuación debemos añadir este grupo a través de las herramientas de utilidad que ofrece OpenLDAP:
+
+```console
+sdelquin@arkania:~$ sudo ldapadd -D "cn=admin,dc=ldap,dc=dpl,dc=arkania,dc=es" -W -H ldapi:/// -f /etc/ldap/users.ldif
+Enter LDAP Password:
+adding new entry "ou=People,dc=ldap,dc=dpl,dc=arkania,dc=es"
+```
+
+Para verificar que que el proceso se ha realizado correctamente podemos hacer una búsqueda en nuestro servidor OpenLDAP:
+
+```console
+sdelquin@arkania:~$ sudo ldapsearch -x -b "dc=ldap,dc=dpl,dc=arkania,dc=es" ou
+# extended LDIF
+#
+# LDAPv3
+# base <dc=ldap,dc=dpl,dc=arkania,dc=es> with scope subtree
+# filter: (objectclass=*)
+# requesting: ou
+#
+
+# ldap.dpl.arkania.es
+dn: dc=ldap,dc=dpl,dc=arkania,dc=es
+
+# users, ldap.dpl.arkania.es
+dn: ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es
+ou: users
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+```
+
+Hay que tener en cuenta que en todos los pasos anteriores estamos usando el dominio `ldap.dpl.arkania.es` de ahí que el **nombre distinguido** `dn` venga definido por los componentes:
+
+- `dc=ldap`
+- `dc=dpl`
+- `dc=arkania`
+- `dc=es`
+
+> 💡 Estos valores habría que adaptarlos según el dominio y el `dn` que se haya especificado en cada caso.
+
+#### Configurar un nuevo usuario
+
+Después de configurar un grupo en OpenLDAP, podemos añadir un nuevo usuario a dicho grupo. Esto también se puede hacer utilizando un archivo LDIF y la herramienta de línea de comandos `ldapadd`.
+
+```console
+sdelquin@arkania:~$ sudo vi /etc/ldap/guido.ldif
+```
+
+> Contenido:
+
+```ldif
+dn: cn=guido,ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es
+objectClass: inetOrgPerson
+givenName: Guido
+surname: Van Rossum
+userPassword: pythoniscool
+```
+
+> 💡 Existen [múltiples atributos](https://docs.oracle.com/cd/E19225-01/820-6551/6nhsdeq75/index.html) que podemos establecer en función del `objectClass` que hayamos definido.
+
+Ahora ya podemos añadir el usuario:
+
+```console
+sdelquin@arkania:~$ sudo ldapadd -D "cn=admin,dc=ldap,dc=dpl,dc=arkania,dc=es" -W -H ldapi:/// -f /etc/ldap/guido.ldif
+Enter LDAP Password:
+adding new entry "cn=guido,ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es"
+```
+
+Si queremos asegurarnos de que todo ha ido bien podemos hacer una consulta al servidor OpenLDAP:
+
+```console
+sdelquin@vps-fc1b46ec:~$ sudo ldapsearch -x -b "ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es"
+# extended LDIF
+#
+# LDAPv3
+# base <ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# users, ldap.dpl.arkania.es
+dn: ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es
+objectClass: organizationalUnit
+ou: users
+
+# guido, users, ldap.dpl.arkania.es
+dn: cn=guido,ou=users,dc=ldap,dc=dpl,dc=arkania,dc=es
+objectClass: inetOrgPerson
+givenName: Guido
+sn: Van Rossum
+cn: guido
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+```
+
+#### Probando la autenticación
+
+Supongamos que hemos desarrollado una aplicación en Python y queremos valernos del servidor OpenLDAP para llevar a cabo la autenticación de usuarios.
+
+Desde una máquina "cliente" creamos un entorno virtual en Python:
+
+```console
+sdelquin@lemon:~$ mkdir ldap_auth && cd ldap_auth
+sdelquin@lemon:~/ldap_auth$ python -m venv --prompt ldap_auth .venv
+sdelquin@lemon:~/ldap_auth$ source .venv/bin/activate
+(ldap_auth) sdelquin@lemon:~/ldap_auth$
+```
+
+Instalamos la librería [ldap3](https://ldap3.readthedocs.io/en/latest/) que nos servirá para probar la autenticación LDAP:
+
+```console
+(ldap_auth) sdelquin@lemon:~/ldap_auth$ pip install ldap3
+Collecting ldap3
+  Using cached ldap3-2.9.1-py2.py3-none-any.whl (432 kB)
+Requirement already satisfied: pyasn1>=0.4.6 in ./.venv/lib/python3.11/site-packages (from ldap3) (0.4.8)
+Installing collected packages: ldap3
+Successfully installed ldap3-2.9.1
+```
+
+Creamos un fichero `main.py` con el código necesario:
+
+```console
+(ldap_auth) sdelquin@lemon:~/ldap_auth$ vi main.py
+```
+
+> Contenido:
+
+```python
+import sys
+
+from ldap3 import Connection
+from ldap3.core.exceptions import LDAPException
+
+LDAP_URI = 'ldap.dpl.arkania.es'
+LDAP_DC = 'dc=ldap,dc=dpl,dc=arkania,dc=es'
+ORG_UNIT = 'users'
+USER_ATTRIBUTES = ['givenName', 'sn']
+
+username = sys.argv[1]
+password = sys.argv[2]
+
+user_dn = f'cn={username},ou={ORG_UNIT},{LDAP_DC}'
+
+try:
+    conn = Connection(LDAP_URI, user=user_dn, password=password, auto_bind=True)
+except LDAPException as err:
+    print(f'⨯ {err}')
+else:
+    print(f'✔️ User "{username}" successfully authenticated!')
+    user_cn = f'(cn={username})'
+    conn.search(LDAP_DC, user_cn, attributes=USER_ATTRIBUTES)
+    print(f'Name: {conn.entries[0].givenName}')
+    print(f'Surname: {conn.entries[0].sn}')
+```
+
+Y ahora podemos probar la autenticación de usuario. Supongamos que pasamos:
+
+- Usuario: `guido`
+- Contraseña: `supersecret`
+
+```console
+(ldap_auth) sdelquin@lemon:~/ldap_auth$ python main.py guido supersecret
+⨯ automatic bind not successful - invalidCredentials
+```
+
+El error nos indica que las credenciales son inválidas. Ahora supongamos que pasamos:
+
+- Usuario: `guido`
+- Contraseña: `pythoniscool`
+
+```console
+(ldap_auth) sdelquin@lemon:~/ldap_auth$ python main.py guido pythoniscool
+✔️ User "guido" successfully authenticated!
+Name: Guido
+Surname: Van Rossum
+```
+
+#### Cuestiones sobre seguridad
+
+Aunque no se vayan a cubrir en este documento, es importante tener en cuenta las siguientes cuestiones sobre seguridad en la comunicación con servidores OpenLDAP:
+
+- [Control de acceso](https://www.openldap.org/doc/admin24/access-control.html)
+- [Certificados TLS](https://www.openldap.org/doc/admin24/tls.html)
+- [Acceso seguro desde herramientas cliente](<[https://](https://ldap3.readthedocs.io/en/latest/ssltls.html)>)
