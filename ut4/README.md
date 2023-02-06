@@ -2148,7 +2148,7 @@ Please consider donating to our open collective to help us maintain RVM.
 👉  Donate: https://opencollective.com/rvm/donate
 ```
 
-Abrimos **una nueva pestaña** para que los cambios se reflejen y podamos probar RVM:
+Abrimos **una nueva pestaña** (o volvemos a logearnos si es en producción) para que los cambios se reflejen y podamos probar RVM:
 
 ```console
 sdelquin@lemon:~$ rvm --version
@@ -2514,7 +2514,7 @@ tar xvz -C /tmp
 Nos movemos a la carpeta descargada:
 
 ```console
-sdelquin@lemon:~$ cd /tmp/nginx-1.22.0/
+sdelquin@lemon:~$ cd /tmp/nginx-$(/sbin/nginx -v |& cut -d '/' -f2)/
 ```
 
 Realizamos la configuración:

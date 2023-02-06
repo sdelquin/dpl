@@ -156,7 +156,7 @@ SSH (o **S**ecure **SH**ell, en español: intérprete de órdenes seguro) es el 
 
 SSH permite **copiar datos de forma segura** (tanto archivos sueltos como simular **sesiones FTP cifradas**), **gestionar claves RSA** para no escribir contraseñas al conectar a los dispositivos y pasar los datos de cualquier otra aplicación por un canal seguro tunelizado mediante SSH y también puede redirigir el tráfico del (Sistema de Ventanas X) para poder ejecutar programas gráficos remotamente. **El puerto TCP asignado es el 22**.
 
-SSH también funciona sobre un modelo cliente-servidor. El servidor es el programa que está escuchando peticiones en el puerto asignado mientras que el cliente es el programa que hace uso de esos servicios conectándose de forma remota a la máquina en cuestión.
+SSH también funciona sobre un **modelo cliente-servidor**. El servidor es el programa que está escuchando peticiones en el puerto asignado mientras que el cliente es el programa que hace uso de esos servicios conectándose de forma remota a la máquina en cuestión.
 
 ### Instalación
 
@@ -241,14 +241,14 @@ La configuración del servidor SSH se encuentra en el fichero (privilegiado) `/e
 
 Algunos de los [parámetros más relevantes](https://man7.org/linux/man-pages/man5/sshd_config.5.html):
 
-| Parámetro              | Explicación                           | Valor por defecto |
-| ---------------------- | ------------------------------------- | ----------------- |
-| Port                   | Puerto de escucha                     | 22                |
-| PermitRootLogin        | Permitir login de root\*              | prohibit-password |
-| PubkeyAuthentication   | Permitir validación con clave pública | yes               |
-| PasswordAuthentication | Permitir validación con contraseña    | yes               |
-| X11Forwarding          | Permitir abrir aplicaciones gráficas  | yes               |
-| Banner                 | Ruta a un fichero de banner           | none              |
+| Parámetro              | Explicación                          | Valor por defecto |
+| ---------------------- | ------------------------------------ | ----------------- |
+| Port                   | Puerto de escucha                    | 22                |
+| PermitRootLogin        | Permite login de root\*              | prohibit-password |
+| PubkeyAuthentication   | Permite validación con clave pública | yes               |
+| PasswordAuthentication | Permite validación con contraseña    | yes               |
+| X11Forwarding          | Permite abrir aplicaciones gráficas  | yes               |
+| Banner                 | Ruta a un fichero de banner          | none              |
 
 \*Opciones para `PermitRootLogin`:
 
@@ -260,25 +260,37 @@ Algunos de los [parámetros más relevantes](https://man7.org/linux/man-pages/ma
 
 #### `ssh`
 
-Permite conectar a una máquina con servidor SSH.
+Permite conectar a una máquina con servidor SSH o bien lanzar un comando remotamente:
 
 Ejemplos:
 
 ```console
 $ ssh sdelquin@dpl.arkania.es  # conexión como sdelquin
 $ ssh dpl.arkania.es           # conexión con usuario logeado
+
+$ ssh dpl.arkania.es df -h            # lanzar comando
+
+$ # lanzar múltiples comandos ↓
+$ ssh dpl.arkania.es "
+  date
+  free -m
+  ip a
+"
 ```
 
 #### `scp`
 
-Permite copiar desde/hacia una máquina con servidor SSH.
+Permite copiar desde/hacia una máquina con servidor SSH:
 
 Ejemplos:
 
 ```console
-$ scp image.jpg sdelquin@dpl.arkania.es       # destino $HOME (remoto)
-$ scp image.jpg dpl.arkania.es                # usa usuario logeado
+$ # UPLOAD
+$ scp image.jpg sdelquin@dpl.arkania.es:      # destino $HOME (remoto)
+$ scp image.jpg dpl.arkania.es:               # usa usuario logeado
 $ scp image.jpg dpl.arkania.es:~/images       # destino $HOME/images (remoto)
+
+$ # DOWNLOAD
 $ scp dpl.arkania.es:~/images/image.jpg .     # destino carpeta actual (local)
 $ scp dpl.arkania.es:~/images/image.jpg /tmp  # destino /tmp (local)
 $ scp -r dpl.arkania.es:~/images .            # copia de carpeta completa
@@ -353,7 +365,7 @@ The key's randomart image is:
 +----[SHA256]-----+
 ```
 
-→ RSA es un tipo de algoritmo para generar claves, pero existen [otros algoritmos de generación de claves](https://goteleport.com/blog/comparing-ssh-keys/).
+> 💡 RSA es un tipo de algoritmo para generar claves, pero existen [otros algoritmos de generación de claves](https://goteleport.com/blog/comparing-ssh-keys/).
 
 Con el comando anterior se habrá creado una carpeta `$HOME/.ssh` con las claves:
 
@@ -366,7 +378,7 @@ total 8
 
 #### `ssh-copy-id`
 
-Permite copiar la clave pública (generada con `ssh-keygen`) a la máquina con servidor SSH con el objetivo de poder "logearnos" sin necesidad de introducir contraseña.
+**Permite copiar la clave pública** (generada con `ssh-keygen`) a la máquina con servidor SSH con el objetivo de poder "logearnos" sin necesidad de introducir contraseña.
 
 ```console
 sdelquin@lemon:~$ ssh-copy-id dpl.arkania.es
@@ -781,6 +793,8 @@ userPassword: pythoniscool
 
 > 💡 Existen [múltiples atributos](https://docs.oracle.com/cd/E19225-01/820-6551/6nhsdeq75/index.html) que podemos establecer en función del `objectClass` que hayamos definido.
 
+> 💡 Las contraseñas [pueden "hashearse"](https://serverfault.com/a/849528) al crear el fichero LDIF.
+
 Ahora ya podemos añadir el usuario:
 
 ```console
@@ -903,10 +917,20 @@ Name: Guido
 Surname: Van Rossum
 ```
 
-#### Cuestiones sobre seguridad
+#### Aspectos adicionales
 
-Aunque no se vayan a cubrir en este documento, es importante tener en cuenta las siguientes cuestiones sobre seguridad en la comunicación con servidores OpenLDAP:
+Aunque no se vayan a cubrir en este documento, es importante tener en cuenta las siguientes cuestiones sobre gestión de OpenLDAP:
 
+Cliente:
+
+- [Acceso seguro](https://ldap3.readthedocs.io/en/latest/ssltls.html)
+- [Carga masiva de objetos](https://ldap3.readthedocs.io/en/latest/add.html)
+
+Servidor:
+
+- [Configuración slapd](https://www.openldap.org/doc/admin24/slapdconf2.html)
 - [Control de acceso](https://www.openldap.org/doc/admin24/access-control.html)
 - [Certificados TLS](https://www.openldap.org/doc/admin24/tls.html)
-- [Acceso seguro desde herramientas cliente](<[https://](https://ldap3.readthedocs.io/en/latest/ssltls.html)>)
+- [Formas de enlace](https://ldap.com/the-ldap-bind-operation/)
+
+> 💡 Todo esto y mucho más está documentado en la [Guía de administración de OpenLDAP](https://www.openldap.org/doc/admin24/guide.html).
