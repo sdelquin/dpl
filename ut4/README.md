@@ -2699,6 +2699,8 @@ lrwxrwxrwx 1 sdelquin sdelquin    3 nov 15 10:14 lib64 -> lib
 -rw-r--r-- 1 sdelquin sdelquin  219 nov 15 10:14 pyvenv.cfg
 ```
 
+La carpeta del entorno virtual `.venv` **no debe estar en el control de versiones**, por lo que se recomienda incluirla en el fichero `.gitignore`.
+
 #### Django
 
 Para **instalar Django** (y sus dependencias) basta con utilizar la herramienta de gestión de paquetes en Python denominada [pip](https://pip.pypa.io/en/stable/) (_Package Installer for Python_):
