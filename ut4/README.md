@@ -3310,6 +3310,7 @@ server {
     server_name travelroad;
 
     location / {
+        include proxy_params;
         proxy_pass http://unix:/tmp/travelroad.sock;  # socket UNIX
     }
 }
