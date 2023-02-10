@@ -3026,7 +3026,7 @@ Si accedemos a http://localhost:8000 podemos observar el resultado esperado:
 
 ![Django funciona desarrollo](./images/django-dev-works.png)
 
-### Despliegue en producción
+### Parametrizando la configuración
 
 Queremos que las credenciales a la base de datos sea un elemento configurable en función del entorno en el que estemos trabajando.
 
@@ -3079,7 +3079,54 @@ DATABASES = {
 ...
 ```
 
-Ahora creamos un fichero `.env` que contendrá las configuraciones concretas para el entorno de producción:
+Comprobamos que todo sigue estando correcto:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ ./manage.py check
+System check identified no issues (0 silenced).
+```
+
+### Especificación de requerimientos
+
+De cara a que el proyecto pueda "reproducirse" en cualquier entorno virtual necesitamos especificar los requerimientos (dependencias) en un fichero `requirements.txt`.
+
+Lo creamos y añadimos los paquetes utilizados:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ vi requirements.txt
+```
+
+> Contenido:
+
+```
+django
+psycopg2
+prettyconf
+```
+
+### Entorno de producción
+
+Cuando nos vayamos al entorno de producción hay que realizar una serie de pasos:
+
+1. Clonar el repositorio git.
+2. Crear el entorno virtual (tal y como se ha visto).
+3. Instalar las dependencias.
+4. Fijar parámetros para el entorno de producción.
+5. Montar el servidor de aplicación.
+6. Configurar el _virtual host_ para Nginx.
+7. Preparar el script de despliegue.
+
+### Instalar las dependencias
+
+Una vez clonado el repositorio y con el entorno virtual creado y activo, ejecutamos el siguiente comando para instalar las dependencias del proyecto:
+
+```console
+(travelroad) sdelquin@lemon:~/travelroad$ pip install -r requirements.txt
+```
+
+### Parámetros para el entorno de producción
+
+Necesitamos un fichero `.env` que contendrá las configuraciones concretas para el entorno de producción:
 
 ```console
 (travelroad) sdelquin@lemon:~/travelroad$ vi .env
@@ -3089,9 +3136,12 @@ Ahora creamos un fichero `.env` que contendrá las configuraciones concretas par
 
 ```ini
 DEBUG=0
-ALLOWED_HOSTS='travelroad'
+# ↓ Dominio en el que se va a desplegar la aplicación
+ALLOWED_HOSTS=travelroad.dpl.arkania.es
 #DB_PASSWORD='supersecret'
 ```
+
+> 💡 Tener en cuenta que el fichero `.env` hay que dejarlo fuera de control de versiones.
 
 ### Servidor de aplicación
 
@@ -3326,7 +3376,7 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 
 ### Aplicación en producción
 
-Ya podemos acceder a http://travelroad obteniendo el resultado esperado:
+Ya podemos acceder a http://travelroad (o el dominio de producción que corresponda) obteniendo el resultado esperado:
 
 ![Django funcionando](./images/django-works.png)
 
@@ -3355,8 +3405,8 @@ ssh arkania "
   cd $(dirname $0)
   git pull
 
-  # source .venv/bin/activate
-  # pip install -r requirements.txt
+  source .venv/bin/activate
+  pip install -r requirements.txt
   # python manage.py migrate
   # python manage.py collectstatic --no-input
 
