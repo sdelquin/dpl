@@ -130,8 +130,8 @@ Una vez conectados a nuestro servidor FTP, existen una serie de comandos básico
 | `cd`    | Cambiar a otra carpeta               |
 | `mkdir` | Crear una nueva carpeta              |
 | `pwd`   | Mostrar la carpeta de trabajo actual |
-| `get`   | Descargar el fichero especificado    |
-| `mget`  | Descargar los ficheros especificados |
+| `get`   | Descargar un único fichero           |
+| `mget`  | Descargar múltiples ficheros         |
 
 ### Comandos locales
 
@@ -141,8 +141,8 @@ Aunque estemos conectados a un servidor FTP, podemos ejecutar una serie de coman
 | ------- | ------------------------------------ |
 | `lcd`   | Cambiar a otra carpeta               |
 | `!pwd`  | Mostrar la carpeta de trabajo actual |
-| `put`   | Subir el fichero especificado        |
-| `mput`  | Subir los ficheros especificados     |
+| `put`   | Subir un único fichero               |
+| `mput`  | Subir múltiples ficheros             |
 
 > 💡 Para salir de la sesión FTP usamos el comando `quit`.
 
@@ -316,6 +316,7 @@ Comandos disponibles **en remoto**:
 | `chown` | Cambiar propietario a fichero              |
 | `df`    | Estadísticas de uso del disco              |
 | `get`   | Descargar un fichero o una carpeta (`-r`)  |
+| `put`   | Subir un fichero o una carpeta (`-r`)      |
 | `ls`    | Listar el contenido de la carpeta actual   |
 | `mkdir` | Crear una nueva carpeta                    |
 | `pwd`   | Mostrar la carpeta de trabajo              |
