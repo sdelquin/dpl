@@ -958,6 +958,8 @@ Damos permisos de ejecución:
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
 
+> 💡 `deploy.sh` es un fichero que se incluye en el control de versiones.
+
 ## Express (Javascript)
 
 ![Express Logo](./images/express-logo.png)
@@ -1163,7 +1165,9 @@ To address all issues, run:
 Run `npm audit` for details.
 ```
 
-> 💡 `npm install` obtiene las dependencias del fichero `package.json` y almacena los paquetes en la carpeta `node_modules`.
+`npm install` obtiene las dependencias del fichero `package.json` y almacena los paquetes en la carpeta `node_modules`.
+
+> 💡 `node_modules` es una carpeta que debe esta fuera de control de versiones.
 
 Ahora podemos **probar la aplicación** lanzando el servidor de desarrollo:
 
@@ -1385,6 +1389,7 @@ sdelquin@lemon:~/travelroad$ vi deploy.sh
 ssh arkania "
   cd $(dirname $0)
   git pull
+  npm install
   pm2 restart travelroad --update-env
 "
 ```
@@ -1394,6 +1399,8 @@ Damos permisos de ejecución:
 ```console
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
+
+> 💡 `deploy.sh` es un fichero que se incluye en el control de versiones.
 
 ## Spring (Java)
 
@@ -1579,7 +1586,7 @@ OS name: "linux", version: "5.10.0-18-arm64", arch: "aarch64", family: "unix"
 
 ### Creación del proyecto
 
-Creamos la **estructura base** del proyecto utilizando _Spring Boot_ con el siguiente comando:
+Creamos la **estructura base** del proyecto utilizando [la herramienta en línea de comandos](https://docs.spring.io/spring-boot/docs/current/reference/html/cli.html) para Spring Boot:
 
 ```console
 sdelquin@lemon:~$ spring init \
@@ -2102,6 +2109,8 @@ Finalizamos dando permisos de ejecución:
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
 
+> 💡 `deploy.sh` es un fichero que se incluye en el control de versiones.
+
 ## Ruby on Rails (Ruby)
 
 ![Logo Ruby on Rails](./images/rubyonrails-logo.png)
@@ -2240,7 +2249,7 @@ $ sudo apt install -y libpq-dev
 Rails nos provee de un subcomando para crear una nueva aplicación (andamiaje). Incluimos el nombre de la aplicación y el tipo de base de datos que vamos a utilizar:
 
 ```console
-sdelquin@lemon:~$ rails new travelroad --database=postgresql
+sdelquin@lemon:~$ rails new travelroad -G --database=postgresql
 ```
 
 La estructura de carpetas y ficheros queda tal que así:
@@ -2266,11 +2275,7 @@ drwxr-xr-x  5 sdelquin sdelquin 4096 feb  3 15:23 tmp
 drwxr-xr-x  3 sdelquin sdelquin 4096 feb  3 15:23 vendor
 ```
 
-Aunque no lo veamos (a priori), sí **se ha creado un "repositorio git"** dentro de esta carpeta. Para que no nos genere conflicto con nuestro propio repositorio, se recomienda borrar esta carpeta:
-
-```console
-sdelquin@lemon:~/travelroad$ rm -r .git
-```
+> 💡 La opción `-G` deshabilita la creación de un repositorio git.
 
 Para que la **conexión a la base de datos** funcione correctamente debemos establecer las credenciales de inicio de sesión en PostgreSQL. Para ello utilizamos uno de los ficheros que provee Ruby on Rails en su andamiaje:
 
@@ -2345,9 +2350,7 @@ sdelquin@lemon:~/travelroad$ vi config/routes.rb
 
 ```ruby
 Rails.application.routes.draw do
-  root "places#index"
-
-  get "/places", to: "places#index"
+  get "/", to: "places#index"
 end
 ```
 
@@ -2657,6 +2660,8 @@ Damos permisos de ejecución:
 ```console
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
+
+> 💡 `deploy.sh` es un fichero que se incluye en el control de versiones.
 
 ## Django (Python)
 
@@ -3409,6 +3414,7 @@ ssh arkania "
 
   source .venv/bin/activate
   pip install -r requirements.txt
+
   # python manage.py migrate
   # python manage.py collectstatic --no-input
 
@@ -3421,3 +3427,5 @@ Damos permisos de ejecución:
 ```console
 sdelquin@lemon:~/travelroad$ chmod +x deploy.sh
 ```
+
+> 💡 `deploy.sh` es un fichero que se incluye en el control de versiones.

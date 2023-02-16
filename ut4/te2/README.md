@@ -11,7 +11,7 @@ Sobre la aplicación **TravelRoad** (vista en clase) se pide desplegar en las si
 | Laravel       | https://laravel.travelroad.aluXXXX.arkania.es |
 | Express       | https://express.travelroad.aluXXXX.arkania.es |
 | Spring        | https://spring.travelroad.aluXXXX.arkania.es  |
-| Ruby on Rails | https://ror.travelroad.aluXXXX.arkania.es     |
+| Ruby on Rails | https://rails.travelroad.aluXXXX.arkania.es   |
 | Django        | https://django.travelroad.aluXXXX.arkania.es  |
 
 ## Personalización de la aplicación
@@ -32,12 +32,12 @@ Se pide **modificar ligeramente la aplicación original TravelRoad** ajustándol
 
 ## Aspectos comunes a todos los despliegues
 
-- Trabajar cada framework en una carpeta con su nombre: `laravel`, `express`, `spring`, `ror` y `django`.
+- Incluir al principio de cada framework en el informe un enlace a la url de la aplicación desplegada.
+- Trabajar cada framework en una carpeta con su nombre: `laravel`, `express`, `spring`, `rails` y `django`.
 - Identificar cada framework en la página de inicio (_"Powered by"_).
 - Ignorar información sensible del control de versiones.
 - Utilizar un script de despliegue ajustado a cada caso.
 - Incluir certificado de seguridad.
-- Incluir al final de cada sección del informe un enlace a la url de la aplicación desplegada.
 
 ## Estructura del informe
 
@@ -46,7 +46,7 @@ Dado que es una actividad extensa, se recomienda hacer un `README.md` con enlace
 - `laravel.md`
 - `express.md`
 - `spring.md`
-- `ror.md`
+- `rails.md`
 - `django.md`
 
 ## Entregable
