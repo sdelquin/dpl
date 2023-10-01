@@ -226,7 +226,7 @@ sdelquin@lemon:~$ curl -fsSL https://nginx.org/keys/nginx_signing.key \
 A continuación añadimos las **fuentes del repositorio oficial** de Nginx para `apt`:
 
 ```console
-sdelquin@lemon:~$ echo 'deb http://nginx.org/packages/debian bullseye nginx' \
+sdelquin@lemon:~$ echo "deb http://nginx.org/packages/debian $(lsb_release -sc) nginx" \
 | sudo tee /etc/apt/sources.list.d/nginx.list > /dev/null
 ```
 
