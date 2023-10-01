@@ -573,21 +573,7 @@ sdelquin@lemon:~$ sudo systemctl reload nginx
 Creamos un fichero PHP que contendrá un sencillo código mostrando la información de la instalación:
 
 ```console
-sdelquin@lemon:~$ cd
-sdelquin@lemon:~$ mkdir dev
-sdelquin@lemon:~$ echo "<?php phpinfo(); ?>" > ~/dev/info.php
-```
-
-Ahora enlazamos este fichero desde la carpeta "root" del servidor web Nginx:
-
-```console
-sdelquin@lemon:~$ sudo ln -s ~/dev/info.php /usr/share/nginx/html/
-
-sdelquin@lemon:~$ ls -l /usr/share/nginx/html/
-total 8
--rw-r--r-- 1 root root 497 may 24 00:59 50x.html
--rw-r--r-- 1 root root 615 may 24 00:59 index.html
-lrwxrwxrwx 1 root root  27 oct 13 16:15 info.php -> /home/sdelquin/dev/info.php
+sdelquin@lemon:~$ echo "<?php phpinfo(); ?>" | sudo tee /usr/share/nginx/html/index.php
 ```
 
 Abrimos un navegador en la ruta especificada y vemos el resultado:
