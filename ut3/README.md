@@ -725,6 +725,7 @@ sdelquin@lemon:/tmp/nginx-1.22.0$ make modules
 Este proceso habrá creado un fichero `.so` dentro de la carpeta `objs`. Lo copiaremos a la carpeta desde la que se cargan los módulos dinámicos de Nginx:
 
 ```console
+sdelquin@lemon:/tmp/nginx-1.22.0$ sudo mkdir -p /etc/nginx/modules
 sdelquin@lemon:/tmp/nginx-1.22.0$ sudo cp objs/ngx_http_fancyindex_module.so /etc/nginx/modules
 ```
 
