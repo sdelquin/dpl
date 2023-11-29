@@ -2863,7 +2863,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'travelroad',
-        'USER': 'travelroad_user'
+        'USER': 'travelroad_user',
         'PASSWORD': 'dpl0000',
         'HOST': 'localhost',
         'PORT': 5432,
