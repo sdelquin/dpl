@@ -3273,7 +3273,7 @@ sdelquin@lemon:~$ sudo systemctl restart supervisor
 Ahora añadimos el usuario al grupo creado:
 
 ```console
-sdelquin@lemon:~$ sudo addgroup sdelquin supervisor
+sdelquin@lemon:~$ sudo usermod -a -G supervisor sdelquin
 Añadiendo al usuario `sdelquin' al grupo `supervisor' ...
 Añadiendo al usuario sdelquin al grupo supervisor
 Hecho.
